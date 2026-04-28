@@ -453,3 +453,35 @@ function togBtn(btn){btn.classList.toggle('on');const thumb=btn.querySelector('.
 
 tiles();totals();applyDark();
 
+// --- Event wiring (replacing inline onclick attributes) ---
+
+// Tab bar
+document.querySelectorAll('.tab[id^="t-"]').forEach(btn => {
+  btn.addEventListener('click', () => goPage(btn.id.slice(2)));
+});
+
+// All back/close buttons (use data-close attribute to target the slide)
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => closeSlide(btn.dataset.close));
+});
+
+// Share modal: close when tapping the backdrop itself
+document.getElementById('share-modal-bg').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeShareModal();
+});
+
+// Expose remaining functions used by inline onclick in dynamically-rendered HTML.
+// These will be progressively replaced with event listeners as each section is
+// migrated to React.
+Object.assign(window, {
+  openPicker, bView, feedTab, setSort,
+  saveBuild, openShareModal, closeShareModal, postBuild,
+  togBuildLike, openBuildDetail, postBuildCmt,
+  openVideo, openNewsItem,
+  openEditProfile, saveProfile, changePass,
+  openYtKey, saveYtKey, openFeeds, addCh, rmCh, resetCh,
+  toggleDark, togBtn,
+  renderAccount, renderLogin, signUp, signIn, signInGoogle, signOut, deleteAccount,
+  loadBuild, delBuild, showNotif, openSlide, closeSlide,
+});
+

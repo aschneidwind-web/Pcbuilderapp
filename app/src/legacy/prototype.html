@@ -358,7 +358,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 
     <div class="slide" id="picker-screen">
       <div class="slide-nav">
-        <button class="back" onclick="closeSlide('picker-screen')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <button class="back" data-close="picker-screen"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
         <span class="slide-title" id="picker-title">Choose</span><div style="width:50px;"></div>
       </div>
       <div class="slide-body" id="picker-body"></div>
@@ -366,14 +366,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 
     <div class="slide" id="article-screen">
       <div class="slide-nav">
-        <button class="back" onclick="closeSlide('article-screen')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <button class="back" data-close="article-screen"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
         <button class="ext-btn" id="art-ext">Open original</button>
       </div>
       <div class="slide-body" id="article-body"></div>
     </div>
 
     <div class="slide" id="slide-editprofile">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-editprofile')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Edit profile</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-editprofile"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Edit profile</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="form-card">
           <div class="form-title">Display name</div>
@@ -393,7 +393,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-changepass">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-changepass')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Change password</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-changepass"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Change password</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="form-card">
           <div class="field"><label>Current password</label><input class="auth-in" id="cp-old" type="password" placeholder="Current password"/></div>
@@ -407,7 +407,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-ytkey">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-ytkey')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">YouTube API key</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-ytkey"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">YouTube API key</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="form-card">
           <div class="form-title">API key</div>
@@ -424,7 +424,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-feeds">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-feeds')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Feed sources</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-feeds"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Feed sources</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="form-card">
           <div class="form-title">YouTube channels</div>
@@ -444,7 +444,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-notifications">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-notifications')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Notifications</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-notifications"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Notifications</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="grp">
           <div class="srow"><div class="srow-left"><div class="sico" style="background:#E6F1FB;color:#185FA5;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Likes on your builds</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
@@ -457,7 +457,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-privacy">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-privacy')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Privacy &amp; data</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-privacy"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Privacy &amp; data</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div class="grp">
           <div class="srow"><div class="srow-left"><div class="sico" style="background:#EAF3DE;color:#3B6D11;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="slabel">Public profile</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
@@ -472,7 +472,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
     </div>
 
     <div class="slide" id="slide-about">
-      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-about')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">About</span><div style="width:50px;"></div></div>
+      <div class="slide-nav"><button class="back" data-close="slide-about"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">About</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div style="text-align:center;padding:24px 0 20px;">
           <div style="width:64px;height:64px;background:#0A84FF;border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div>
@@ -492,7 +492,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
       </div>
     </div>
 
-    <div class="share-modal-bg" id="share-modal-bg" onclick="if(event.target===this)closeShareModal()">
+    <div class="share-modal-bg" id="share-modal-bg">
       <div class="share-modal">
         <div class="share-handle"></div>
         <div class="share-modal-title">Share your build</div>
@@ -506,23 +506,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
   </div>
 
   <div class="tabbar">
-    <button class="tab on" id="t-build" onclick="goPage('build')">
+    <button class="tab on" id="t-build">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
       <span class="tab-lbl">Build</span>
     </button>
-    <button class="tab" id="t-community" onclick="goPage('community')">
+    <button class="tab" id="t-community">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="tab-lbl">Community</span>
     </button>
-    <button class="tab" id="t-compare" onclick="goPage('compare')">
+    <button class="tab" id="t-compare">
       <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       <span class="tab-lbl">Compare</span>
     </button>
-    <button class="tab" id="t-saves" onclick="goPage('saves')">
+    <button class="tab" id="t-saves">
       <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       <span class="tab-lbl">Saved</span>
     </button>
-    <button class="tab" id="t-account" onclick="goPage('account')">
+    <button class="tab" id="t-account">
       <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
       <span class="tab-lbl">Account</span>
     </button>
