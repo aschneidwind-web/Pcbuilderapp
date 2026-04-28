@@ -1,0 +1,534 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
+
+.app-root{max-width:390px;margin:0 auto;height:620px;display:flex;flex-direction:column;position:relative;overflow:hidden;}
+
+.app-root.dark{--bg1:#1C1C1E;--bg2:#000;--t1:#fff;--t2:#AEAEB2;--t3:#6C6C70;--bd:rgba(255,255,255,0.1);--bd2:rgba(255,255,255,0.18);--bg-info:#0C2A4A;--bg-success:#0A2E18;--bg-danger:#3A0F0C;--t-info:#5AC8FA;--t-success:#30D158;--t-danger:#FF453A;}
+.app-root:not(.dark){
+  --bg1:#fff;
+  --bg2:#F2F2F7;
+  --t1:#1C1C1E;
+  /* Improve light-mode legibility */
+  --t2:#3A3A3C;
+  --t3:#6C6C70;
+  --bd:rgba(60,60,67,0.16);
+  --bd2:rgba(60,60,67,0.28);
+  --bg-info:#E8F3FF;
+  --bg-success:#E8F8ED;
+  --bg-danger:#FFECEB;
+  --t-info:#185FA5;
+  --t-success:#1A7F3C;
+  --t-danger:#C0392B;
+}
+
+.pages{flex:1;overflow:hidden;position:relative;background:var(--bg2);}
+.page{display:none;position:absolute;top:0;left:0;width:100%;height:100%;overflow-y:auto;padding-bottom:16px;background:var(--bg2);}
+.page.active{display:block;}
+.tabbar{flex-shrink:0;background:var(--bg1);border-top:0.5px solid var(--bd);display:flex;padding:6px 0 4px;z-index:10;}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 0;border:none;background:none;}
+.tab svg{width:21px;height:21px;stroke:var(--t3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.tab.on svg{stroke:#0A84FF;}
+.tab-lbl{font-size:10px;font-weight:500;color:var(--t3);}
+.tab.on .tab-lbl{color:#0A84FF;}
+
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;background:var(--bg2);z-index:20;transform:translateX(100%);transition:transform 0.28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+.slide.open{transform:translateX(0);}
+.slide-nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 12px;border-bottom:0.5px solid var(--bd);flex-shrink:0;background:var(--bg2);}
+.slide-body{flex:1;overflow-y:auto;padding:14px 16px 32px;}
+.back{display:flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:#0A84FF;font-size:14px;font-weight:500;}
+.back svg{width:17px;height:17px;stroke:#0A84FF;fill:none;stroke-width:2;stroke-linecap:round;}
+.slide-title{font-size:16px;font-weight:500;color:var(--t1);}
+.ext-btn{font-size:12px;color:#0A84FF;background:none;border:none;cursor:pointer;font-weight:500;}
+
+.navbar{padding:16px 20px 8px;}
+.nav-title{font-size:26px;font-weight:500;color:var(--t1);letter-spacing:-0.3px;}
+.nav-sub{font-size:13px;color:var(--t2);margin-top:2px;}
+.seg-wrap{padding:0 16px 12px;}
+.seg{display:flex;background:rgba(116,116,128,0.12);border-radius:9px;padding:2px;}
+.seg-btn{flex:1;padding:7px 4px;font-size:13px;font-weight:500;border:none;background:none;cursor:pointer;border-radius:7px;color:var(--t2);}
+.seg-btn.on{background:var(--bg1);color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:0 16px 12px;}
+.tile{background:var(--bg1);border-radius:14px;padding:13px;cursor:pointer;border:0.5px solid var(--bd);position:relative;transition:opacity 0.1s;}
+.tile:active{opacity:0.7;}.tile.on{border:2px solid #0A84FF;}
+.ti{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:9px;}
+.ti svg{width:18px;height:18px;}
+.tl{font-size:12px;font-weight:500;color:var(--t1);margin-bottom:2px;}
+.ts{font-size:11px;color:var(--t3);min-height:28px;line-height:1.4;}
+.tp{font-size:13px;font-weight:500;color:var(--t1);margin-top:5px;}
+.chk{position:absolute;top:9px;right:9px;width:17px;height:17px;background:var(--bg-info);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.chk svg{width:9px;height:9px;stroke:var(--t-info);}
+.card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px 16px;margin:0 16px 10px;}
+.total-amt{font-size:28px;font-weight:500;color:var(--t1);letter-spacing:-0.5px;}
+.pill{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;}
+.pill-ok{background:var(--bg-success);color:var(--t-success);}
+.pill-err{background:var(--bg-danger);color:var(--t-danger);}
+.save-row{display:flex;gap:8px;align-items:center;margin:0 16px 12px;}
+.save-in{flex:1;font-size:14px;padding:10px 12px;border-radius:10px;border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);outline:none;}
+.save-in::placeholder{color:var(--t3);}
+.save-btn{background:#0A84FF;color:#fff;border:none;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;}
+.share-btn{background:var(--bg-success);color:var(--t-success);border:none;padding:10px 14px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:5px;}
+.share-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.sp{padding:0 16px;}
+.sum-row{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:0.5px solid var(--bd);cursor:pointer;}
+.sum-row:last-of-type{border-bottom:none;}
+.sum-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sum-icon svg{width:16px;height:16px;}
+.sec-hdr{font-size:12px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:0.4px;padding:14px 0 8px;}
+.bench-hero{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:16px;margin-bottom:10px;}
+.tier-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.tier-name{font-size:22px;font-weight:500;letter-spacing:-0.3px;}
+.tier-sub{font-size:12px;color:var(--t2);margin-top:2px;}
+.ring-wrap{position:relative;width:68px;height:68px;flex-shrink:0;}
+.ring-pct{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:500;color:var(--t1);}
+.tier-desc{font-size:13px;color:var(--t2);line-height:1.6;}
+.cat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:10px;}
+.cat-card{background:var(--bg1);border-radius:12px;border:0.5px solid var(--bd);padding:11px 12px;}
+.cat-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.cat-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.cat-ico svg{width:14px;height:14px;}
+.cat-badge{font-size:10px;font-weight:500;padding:2px 6px;border-radius:9px;}
+.cat-name{font-size:11px;font-weight:500;color:var(--t1);margin-bottom:5px;}
+.btr{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:3px;}
+.bfill{height:100%;border-radius:3px;}
+.cat-pct{font-size:10px;color:var(--t3);}
+.bk-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px 16px;margin-bottom:10px;}
+.bk-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:10px;}
+.bk-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.bk-lbl{font-size:12px;color:var(--t2);width:72px;flex-shrink:0;}
+.bk-bw{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.bk-b{height:100%;border-radius:3px;}
+.bk-val{font-size:11px;color:var(--t2);width:44px;text-align:right;flex-shrink:0;}
+.up-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px 16px;margin-bottom:10px;}
+.up-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:8px;}
+.up-row{display:flex;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--bd);}
+.up-row:last-child{border-bottom:none;padding-bottom:0;}
+.up-dot{width:6px;height:6px;border-radius:50%;background:#FF9500;margin-top:5px;flex-shrink:0;}
+.up-txt{font-size:12px;color:var(--t2);line-height:1.5;}
+.empty-state{text-align:center;padding:40px 24px;color:var(--t3);font-size:13px;line-height:1.8;}
+.empty-title{font-size:15px;font-weight:500;color:var(--t1);margin-bottom:6px;}
+.feed-pad{padding:0 16px;}
+.vid-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);margin-bottom:10px;overflow:hidden;cursor:pointer;transition:opacity 0.1s;}
+.vid-card:active{opacity:0.75;}
+.thumb{position:relative;background:var(--bg2);height:0;padding-bottom:56.25%;}
+.thumb img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;}
+.thumb-ph{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#0A0A14;}
+.thumb-ph svg{width:32px;height:32px;stroke:#ffffff30;fill:none;stroke-width:1.5;}
+.play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.play svg{width:18px;height:18px;fill:#fff;margin-left:3px;}
+.dur{position:absolute;bottom:7px;right:7px;background:rgba(0,0,0,0.8);color:#fff;font-size:10px;font-weight:500;padding:2px 5px;border-radius:4px;}
+.vid-info{padding:10px 12px 12px;}
+.ch-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.ch-ico{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;flex-shrink:0;}
+.ch-name{font-size:11px;color:var(--t2);}
+.vid-title{font-size:13px;font-weight:500;color:var(--t1);line-height:1.4;margin-bottom:5px;}
+.vid-meta{font-size:11px;color:var(--t3);}
+.vid-foot{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.lk-btn{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer;padding:4px 6px;border-radius:8px;border:none;background:none;}
+.lk-btn.liked{color:var(--t-danger);}
+.lk-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.lk-btn.liked svg{fill:var(--t-danger);}
+.news-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:13px 14px;margin-bottom:10px;cursor:pointer;transition:opacity 0.1s;}
+.news-card:active{opacity:0.75;}
+.nsrc-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.ndot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.nsrc{font-size:11px;font-weight:500;color:var(--t2);}
+.ntime{font-size:11px;color:var(--t3);margin-left:auto;}
+.ntitle{font-size:14px;font-weight:500;color:var(--t1);line-height:1.4;margin-bottom:4px;}
+.ndesc{font-size:12px;color:var(--t2);line-height:1.5;}
+.nfoot{display:flex;justify-content:space-between;align-items:center;margin-top:9px;}
+.tag-pill{font-size:10px;font-weight:500;padding:2px 7px;border-radius:9px;}
+.ld-wrap{text-align:center;padding:32px 0;color:var(--t3);font-size:13px;}
+.ld{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--t3);margin:0 2px;animation:pulse 1.2s ease-in-out infinite;}
+.ld:nth-child(2){animation-delay:0.2s;}.ld:nth-child(3){animation-delay:0.4s;}
+@keyframes pulse{0%,80%,100%{opacity:0.3}40%{opacity:1}}
+.err-wrap{background:var(--bg1);border-radius:12px;border:0.5px solid var(--bd);padding:14px;margin-bottom:10px;text-align:center;}
+.err-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:4px;}
+.err-desc{font-size:12px;color:var(--t2);line-height:1.5;}
+.build-share-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px;margin-bottom:10px;cursor:pointer;}
+.build-share-card:active{opacity:0.8;}
+.bs-hdr{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.bs-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;}
+.bs-user{font-size:13px;font-weight:500;color:var(--t1);}
+.bs-time{font-size:11px;color:var(--t3);}
+.bs-title{font-size:15px;font-weight:500;color:var(--t1);margin-bottom:4px;}
+.bs-caption{font-size:13px;color:var(--t2);margin-bottom:10px;line-height:1.5;}
+.bs-tier-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.bs-tier-badge{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;}
+.bs-price{font-size:13px;font-weight:500;color:var(--t1);}
+.bs-comps{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.bs-comp-pill{font-size:11px;padding:2px 8px;border-radius:9px;background:var(--bg2);color:var(--t2);}
+.bs-footer{display:flex;align-items:center;gap:12px;padding-top:10px;border-top:0.5px solid var(--bd);}
+.bs-action{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t2);cursor:pointer;background:none;border:none;padding:0;}
+.bs-action svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.bs-action.liked{color:var(--t-danger);}
+.bs-action.liked svg{fill:var(--t-danger);}
+.art-pad{padding:0 16px;}
+.art-title{font-size:18px;font-weight:500;color:var(--t1);line-height:1.35;margin-bottom:6px;}
+.art-meta{font-size:12px;color:var(--t3);margin-bottom:14px;}
+.art-desc{font-size:14px;color:var(--t2);line-height:1.7;margin-bottom:18px;}
+.like-bar{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:0.5px solid var(--bd);border-bottom:0.5px solid var(--bd);margin-bottom:18px;}
+.lk-big{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;padding:8px 16px;border-radius:10px;border:0.5px solid var(--bd2);background:none;cursor:pointer;color:var(--t2);}
+.lk-big svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.lk-big.liked{color:var(--t-danger);}
+.lk-big.liked svg{fill:var(--t-danger);}
+.lk-count{font-size:13px;color:var(--t3);}
+.cmts-hdr{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:12px;}
+.cmt-box{display:flex;gap:9px;margin-bottom:14px;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;}
+.cmt-iw{flex:1;}
+.cmt-in{width:100%;font-size:13px;padding:8px 11px;border-radius:10px;border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);outline:none;resize:none;font-family:inherit;line-height:1.4;}
+.cmt-in::placeholder{color:var(--t3);}
+.post-btn{margin-top:6px;float:right;background:#0A84FF;color:#fff;border:none;padding:6px 13px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;}
+.cmt-item{display:flex;gap:9px;margin-bottom:12px;}
+.cn{font-size:12px;font-weight:500;color:var(--t1);}
+.ct{font-size:11px;color:var(--t3);margin-left:5px;}
+.ctxt{font-size:13px;color:var(--t2);line-height:1.5;margin-top:2px;}
+.yt-wrap{position:relative;background:#000;height:0;padding-bottom:56.25%;margin-bottom:16px;}
+.yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.opt-row{background:var(--bg1);padding:12px 14px;border-bottom:0.5px solid var(--bd);cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.opt-row:first-child{border-radius:13px 13px 0 0;}.opt-row:last-child{border-radius:0 0 13px 13px;border-bottom:none;}
+.opt-row:active{opacity:0.7;}.opt-row.on{background:var(--bg-info);}
+.opt-name{font-size:14px;font-weight:500;color:var(--t1);}
+.opt-spec{font-size:11px;color:var(--t2);margin-top:2px;}
+.opt-r{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
+.opt-price{font-size:14px;font-weight:500;color:var(--t1);}
+.opt-pts{font-size:10px;color:var(--t3);}
+.bv{font-size:10px;font-weight:500;background:var(--bg-success);color:var(--t-success);padding:2px 6px;border-radius:9px;margin-left:5px;}
+.opt-chk{color:#0A84FF;font-size:17px;margin-left:4px;flex-shrink:0;}
+.cmp-wrap{padding:0 16px;}
+.cmp-select-wrap{position:relative;margin-bottom:14px;}
+.cmp-select{width:100%;padding:12px 40px 12px 14px;font-size:14px;font-weight:500;color:var(--t1);background:var(--bg1);border:0.5px solid var(--bd2);border-radius:12px;appearance:none;-webkit-appearance:none;cursor:pointer;outline:none;}
+.cmp-chev{position:absolute;right:12px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.cmp-chev svg{width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;stroke-linecap:round;}
+.sort-row{display:flex;gap:8px;margin-bottom:14px;}
+.sort-btn{flex:1;padding:7px 4px;font-size:12px;font-weight:500;border:0.5px solid var(--bd2);border-radius:9px;background:none;cursor:pointer;color:var(--t2);}
+.sort-btn.on{background:var(--bg-info);color:var(--t-info);border-color:#0A84FF;}
+.cmp-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px;margin-bottom:10px;}
+.cmp-card.winner{border:2px solid #34C759;}
+.w-badge{display:inline-block;font-size:10px;font-weight:500;background:var(--bg-success);color:var(--t-success);padding:2px 8px;border-radius:20px;margin-bottom:8px;}
+.cmp-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:8px;}
+.cmp-name{font-size:14px;font-weight:500;color:var(--t1);}
+.cmp-spec{font-size:11px;color:var(--t2);margin-top:2px;}
+.cmp-price{font-size:16px;font-weight:500;color:var(--t1);white-space:nowrap;}
+.br2{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.br2-lbl{font-size:11px;color:var(--t2);width:80px;flex-shrink:0;}
+.br2-track{flex:1;height:5px;background:var(--bg2);border-radius:3px;overflow:hidden;}
+.br2-fill{height:100%;border-radius:3px;}
+.br2-pct{font-size:11px;color:var(--t2);width:40px;text-align:right;flex-shrink:0;}
+.stats-row{display:flex;margin-top:12px;padding-top:10px;border-top:0.5px solid var(--bd);}
+.stat{flex:1;text-align:center;}
+.stat+.stat{border-left:0.5px solid var(--bd);}
+.stat-v{font-size:14px;font-weight:500;color:var(--t1);}
+.stat-l{font-size:10px;color:var(--t2);margin-top:1px;}
+.saves-pad{padding:0 16px;}
+.sv-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:13px 15px;margin-bottom:10px;}
+.sv-name{font-size:14px;font-weight:500;color:var(--t1);margin-bottom:3px;}
+.sv-meta{font-size:12px;color:var(--t2);}
+.sv-parts{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5;}
+.sv-acts{display:flex;gap:8px;margin-top:10px;}
+.sv-btn{flex:1;padding:8px;border-radius:9px;border:none;font-size:12px;font-weight:500;cursor:pointer;}
+.sv-load{background:var(--bg-info);color:var(--t-info);}
+.sv-del{background:var(--bg-danger);color:var(--t-danger);}
+.grp{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);margin-bottom:12px;overflow:hidden;}
+.srow{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:0.5px solid var(--bd);cursor:pointer;transition:background 0.1s;}
+.srow:last-child{border-bottom:none;}
+.srow:active{background:var(--bg2);}
+.srow-left{display:flex;align-items:center;gap:10px;}
+.sico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sico svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.slabel{font-size:14px;color:var(--t1);}
+.svalue{font-size:13px;color:var(--t3);}
+.sarrow{font-size:18px;color:var(--t3);}
+.danger-label{font-size:14px;color:var(--t-danger);}
+.toggle{width:44px;height:26px;background:var(--bd2);border-radius:13px;position:relative;cursor:pointer;transition:background 0.2s;border:none;flex-shrink:0;}
+.toggle.on{background:#34C759;}
+.tog-thumb{width:22px;height:22px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left 0.2s;}
+.toggle.on .tog-thumb{left:20px;}
+.profile-hero{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:20px 16px;margin-bottom:12px;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.profile-av{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;}
+.profile-name{font-size:17px;font-weight:500;color:var(--t1);}
+.profile-email{font-size:13px;color:var(--t2);}
+.profile-stats{display:flex;width:100%;margin-top:4px;}
+.pstat{flex:1;text-align:center;}
+.pstat+.pstat{border-left:0.5px solid var(--bd);}
+.pstat-v{font-size:16px;font-weight:500;color:var(--t1);}
+.pstat-l{font-size:11px;color:var(--t3);margin-top:2px;}
+.auth-wrap{padding:0 16px 32px;}
+.auth-logo{width:56px;height:56px;background:#0A84FF;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;}
+.auth-logo svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;}
+.auth-title{font-size:22px;font-weight:500;color:var(--t1);text-align:center;margin-bottom:6px;}
+.auth-sub{font-size:14px;color:var(--t2);text-align:center;margin-bottom:24px;line-height:1.5;}
+.field{margin-bottom:14px;}
+.field label{font-size:13px;font-weight:500;color:var(--t2);margin-bottom:6px;display:block;}
+.auth-in{width:100%;font-size:15px;padding:12px 14px;border-radius:12px;border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);outline:none;}
+.auth-in:focus{border-color:#0A84FF;}
+.auth-in::placeholder{color:var(--t3);}
+.auth-btn{width:100%;padding:14px;border-radius:12px;border:none;background:#0A84FF;color:#fff;font-size:15px;font-weight:500;cursor:pointer;margin-top:6px;margin-bottom:14px;}
+.divider{display:flex;align-items:center;gap:12px;margin:0 0 14px;}
+.div-line{flex:1;height:0.5px;background:var(--bd);}
+.div-txt{font-size:12px;color:var(--t3);}
+.social-btn{width:100%;padding:12px;border-radius:12px;border:0.5px solid var(--bd2);background:var(--bg1);color:var(--t1);font-size:14px;font-weight:500;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px;}
+.auth-switch{text-align:center;font-size:13px;color:var(--t2);margin-top:6px;}
+.auth-switch span{color:#0A84FF;cursor:pointer;font-weight:500;}
+.err-msg{font-size:12px;color:var(--t-danger);margin-top:-8px;margin-bottom:10px;text-align:center;display:none;}
+.success-msg{font-size:13px;color:var(--t-success);text-align:center;margin-top:8px;display:none;}
+.form-card{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:16px;margin-bottom:12px;}
+.form-title{font-size:13px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:10px;}
+.form-btn{width:100%;padding:12px;border-radius:10px;border:none;background:#0A84FF;color:#fff;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px;}
+.form-btn.sec{background:var(--bg2);color:var(--t2);border:0.5px solid var(--bd2);}
+.ch-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg2);border:0.5px solid var(--bd2);border-radius:20px;font-size:12px;color:var(--t2);margin:3px;}
+.chip-x{background:none;border:none;cursor:pointer;color:var(--t3);font-size:14px;line-height:1;padding:0 0 0 2px;}
+.api-note{font-size:11px;color:var(--t3);line-height:1.6;margin-top:8px;}
+.share-modal-bg{display:none;position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:50;align-items:flex-end;justify-content:center;}
+.share-modal-bg.open{display:flex;}
+.share-modal{background:var(--bg1);border-radius:20px 20px 0 0;width:100%;padding:0 0 20px;}
+.share-handle{width:36px;height:4px;background:var(--bd2);border-radius:2px;margin:10px auto 14px;}
+.share-modal-title{font-size:16px;font-weight:500;color:var(--t1);text-align:center;margin-bottom:16px;}
+.share-body{padding:0 16px;}
+.share-cap-in{width:100%;font-size:14px;padding:10px 12px;border-radius:10px;border:0.5px solid var(--bd2);background:var(--bg2);color:var(--t1);outline:none;resize:none;font-family:inherit;line-height:1.5;margin-bottom:12px;}
+.share-cap-in::placeholder{color:var(--t3);}
+.share-preview{background:var(--bg2);border-radius:12px;padding:12px;margin-bottom:14px;}
+.share-post-btn{width:100%;padding:13px;border-radius:12px;border:none;background:#0A84FF;color:#fff;font-size:15px;font-weight:500;cursor:pointer;}
+.notif{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg1);font-size:13px;font-weight:500;padding:8px 16px;border-radius:20px;z-index:100;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;}
+.notif.show{opacity:1;}
+</style>
+
+<div class="app-root" id="app">
+  <div class="pages" id="pages">
+
+    <div class="page active" id="pg-build">
+      <div class="navbar"><div class="nav-title">My build</div><div class="nav-sub" id="build-sub">0 of 7 selected</div></div>
+      <div class="seg-wrap"><div class="seg">
+        <button class="seg-btn on" onclick="bView('grid',this)">Components</button>
+        <button class="seg-btn" onclick="bView('summary',this)">Summary</button>
+      </div></div>
+      <div id="v-grid">
+        <div class="grid" id="tile-grid"></div>
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:11px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px;">Total estimate</div>
+            <div class="total-amt" id="total-amt">$0</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="cpill" style="display:none;" class="pill"></div>
+            <div style="font-size:11px;color:var(--t3);margin-top:5px;">estimated prices</div>
+          </div>
+        </div>
+        <div class="save-row">
+          <input class="save-in" id="bname" placeholder="Name this build…"/>
+          <button class="save-btn" id="sbtn" onclick="saveBuild()">Save</button>
+          <button class="share-btn" onclick="openShareModal()"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>
+        </div>
+      </div>
+      <div id="v-summary" style="display:none;"></div>
+    </div>
+
+    <div class="page" id="pg-community">
+      <div class="navbar"><div class="nav-title">Community</div><div class="nav-sub">Builds, videos &amp; news</div></div>
+      <div class="seg-wrap"><div class="seg">
+        <button class="seg-btn on" onclick="feedTab('builds',this)">Builds</button>
+        <button class="seg-btn" onclick="feedTab('videos',this)">Videos</button>
+        <button class="seg-btn" onclick="feedTab('news',this)">News</button>
+      </div></div>
+      <div class="feed-pad" id="feed-content"></div>
+    </div>
+
+    <div class="page" id="pg-compare">
+      <div class="navbar"><div class="nav-title">Compare</div><div class="nav-sub" id="cmp-sub">Price vs performance</div></div>
+      <div class="cmp-wrap">
+        <div class="cmp-select-wrap"><select class="cmp-select" id="cmp-select" onchange="cmpCat=this.value;renderCompare()"></select><div class="cmp-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div></div>
+        <div class="sort-row">
+          <button class="sort-btn on" id="sort-value" onclick="setSort('value')">Best value</button>
+          <button class="sort-btn" id="sort-perf" onclick="setSort('perf')">Performance</button>
+          <button class="sort-btn" id="sort-price" onclick="setSort('price')">Price</button>
+        </div>
+        <div id="cmp-content"></div>
+      </div>
+    </div>
+
+    <div class="page" id="pg-saves">
+      <div class="navbar"><div class="nav-title">Saved</div><div class="nav-sub" id="saves-count">0 builds</div></div>
+      <div class="saves-pad" id="saves-content"></div>
+    </div>
+
+    <div class="page" id="pg-account">
+      <div id="account-main"></div>
+    </div>
+
+    <div class="slide" id="picker-screen">
+      <div class="slide-nav">
+        <button class="back" onclick="closeSlide('picker-screen')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <span class="slide-title" id="picker-title">Choose</span><div style="width:50px;"></div>
+      </div>
+      <div class="slide-body" id="picker-body"></div>
+    </div>
+
+    <div class="slide" id="article-screen">
+      <div class="slide-nav">
+        <button class="back" onclick="closeSlide('article-screen')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button>
+        <button class="ext-btn" id="art-ext">Open original</button>
+      </div>
+      <div class="slide-body" id="article-body"></div>
+    </div>
+
+    <div class="slide" id="slide-editprofile">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-editprofile')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Edit profile</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="form-card">
+          <div class="form-title">Display name</div>
+          <div class="field"><input class="auth-in" id="ep-name" placeholder="Your name" type="text"/></div>
+          <div class="form-title">Email</div>
+          <div class="field"><input class="auth-in" id="ep-email" placeholder="you@example.com" type="email"/></div>
+          <div class="form-title">Bio</div>
+          <div class="field"><textarea class="auth-in" id="ep-bio" rows="3" placeholder="Tell the community about yourself…" style="resize:none;line-height:1.5;"></textarea></div>
+          <button class="form-btn" onclick="saveProfile()">Save changes</button>
+          <div id="ep-success" class="success-msg">Saved!</div>
+        </div>
+        <div class="form-card">
+          <div class="form-title">Avatar colour</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;" id="avatar-colours"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-changepass">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-changepass')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Change password</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="form-card">
+          <div class="field"><label>Current password</label><input class="auth-in" id="cp-old" type="password" placeholder="Current password"/></div>
+          <div class="field"><label>New password</label><input class="auth-in" id="cp-new" type="password" placeholder="Min. 6 characters"/></div>
+          <div class="field"><label>Confirm new password</label><input class="auth-in" id="cp-conf" type="password" placeholder="Repeat new password"/></div>
+          <button class="form-btn" onclick="changePass()">Update password</button>
+          <div id="cp-err" class="err-msg"></div>
+          <div id="cp-ok" class="success-msg">Password updated!</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-ytkey">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-ytkey')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">YouTube API key</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="form-card">
+          <div class="form-title">API key</div>
+          <div class="field"><input class="auth-in" id="yt-key-in" type="text" placeholder="AIza…"/></div>
+          <button class="form-btn" onclick="saveYtKey()">Save key</button>
+          <div id="yt-ok" class="success-msg">Key saved!</div>
+          <div class="api-note">Get a free key at console.cloud.google.com → Enable YouTube Data API v3 → Credentials → API key. Free tier: 10,000 requests/day.</div>
+        </div>
+        <div class="form-card">
+          <div class="form-title">Connection status</div>
+          <div id="yt-status" style="font-size:13px;color:var(--t2);line-height:1.6;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-feeds">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-feeds')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Feed sources</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="form-card">
+          <div class="form-title">YouTube channels</div>
+          <div id="ch-chips" style="margin-bottom:12px;"></div>
+          <div class="field"><label>Channel ID</label><input class="auth-in" id="ch-id" placeholder="UCXuqSBlHAE6Xw-yeJA0Tunw"/></div>
+          <div class="field"><label>Display name</label><input class="auth-in" id="ch-nm" placeholder="Linus Tech Tips"/></div>
+          <div style="display:flex;gap:8px;">
+            <button class="form-btn" onclick="addCh()" style="flex:1;">Add</button>
+            <button class="form-btn sec" onclick="resetCh()" style="flex:1;">Reset defaults</button>
+          </div>
+        </div>
+        <div class="form-card">
+          <div class="form-title">News feeds</div>
+          <div id="rss-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-notifications">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-notifications')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Notifications</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="grp">
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#E6F1FB;color:#185FA5;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Likes on your builds</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#EAF3DE;color:#3B6D11;"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="slabel">Comments on your builds</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="slabel">Price drop alerts</span></div><button class="toggle" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#FCEBEB;color:#A32D2D;"><svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><span class="slabel">New channel videos</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#EEEDFE;color:#534AB7;"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="12" y2="15"/></svg></div><span class="slabel">Weekly news digest</span></div><button class="toggle" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-privacy">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-privacy')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">Privacy &amp; data</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div class="grp">
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#EAF3DE;color:#3B6D11;"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><span class="slabel">Public profile</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#E6F1FB;color:#185FA5;"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></div><span class="slabel">Builds visible to community</span></div><button class="toggle on" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+          <div class="srow"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="slabel">Analytics &amp; usage data</span></div><button class="toggle" onclick="togBtn(this)"><div class="tog-thumb"></div></button></div>
+        </div>
+        <div class="grp">
+          <div class="srow" onclick="showNotif('Data export requested')"><div class="srow-left"><div class="sico" style="background:#E1F5EE;color:#0F6E56;"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div><span class="slabel">Export my data</span></div><span class="sarrow">›</span></div>
+          <div class="srow" onclick="deleteAccount()"><div class="srow-left"><div class="sico" style="background:#FFECEB;color:#C0392B;"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></div><span class="danger-label">Delete account</span></div><span class="sarrow" style="color:var(--t-danger);">›</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide" id="slide-about">
+      <div class="slide-nav"><button class="back" onclick="closeSlide('slide-about')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">About</span><div style="width:50px;"></div></div>
+      <div class="slide-body">
+        <div style="text-align:center;padding:24px 0 20px;">
+          <div style="width:64px;height:64px;background:#0A84FF;border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div>
+          <div style="font-size:20px;font-weight:500;color:var(--t1);">PC Builder</div>
+          <div style="font-size:13px;color:var(--t3);margin-top:4px;">Version 1.0.0 (beta)</div>
+        </div>
+        <div class="grp">
+          <div class="srow" onclick="showNotif('Opening privacy policy…')"><div class="srow-left"><span class="slabel">Privacy policy</span></div><span class="sarrow">›</span></div>
+          <div class="srow" onclick="showNotif('Opening terms…')"><div class="srow-left"><span class="slabel">Terms of service</span></div><span class="sarrow">›</span></div>
+          <div class="srow" onclick="showNotif('Opening licenses…')"><div class="srow-left"><span class="slabel">Open source licenses</span></div><span class="sarrow">›</span></div>
+        </div>
+        <div class="grp">
+          <div class="srow" onclick="showNotif('Thanks for the feedback!')"><div class="srow-left"><span class="slabel">Send feedback</span></div><span class="sarrow">›</span></div>
+          <div class="srow" onclick="showNotif('Opening App Store…')"><div class="srow-left"><span class="slabel">Rate the app</span></div><span class="sarrow">›</span></div>
+        </div>
+        <div style="text-align:center;padding:16px 0;font-size:12px;color:var(--t3);">Built for PC enthusiasts everywhere.</div>
+      </div>
+    </div>
+
+    <div class="share-modal-bg" id="share-modal-bg" onclick="if(event.target===this)closeShareModal()">
+      <div class="share-modal">
+        <div class="share-handle"></div>
+        <div class="share-modal-title">Share your build</div>
+        <div class="share-body">
+          <textarea class="share-cap-in" id="share-caption" rows="3" placeholder="Say something about your build… (optional)"></textarea>
+          <div class="share-preview" id="share-preview"></div>
+          <button class="share-post-btn" onclick="postBuild()">Post to community</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab on" id="t-build" onclick="goPage('build')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>
+      <span class="tab-lbl">Build</span>
+    </button>
+    <button class="tab" id="t-community" onclick="goPage('community')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="tab-lbl">Community</span>
+    </button>
+    <button class="tab" id="t-compare" onclick="goPage('compare')">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="tab-lbl">Compare</span>
+    </button>
+    <button class="tab" id="t-saves" onclick="goPage('saves')">
+      <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+      <span class="tab-lbl">Saved</span>
+    </button>
+    <button class="tab" id="t-account" onclick="goPage('account')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span class="tab-lbl">Account</span>
+    </button>
+  </div>
+
+  <div class="notif" id="notif"></div>
+</div>
+
+<script type="module" src="/src/legacy/prototype.js"></script>
