@@ -486,3 +486,19 @@ Object.assign(window, {
   loadBuild, delBuild, showNotif, openSlide, closeSlide,
 });
 
+
+// ═══ REDESIGNED TILES — overrides old function via hoisting ══════════════════
+function tiles(){
+  const g=document.getElementById('tile-grid');
+  if(!g)return;
+  g.innerHTML='';
+  const chev='<svg class="tile-chev" width="7" height="12" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  Object.entries(C).forEach(([k,comp])=>{
+    const v=sel[k];
+    const d=document.createElement('div');
+    d.className='tile'+(v?' on':'');
+    d.onclick=()=>openPicker(k);
+    d.innerHTML=`<div class="ti" style="background:${comp.ib};color:${comp.ic};">${comp.icon}</div><div class="tile-body"><span class="tl">${comp.label}</span><span class="ts">${v?v.n:'Choose a component'}</span></div><div class="tile-end">${v?`<span class="tp">$${v.p.toLocaleString()}</span>`:''}<span>${chev}</span></div>`;
+    g.appendChild(d);
+  });
+}
