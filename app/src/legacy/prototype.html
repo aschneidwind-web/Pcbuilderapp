@@ -1,4 +1,4 @@
-﻿<style>
+<style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 
@@ -293,50 +293,66 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
 .notif{position:absolute;top:16px;left:50%;transform:translateX(-50%);background:var(--t1);color:var(--bg1);font-size:13px;font-weight:500;padding:8px 16px;border-radius:20px;z-index:100;opacity:0;transition:opacity 0.2s;pointer-events:none;white-space:nowrap;}
 .notif.show{opacity:1;}
 
-/* ═══ BUILD PAGE REDESIGN ═══════════════════════════════════════════════════ */
-.grid{display:flex;flex-direction:column;padding:0 16px 12px;gap:0;}
-#tile-grid{background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);overflow:hidden;margin-bottom:10px;}
-.tile{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:0!important;border:none!important;border-bottom:0.5px solid var(--bd)!important;background:transparent!important;cursor:pointer;position:relative;transition:background 0.12s;}
-.tile:last-child{border-bottom:none!important;}
-.tile:active{background:rgba(120,120,128,0.1)!important;}
-.tile.on{background:rgba(10,132,255,0.06)!important;}
-.tile.on .tl{color:var(--accent)!important;}
-.ti{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:0!important;}
-.ti svg{width:18px;height:18px;}
-.tile-body{flex:1;min-width:0;}
-.tl{display:block;font-size:14px;font-weight:500;color:var(--t1);margin-bottom:2px;}
-.ts{display:block;font-size:12px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:0!important;}
-.tile-end{display:flex;align-items:center;gap:8px;flex-shrink:0;}
-.tp{font-size:13px;font-weight:500;color:var(--t1);margin-top:0!important;}
-.tile-chev{display:block;stroke:var(--t3);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
-.chk{display:none!important;}
+/* ── Build tab redesign ── */
+.build-hdr{padding:14px 16px 12px;background:var(--bg1);border-bottom:0.5px solid var(--bd);}
+.build-hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.build-price-area{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.build-prog-row{display:flex;align-items:center;gap:10px;}
+.build-prog-track{flex:1;height:3px;background:var(--bg2);border-radius:2px;overflow:hidden;}
+.build-prog-fill{height:100%;background:#0A84FF;border-radius:2px;transition:width 0.3s ease;width:0%;}
+.build-prog-lbl{font-size:12px;font-weight:500;color:var(--t3);white-space:nowrap;}
+.hdr-action-btn{display:flex;align-items:center;gap:5px;background:none;border:0.5px solid var(--bd2);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;}
+.hdr-action-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;}
+.comp-list-wrap{margin:12px 16px 0;background:var(--bg1);border-radius:16px;border:0.5px solid var(--bd);overflow:hidden;}
+.comp-row{display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:0.5px solid var(--bd);cursor:pointer;transition:background 0.1s;}
+.comp-row:last-child{border-bottom:none;}
+.comp-row:active{background:var(--bg2);}
+.comp-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.comp-icon svg{width:20px;height:20px;}
+.comp-info{flex:1;min-width:0;}
+.comp-cat{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.comp-name{font-size:14px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.comp-name.empty{color:var(--t3);font-weight:400;font-size:13px;}
+.comp-spec{font-size:11px;color:var(--t3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.comp-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.comp-price{font-size:14px;font-weight:500;color:var(--t1);}
+.comp-chev svg{width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;stroke-linecap:round;}
+.comp-add{width:20px;height:20px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.comp-add svg{width:12px;height:12px;stroke:var(--t3);fill:none;stroke-width:2.5;stroke-linecap:round;}
+.comp-done{width:20px;height:20px;border-radius:50%;background:#0A84FF;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.comp-done svg{width:11px;height:11px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;}
+.build-save-card{margin:12px 16px;background:var(--bg1);border-radius:14px;border:0.5px solid var(--bd);padding:14px;display:flex;gap:8px;align-items:center;}
+.build-save-card .save-in{flex:1;}
+.build-save-card .save-btn{white-space:nowrap;}
 </style>
 
 <div class="app-root" id="app">
   <div class="pages" id="pages">
 
     <div class="page active" id="pg-build">
-      <div class="navbar"><div class="nav-title">My build</div><div class="nav-sub" id="build-sub">0 of 7 selected</div></div>
+      <div class="build-hdr">
+        <div class="build-hdr-top">
+          <div class="nav-title">Build</div>
+          <button class="hdr-action-btn" onclick="openShareModal()"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>
+        </div>
+        <div class="build-price-area">
+          <div class="total-amt" id="total-amt">$0</div>
+          <div id="cpill" style="display:none;" class="pill"></div>
+        </div>
+        <div class="build-prog-row">
+          <div class="build-prog-track"><div class="build-prog-fill" id="prog-fill"></div></div>
+          <span class="build-prog-lbl" id="build-sub">0 / 7</span>
+        </div>
+      </div>
       <div class="seg-wrap"><div class="seg">
         <button class="seg-btn on" onclick="bView('grid',this)">Components</button>
         <button class="seg-btn" onclick="bView('summary',this)">Summary</button>
       </div></div>
       <div id="v-grid">
-        <div class="grid" id="tile-grid"></div>
-        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
-          <div>
-            <div style="font-size:11px;font-weight:500;color:var(--t2);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:4px;">Total estimate</div>
-            <div class="total-amt" id="total-amt">$0</div>
-          </div>
-          <div style="text-align:right;">
-            <div id="cpill" style="display:none;" class="pill"></div>
-            <div style="font-size:11px;color:var(--t3);margin-top:5px;">estimated prices</div>
-          </div>
-        </div>
-        <div class="save-row">
+        <div class="comp-list-wrap"><div id="tile-grid"></div></div>
+        <div class="build-save-card">
           <input class="save-in" id="bname" placeholder="Name this build…"/>
           <button class="save-btn" id="sbtn" onclick="saveBuild()">Save</button>
-          <button class="share-btn" onclick="openShareModal()"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Share</button>
         </div>
       </div>
       <div id="v-summary" style="display:none;"></div>

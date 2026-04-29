@@ -1,4 +1,4 @@
-﻿/* eslint-disable */
+/* eslint-disable */
 // Legacy prototype logic (as-is). We'll incrementally refactor this into React.
 
 const C={
@@ -23,7 +23,7 @@ const CATS=[{id:"g1080",label:"1080p gaming",ib:'#E6F1FB',ic:'#185FA5',bar:'#0A8
 function bStyle(sc,th){if(sc>=th[2])return{bg:'#EAF3DE',c:'#3B6D11'};if(sc>=th[1])return{bg:'#E6F1FB',c:'#185FA5'};if(sc>=th[0])return{bg:'#FAEEDA',c:'#854F0B'};return{bg:'#F1EFE8',c:'#5F5E5A'};}
 
 const YT_DEF=[{id:'UCXuqSBlHAE6Xw-yeJA0Tunw',name:'Linus Tech Tips'},{id:'UCTzLRZUgelatKZ4nyIKcAbg',name:'Hardware Unboxed'},{id:'UC0vBXGSyV14uvJ4hECDOl0Q',name:'Techquickie'},{id:'UCNUYwNznn-ZuFaHKBnBfXOQ',name:'JayzTwoCents'}];
-const RSS_SRC=[{name:"Tom's Hardware",color:'#0A84FF',rss:'https://www.tomshardware.com/feeds/all'},{name:'PC Gamer',color:'#34C759',rss:'https://www.pcgamer.com/rss/'},{name:'The Verge',color:'#FF3B30',rss:'https://www.theverge.com/tech/rss/index.xml'},{name:'Ars Technica',color:'#FF9500',rss:'https://feeds.arstechnica.com/arstechnica/technology-lab'}];
+const RSS_SRC=[{name:"Tom's Hardware",color:'#0A84FF',rss:'https://www.tomshardware.com/feeds/all'},{name:'AnandTech',color:'#34C759',rss:'https://www.anandtech.com/rss/'},{name:'The Verge',color:'#FF3B30',rss:'https://www.theverge.com/tech/rss/index.xml'},{name:'Ars Technica',color:'#FF9500',rss:'https://feeds.arstechnica.com/arstechnica/technology-lab'}];
 const COLS=['#0A84FF','#34C759','#FF9500','#BF5AF2','#FF3B30','#1D9E75','#FF6B35','#007AFF'];
 const NAMES=['Alex K.','Jordan M.','Sam T.','Riley P.','Casey W.','Morgan L.'];
 const SAMPLE_BUILDS=[{id:'sb1',user:'Alex K.',avatar:0,time:'2h ago',buildName:'Budget 1080p Beast',caption:'First build! Under $900.',total:849,tier:{name:'Capable',color:'#FF9500'},components:[{n:'Core i5-14600K'},{n:'RTX 4060'},{n:'MSI PRO Z790-A WiFi'},{n:'Corsair Vengeance 16GB'}],likes:24},{id:'sb2',user:'Jordan M.',avatar:1,time:'5h ago',buildName:'1440p Workstation',caption:'Great for gaming and video editing.',total:1489,tier:{name:'Enthusiast',color:'#34C759'},components:[{n:'Ryzen 7 7800X3D'},{n:'RTX 4070 Super'},{n:'G.Skill Trident Z5 32GB'},{n:'WD Black SN850X 2TB'}],likes:61},{id:'sb3',user:'Sam T.',avatar:2,time:'1d ago',buildName:'The Silent Beast',caption:'Noise levels were the priority.',total:1240,tier:{name:'Mid-range',color:'#0A84FF'},components:[{n:'Core i7-14700K'},{n:'RTX 4070 Super'},{n:'Seasonic Focus GX-1000'}],likes:38}];
@@ -85,9 +85,22 @@ function goPage(name){
 
 function tiles(){
   const g=document.getElementById('tile-grid');g.innerHTML='';
+  const addSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  const chkSvg='<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg>';
+  const chevSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="9 18 15 12 9 6"/></svg>';
   Object.entries(C).forEach(([k,comp])=>{
-    const v=sel[k];const d=document.createElement('div');d.className='tile'+(v?' on':'');d.onclick=()=>openPicker(k);
-    d.innerHTML=`<div class="ti" style="background:${comp.ib};color:${comp.ic};">${comp.icon}</div><div class="tl">${comp.label}</div><div class="ts">${v?v.n:'Tap to select'}</div>${v?`<div class="tp">$${v.p}</div><div class="chk"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="2,6 5,9 10,3"/></svg></div>`:''}`;
+    const v=sel[k];const d=document.createElement('div');d.className='comp-row';d.onclick=()=>openPicker(k);
+    d.innerHTML=`
+      <div class="comp-icon" style="background:${comp.ib};color:${comp.ic};">${comp.icon}</div>
+      <div class="comp-info">
+        <div class="comp-cat">${comp.label}</div>
+        ${v?`<div class="comp-name">${v.n}</div><div class="comp-spec">${v.s}</div>`:`<div class="comp-name empty">Choose ${comp.label}</div>`}
+      </div>
+      <div class="comp-right">
+        ${v?`<span class="comp-price">$${v.p}</span>`:''}
+        ${v?`<div class="comp-done">${chkSvg}</div>`:`<div class="comp-add">${addSvg}</div>`}
+        <div class="comp-chev">${chevSvg}</div>
+      </div>`;
     g.appendChild(d);
   });
 }
@@ -95,7 +108,8 @@ function totals(){
   let t=0;Object.values(sel).forEach(v=>{if(v)t+=v.p;});
   document.getElementById('total-amt').textContent='$'+t.toLocaleString();
   const n=Object.values(sel).filter(Boolean).length;
-  document.getElementById('build-sub').textContent=n+' of 7 selected';
+  document.getElementById('build-sub').textContent=n+' / 7';
+  const pf=document.getElementById('prog-fill');if(pf)pf.style.width=Math.round((n/7)*100)+'%';
   const cpu=sel.cpu,mb=sel.motherboard,pill=document.getElementById('cpill');
   if(cpu&&mb){pill.style.display='inline-block';if(cpu.sk&&mb.sk&&cpu.sk!==mb.sk){pill.textContent='Socket mismatch';pill.className='pill pill-err';}else{pill.textContent='Compatible';pill.className='pill pill-ok';}}
   else pill.style.display='none';
@@ -241,11 +255,10 @@ function buildVid(v){
     <div class="vid-foot"><span class="vid-meta">${[v.views,v.age].filter(Boolean).join(' · ')}</span></div></div>`;
   d.onclick=()=>openVideo(v);return d;
 }
-async function fetchRssText(url){const px=["https://corsproxy.io/?","https://api.allorigins.win/raw?url=","https://thingproxy.freeboard.io/fetch/"];for(const p of px){try{const r=await fetch(p+encodeURIComponent(url),{signal:AbortSignal.timeout(6000)});if(r.ok){const t=await r.text();if(t.includes("<item"))return t;}}catch(e){}}return null;}
 async function renderNews(el){
   el.innerHTML=`<div class="ld-wrap" id="news-ld">Fetching news<span class="ld"></span><span class="ld"></span><span class="ld"></span></div>`;
-  let all=[];
-  for(const src of RSS_SRC){try{const text=await fetchRssText(src.rss);if(!text)continue;const xml=new DOMParser().parseFromString(text,'application/xml');Array.from(xml.querySelectorAll('item')).slice(0,2).forEach(item=>{const title=item.querySelector('title')?.textContent||'';const desc=(item.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').slice(0,120);const link=item.querySelector('link')?.textContent||'';const pub=item.querySelector('pubDate')?.textContent||'';if(title)all.push({id:'n'+Math.random().toString(36).slice(2),source:src.name,dot:src.color,time:pub?timeAgo(pub):'Recent',title:title.slice(0,90),desc:desc+'…',url:link,tag:'Tech',tagBg:'#E6F1FB',tagC:'#0C447C',likes:0});});}catch(e){}}
+  const proxy='https://api.allorigins.win/raw?url=';let all=[];
+  for(const src of RSS_SRC.slice(0,2)){try{const r=await fetch(proxy+encodeURIComponent(src.rss));if(!r.ok)continue;const xml=new DOMParser().parseFromString(await r.text(),'application/xml');Array.from(xml.querySelectorAll('item')).slice(0,2).forEach(item=>{const title=item.querySelector('title')?.textContent||'';const desc=(item.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').slice(0,120);const link=item.querySelector('link')?.textContent||'';const pub=item.querySelector('pubDate')?.textContent||'';if(title)all.push({id:'n'+Math.random().toString(36).slice(2),source:src.name,dot:src.color,time:pub?timeAgo(pub):'Recent',title:title.slice(0,90),desc:desc+'…',url:link,tag:'Tech',tagBg:'#E6F1FB',tagC:'#0C447C',likes:0});});}catch(e){}}
   document.getElementById('news-ld')?.remove();
   const fallback=[{id:'fn1',source:"Tom's Hardware",dot:'#0A84FF',time:'2h ago',tag:'GPU',tagBg:'#FCEBEB',tagC:'#791F1F',title:'RTX 5080 benchmarks leak: 35% uplift over 4080 Super',desc:'Early results show significant gains in rendering workloads.',url:'https://www.tomshardware.com',likes:0},{id:'fn2',source:'AnandTech',dot:'#34C759',time:'5h ago',tag:'CPU',tagBg:'#E6F1FB',tagC:'#0C447C',title:'AMD Zen 5 deep dive: what changes under the hood',desc:"A breakdown of AMD's improvements and what they mean for performance.",url:'https://www.anandtech.com',likes:0},{id:'fn3',source:'Ars Technica',dot:'#FF9500',time:'1d ago',tag:'News',tagBg:'#EEEDFE',tagC:'#3C3489',title:'Intel confirms next-gen desktop platform details',desc:'Arrow Lake-S and its new socket are coming sooner than expected.',url:'https://arstechnica.com',likes:0}];
   (all.length?all:fallback).forEach(n=>{const d=document.createElement('div');d.className='news-card';d.innerHTML=`<div class="nsrc-row"><div class="ndot" style="background:${n.dot};"></div><span class="nsrc">${n.source}</span><span class="ntime">${n.time}</span></div><div class="ntitle">${n.title}</div><div class="ndesc">${n.desc}</div><div class="nfoot"><span class="tag-pill" style="background:${n.tagBg};color:${n.tagC};">${n.tag}</span></div>`;d.onclick=()=>openNewsItem(n);el.appendChild(d);});
@@ -486,19 +499,3 @@ Object.assign(window, {
   loadBuild, delBuild, showNotif, openSlide, closeSlide,
 });
 
-
-// ═══ REDESIGNED TILES — overrides old function via hoisting ══════════════════
-function tiles(){
-  const g=document.getElementById('tile-grid');
-  if(!g)return;
-  g.innerHTML='';
-  const chev='<svg class="tile-chev" width="7" height="12" viewBox="0 0 7 12"><path d="M1 1l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  Object.entries(C).forEach(([k,comp])=>{
-    const v=sel[k];
-    const d=document.createElement('div');
-    d.className='tile'+(v?' on':'');
-    d.onclick=()=>openPicker(k);
-    d.innerHTML=`<div class="ti" style="background:${comp.ib};color:${comp.ic};">${comp.icon}</div><div class="tile-body"><span class="tl">${comp.label}</span><span class="ts">${v?v.n:'Choose a component'}</span></div><div class="tile-end">${v?`<span class="tp">$${v.p.toLocaleString()}</span>`:''}<span>${chev}</span></div>`;
-    g.appendChild(d);
-  });
-}
