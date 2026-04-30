@@ -4,6 +4,7 @@ import { useAuth } from './context/AuthContext'
 import { AuthScreen } from './components/AuthScreen'
 import { SavesPage } from './features/saves'
 import { BuildPage, useBuild } from './features/build'
+import { ComparePage } from './features/compare'
 import type { SavedBuild } from './features/saves'
 import legacyHtml from './legacy/prototype.html?raw'
 
@@ -59,8 +60,9 @@ export function App() {
     <div style={shell}>
       <div style={panel}>
         <Routes>
-          <Route path="/build"  element={<BuildPage />} />
-          <Route path="/saves"  element={<SavesPage onLoad={handleLoadBuild} />} />
+          <Route path="/build"   element={<BuildPage />} />
+          <Route path="/saves"   element={<SavesPage onLoad={handleLoadBuild} />} />
+          <Route path="/compare" element={<ComparePage />} />
           <Route
             path="*"
             element={
