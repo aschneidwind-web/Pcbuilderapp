@@ -10,15 +10,21 @@
 
 ## Project Structure
 
-app/src/legacy/prototype.html  <- MAIN APP — HTML structure + CSS
-app/src/legacy/prototype.js    <- MAIN APP LOGIC — edit this for features
-app/src/App.tsx                <- Phase machine: splash > auth > app
-app/src/components/AuthScreen.tsx
-app/src/components/SplashScreen.tsx
+### React Features (Migrated)
+app/src/features/build/       ✅ Build tab: component picker, build summary, quick score
+app/src/features/saves/       ✅ Saved builds tab: list, load, delete builds
+app/src/features/compare/     ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
+app/src/features/account/     ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
+
+### Core App
+app/src/App.tsx               <- Routes: /build, /saves, /compare, /account + auth gate
 app/src/context/AuthContext.tsx
 app/src/lib/supabase.ts
 app/.env.local                 <- VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
-index.html                     <- Standalone deployable version
+
+### Legacy (Dead — do NOT edit)
+app/src/legacy/prototype.html  <- Community tab still here; will migrate next
+app/src/legacy/prototype.js    <- Community tab still here; will migrate next
 
 ## Dev Server
 
@@ -33,10 +39,9 @@ Stable branch: main
 Commit alias: git save "message"
 Always push to dev. Merge to main only when feature is complete.
 
-## Features
+## Architecture
 
-All app features (Build, Community, Compare, Saved, Account) are in prototype.html and prototype.js.
-The React wrapper only handles splash screen and Supabase auth.
+Build, Compare, Saves, and Account are fully migrated to React feature slices with Supabase backing. Community is next. Legacy prototype is read-only archive.
 
 ## General Coding Rules
 - **Modularization:** Follow the Single Responsibility Principle (SRP). Keep functions and classes small.
