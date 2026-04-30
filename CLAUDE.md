@@ -15,6 +15,7 @@ app/src/features/build/       ✅ Build tab: component picker, build summary, qu
 app/src/features/saves/       ✅ Saved builds tab: list, load, delete builds
 app/src/features/compare/     ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
 app/src/features/account/     ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
+app/src/features/community/   ✅ Community tab: builds feed, filters, post build, likes, comments, clone
 
 ### Core App
 app/src/App.tsx               <- Routes: /build, /saves, /compare, /account + auth gate
@@ -22,9 +23,8 @@ app/src/context/AuthContext.tsx
 app/src/lib/supabase.ts
 app/.env.local                 <- VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
 
-### Legacy (Dead — do NOT edit)
-app/src/legacy/prototype.html  <- Community tab still here; will migrate next
-app/src/legacy/prototype.js    <- Community tab still here; will migrate next
+### Legacy (Dead — do NOT edit, do NOT reference)
+app/src/legacy/
 
 ## Dev Server
 
@@ -41,7 +41,7 @@ Always push to dev. Merge to main only when feature is complete.
 
 ## Architecture
 
-Build, Compare, Saves, and Account are fully migrated to React feature slices with Supabase backing. Community is next. Legacy prototype is read-only archive.
+All five tabs (Build, Compare, Saves, Account, Community) are fully migrated to React feature slices with Supabase backing. Legacy prototype is dead—do not edit or reference it.
 
 ## General Coding Rules
 - **Modularization:** Follow the Single Responsibility Principle (SRP). Keep functions and classes small.
