@@ -5,6 +5,7 @@ import { AuthScreen } from './components/AuthScreen'
 import { SavesPage } from './features/saves'
 import { BuildPage, useBuild } from './features/build'
 import { ComparePage } from './features/compare'
+import { AccountPage } from './features/account'
 import type { SavedBuild } from './features/saves'
 import legacyHtml from './legacy/prototype.html?raw'
 
@@ -63,6 +64,7 @@ export function App() {
           <Route path="/build"   element={<BuildPage />} />
           <Route path="/saves"   element={<SavesPage onLoad={handleLoadBuild} />} />
           <Route path="/compare" element={<ComparePage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route
             path="*"
             element={
