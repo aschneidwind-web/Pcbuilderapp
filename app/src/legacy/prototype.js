@@ -23,13 +23,12 @@ const CATS=[{id:"g1080",label:"1080p gaming",ib:'#E6F1FB',ic:'#185FA5',bar:'#0A8
 function bStyle(sc,th){if(sc>=th[2])return{bg:'#EAF3DE',c:'#3B6D11'};if(sc>=th[1])return{bg:'#E6F1FB',c:'#185FA5'};if(sc>=th[0])return{bg:'#FAEEDA',c:'#854F0B'};return{bg:'#F1EFE8',c:'#5F5E5A'};}
 
 const YT_DEF=[{id:'UCXuqSBlHAE6Xw-yeJA0Tunw',name:'Linus Tech Tips'},{id:'UCTzLRZUgelatKZ4nyIKcAbg',name:'Hardware Unboxed'},{id:'UC0vBXGSyV14uvJ4hECDOl0Q',name:'Techquickie'},{id:'UCNUYwNznn-ZuFaHKBnBfXOQ',name:'JayzTwoCents'}];
-const RSS_SRC=[{name:"Tom's Hardware",color:'#0A84FF',rss:'https://www.tomshardware.com/feeds/all'},{name:'AnandTech',color:'#34C759',rss:'https://www.anandtech.com/rss/'},{name:'The Verge',color:'#FF3B30',rss:'https://www.theverge.com/tech/rss/index.xml'},{name:'Ars Technica',color:'#FF9500',rss:'https://feeds.arstechnica.com/arstechnica/technology-lab'}];
 const COLS=['#0A84FF','#34C759','#FF9500','#BF5AF2','#FF3B30','#1D9E75','#FF6B35','#007AFF'];
 const NAMES=['Alex K.','Jordan M.','Sam T.','Riley P.','Casey W.','Morgan L.'];
 const SAMPLE_BUILDS=[{id:'sb1',user:'Alex K.',avatar:0,time:'2h ago',buildName:'Budget 1080p Beast',caption:'First build! Under $900.',total:849,tier:{name:'Capable',color:'#FF9500'},components:[{n:'Core i5-14600K'},{n:'RTX 4060'},{n:'MSI PRO Z790-A WiFi'},{n:'Corsair Vengeance 16GB'}],likes:24},{id:'sb2',user:'Jordan M.',avatar:1,time:'5h ago',buildName:'1440p Workstation',caption:'Great for gaming and video editing.',total:1489,tier:{name:'Enthusiast',color:'#34C759'},components:[{n:'Ryzen 7 7800X3D'},{n:'RTX 4070 Super'},{n:'G.Skill Trident Z5 32GB'},{n:'WD Black SN850X 2TB'}],likes:61},{id:'sb3',user:'Sam T.',avatar:2,time:'1d ago',buildName:'The Silent Beast',caption:'Noise levels were the priority.',total:1240,tier:{name:'Mid-range',color:'#0A84FF'},components:[{n:'Core i7-14700K'},{n:'RTX 4070 Super'},{n:'Seasonic Focus GX-1000'}],likes:38}];
 
 let sel={cpu:null,gpu:null,motherboard:null,ram:null,storage:null,psu:null,case:null};
-let saves=[];let cmpCat='cpu';let sortMode='value';let curFeedTab='builds';let savedBuildName='';
+let saves=[];let cmpCat='cpu';let sortMode='value';let communityFilter='all';let savedBuildName='';
 let ytKey='';let channels=[...YT_DEF];let alikes={};let acmts={};
 let sharedBuilds=[...SAMPLE_BUILDS];let user=null;let darkMode=false;let notifTimer=null;
 
@@ -77,7 +76,7 @@ function goPage(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   document.getElementById('pg-'+name).classList.add('active');
   document.getElementById('t-'+name).classList.add('on');
-  if(name==='community')renderFeed();
+  if(name==='community')renderCommunity();
   if(name==='compare'){buildDropdown();renderCompare();}
   if(name==='saves')renderSaves();
   if(name==='account')renderAccount();
@@ -208,19 +207,30 @@ function postBuild(){
   sharedBuilds.unshift(nb);
   try{const my=JSON.parse(localStorage.getItem('pcb11_sb')||'[]');my.unshift(nb);localStorage.setItem('pcb11_sb',JSON.stringify(my));}catch(e){}
   closeShareModal();showNotif('Build shared!');
-  if(document.getElementById('pg-community').classList.contains('active'))renderFeed();
+  if(document.getElementById('pg-community').classList.contains('active'))renderCommunity();
 }
 
-function feedTab(tab,btn){curFeedTab=tab;document.querySelectorAll('#pg-community .seg-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');renderFeed();}
-function renderFeed(){
-  const el=document.getElementById('feed-content');
-  if(curFeedTab==='builds')renderBuilds(el);
-  else if(curFeedTab==='videos')renderVideos(el);
-  else renderNews(el);
+function renderCommunity(){
+  renderCommunityFilters();
+  renderBuilds(document.getElementById('feed-content'));
+}
+function renderCommunityFilters(){
+  const el=document.getElementById('community-filters');if(!el)return;
+  const tiers=['all',...TIERS.map(t=>t.name)];
+  el.innerHTML=tiers.map(t=>`<button class="filter-chip${communityFilter===t?' on':''}" onclick="setCommunityFilter('${t}')">${t==='all'?'All':t}</button>`).join('');
+}
+function setCommunityFilter(f){communityFilter=f;renderCommunityFilters();renderBuilds(document.getElementById('feed-content'));}
+function cloneBuild(id){
+  const b=sharedBuilds.find(x=>x.id===id);if(!b)return;
+  const fresh={cpu:null,gpu:null,motherboard:null,ram:null,storage:null,psu:null,case:null};
+  b.components.forEach(c=>{Object.entries(C).forEach(([slot,cat])=>{const match=cat.opts.find(o=>o.n===c.n);if(match&&!fresh[slot])fresh[slot]=match;});});
+  Object.assign(sel,fresh);goPage('build');tiles();totals();showNotif('Build loaded — make it yours!');
 }
 function renderBuilds(el){
   el.innerHTML='';
-  sharedBuilds.forEach(b=>{
+  const list=communityFilter==='all'?sharedBuilds:sharedBuilds.filter(b=>b.tier&&b.tier.name===communityFilter);
+  if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No builds here yet</div>Be the first to share one.</div>';return;}
+  list.forEach(b=>{
     const liked=alikes['b_'+b.id+'_l']||false;const lc=(alikes['b_'+b.id]||0)+b.likes;
     const cmts=(acmts['b_'+b.id]||[]).length;const col=COLS[b.avatar%COLS.length];
     const comps=b.components.slice(0,4).map(c=>`<span class="bs-comp-pill">${c.n.split(' ').slice(0,2).join(' ')}</span>`).join('');
@@ -232,6 +242,7 @@ function renderBuilds(el){
       <div class="bs-footer">
         <button class="bs-action${liked?' liked':''}" onclick="event.stopPropagation();togBuildLike('${b.id}',this,${b.likes})"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span id="bslc-${b.id}">${lc}</span></button>
         <button class="bs-action" onclick="event.stopPropagation();openBuildDetail('${b.id}')"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${cmts}</button>
+        <button class="clone-btn" onclick="event.stopPropagation();cloneBuild('${b.id}')"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>Clone</button>
       </div>`;
     d.onclick=()=>openBuildDetail(b.id);el.appendChild(d);
   });
@@ -256,42 +267,6 @@ function openBuildDetail(id){
 }
 function postBuildCmt(bid){const inp=document.getElementById('bci-'+bid);const text=inp.value.trim();if(!text)return;const ni=Math.floor(Math.random()*NAMES.length);const cmt={id:'c'+Date.now(),name:user?user.name:NAMES[ni],avatar:user?user.avatarIdx:ni,time:'Just now',text,likes:0};if(!acmts['b_'+bid])acmts['b_'+bid]=[];acmts['b_'+bid].push(cmt);persist();inp.value='';const list=document.getElementById('bcl-'+bid);const col=COLS[cmt.avatar%COLS.length];const d=document.createElement('div');d.className='cmt-item';d.innerHTML=`<div class="av" style="background:${col}20;color:${col};font-size:10px;">${cmt.name.split(' ').map(w=>w[0]).join('')}</div><div style="flex:1;min-width:0;"><span class="cn">${cmt.name}</span><span class="ct">Just now</span><div class="ctxt">${text}</div></div></div>`;if(list.querySelector('[style*=\"No comments\"]'))list.innerHTML='';list.appendChild(d);}
 
-async function renderVideos(el){
-  el.innerHTML=`<div class="ld-wrap" id="yt-ld">Loading videos<span class="ld"></span><span class="ld"></span><span class="ld"></span></div>`;
-  const samples=[{id:'s1',videoId:'BL4DCEp7blY',title:'How to build a PC — complete step-by-step guide',channel:'Linus Tech Tips',channelColor:'#FF9500',channelInitials:'LT',thumb:'',age:'3 days ago',views:'1.2M views',duration:'24:18',likes:0},{id:'s2',videoId:'J5SWxWhlFbA',title:'Best $700 gaming PC build 2024',channel:'Hardware Unboxed',channelColor:'#34C759',channelInitials:'HU',thumb:'',age:'1 week ago',views:'840K views',duration:'19:05',likes:0}];
-  if(!ytKey){document.getElementById('yt-ld')?.remove();el.insertAdjacentHTML('beforeend',`<div class="err-wrap"><div class="err-title">Add your YouTube API key</div><div class="err-desc">Go to Account → YouTube API key to add a free key and load real videos.</div></div>`);samples.forEach(v=>el.appendChild(buildVid(v)));return;}
-  try{
-    let all=[];
-    for(const ch of channels.slice(0,2)){const r=await fetch(`https://www.googleapis.com/youtube/v3/search?key=${ytKey}&channelId=${ch.id}&part=snippet&order=date&maxResults=2&type=video&q=PC+build`);if(!r.ok)throw new Error('HTTP '+r.status);const d=await r.json();(d.items||[]).forEach(item=>{all.push({id:item.id.videoId,videoId:item.id.videoId,title:item.snippet.title,channel:ch.name,channelColor:COLS[channels.indexOf(ch)%COLS.length],channelInitials:ch.name.split(' ').map(w=>w[0]).slice(0,2).join(''),thumb:item.snippet.thumbnails.medium?.url||'',age:timeAgo(item.snippet.publishedAt),views:'',duration:'',likes:0});});}
-    document.getElementById('yt-ld')?.remove();if(!all.length){samples.forEach(v=>el.appendChild(buildVid(v)));return;}all.forEach(v=>el.appendChild(buildVid(v)));
-  }catch(e){document.getElementById('yt-ld')?.remove();el.insertAdjacentHTML('beforeend',`<div class="err-wrap"><div class="err-title">Could not load videos</div><div class="err-desc">${e.message.includes('403')?'API key invalid or quota exceeded.':'Check your API key in Account settings.'}</div></div>`);samples.forEach(v=>el.appendChild(buildVid(v)));}
-}
-function buildVid(v){
-  const d=document.createElement('div');d.className='vid-card';
-  d.innerHTML=`<div class="thumb"><div class="thumb-ph"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>${v.thumb?`<img src="${v.thumb}" loading="lazy" alt=""/>`:''}  <div class="play"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>${v.duration?`<div class="dur">${v.duration}</div>`:''}</div>
-    <div class="vid-info"><div class="ch-row"><div class="ch-ico" style="background:${v.channelColor}20;color:${v.channelColor};">${v.channelInitials}</div><span class="ch-name">${v.channel}</span></div><div class="vid-title">${v.title}</div>
-    <div class="vid-foot"><span class="vid-meta">${[v.views,v.age].filter(Boolean).join(' · ')}</span></div></div>`;
-  d.onclick=()=>openVideo(v);return d;
-}
-async function renderNews(el){
-  el.innerHTML=`<div class="ld-wrap" id="news-ld">Fetching news<span class="ld"></span><span class="ld"></span><span class="ld"></span></div>`;
-  const proxy='https://api.allorigins.win/raw?url=';let all=[];
-  for(const src of RSS_SRC.slice(0,2)){try{const r=await fetch(proxy+encodeURIComponent(src.rss));if(!r.ok)continue;const xml=new DOMParser().parseFromString(await r.text(),'application/xml');Array.from(xml.querySelectorAll('item')).slice(0,2).forEach(item=>{const title=item.querySelector('title')?.textContent||'';const desc=(item.querySelector('description')?.textContent||'').replace(/<[^>]+>/g,'').slice(0,120);const link=item.querySelector('link')?.textContent||'';const pub=item.querySelector('pubDate')?.textContent||'';if(title)all.push({id:'n'+Math.random().toString(36).slice(2),source:src.name,dot:src.color,time:pub?timeAgo(pub):'Recent',title:title.slice(0,90),desc:desc+'…',url:link,tag:'Tech',tagBg:'#E6F1FB',tagC:'#0C447C',likes:0});});}catch(e){}}
-  document.getElementById('news-ld')?.remove();
-  const fallback=[{id:'fn1',source:"Tom's Hardware",dot:'#0A84FF',time:'2h ago',tag:'GPU',tagBg:'#FCEBEB',tagC:'#791F1F',title:'RTX 5080 benchmarks leak: 35% uplift over 4080 Super',desc:'Early results show significant gains in rendering workloads.',url:'https://www.tomshardware.com',likes:0},{id:'fn2',source:'AnandTech',dot:'#34C759',time:'5h ago',tag:'CPU',tagBg:'#E6F1FB',tagC:'#0C447C',title:'AMD Zen 5 deep dive: what changes under the hood',desc:"A breakdown of AMD's improvements and what they mean for performance.",url:'https://www.anandtech.com',likes:0},{id:'fn3',source:'Ars Technica',dot:'#FF9500',time:'1d ago',tag:'News',tagBg:'#EEEDFE',tagC:'#3C3489',title:'Intel confirms next-gen desktop platform details',desc:'Arrow Lake-S and its new socket are coming sooner than expected.',url:'https://arstechnica.com',likes:0}];
-  (all.length?all:fallback).forEach(n=>{const d=document.createElement('div');d.className='news-card';d.innerHTML=`<div class="nsrc-row"><div class="ndot" style="background:${n.dot};"></div><span class="nsrc">${n.source}</span><span class="ntime">${n.time}</span></div><div class="ntitle">${n.title}</div><div class="ndesc">${n.desc}</div><div class="nfoot"><span class="tag-pill" style="background:${n.tagBg};color:${n.tagC};">${n.tag}</span></div>`;d.onclick=()=>openNewsItem(n);el.appendChild(d);});
-}
-function openVideo(v){
-  document.getElementById('art-ext').style.display='';document.getElementById('art-ext').onclick=()=>window.open('https://www.youtube.com/watch?v='+v.videoId,'_blank');
-  document.getElementById('article-body').innerHTML=`<div class="yt-wrap"><iframe src="https://www.youtube.com/embed/${v.videoId}?rel=0" allowfullscreen></iframe></div><div class="art-pad"><div class="ch-row" style="margin-bottom:8px;"><div class="ch-ico" style="background:${v.channelColor}20;color:${v.channelColor};width:24px;height:24px;border-radius:50%;font-size:10px;">${v.channelInitials}</div><span style="font-size:12px;color:var(--t2);">${v.channel}</span></div><div class="art-title">${v.title}</div><div class="art-meta">${[v.views,v.age].filter(Boolean).join(' · ')}</div></div>`;
-  openSlide('article-screen');
-}
-function openNewsItem(n){
-  document.getElementById('art-ext').style.display='';document.getElementById('art-ext').onclick=()=>window.open(n.url,'_blank');
-  document.getElementById('article-body').innerHTML=`<div class="art-pad" style="padding-top:16px;"><div class="nsrc-row" style="margin-bottom:10px;"><div class="ndot" style="background:${n.dot};"></div><span class="nsrc">${n.source}</span><span class="ntime" style="margin-left:auto;">${n.time}</span></div><span style="display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:9px;background:${n.tagBg};color:${n.tagC};margin-bottom:10px;">${n.tag}</span><div class="art-title" style="margin-top:4px;">${n.title}</div><div class="art-desc">${n.desc}</div></div>`;
-  openSlide('article-screen');
-}
-function timeAgo(ds){try{const diff=Math.floor((new Date()-new Date(ds))/1000);if(diff<3600)return Math.floor(diff/60)+'m ago';if(diff<86400)return Math.floor(diff/3600)+'h ago';if(diff<604800)return Math.floor(diff/86400)+'d ago';return Math.floor(diff/604800)+'w ago';}catch(e){return'Recent';}}
 
 function buildDropdown(){const s=document.getElementById('cmp-select');s.innerHTML='';Object.entries(C).forEach(([k,comp])=>{const opt=document.createElement('option');opt.value=k;opt.textContent=comp.label;if(k===cmpCat)opt.selected=true;s.appendChild(opt);});}
 function setSort(mode){sortMode=mode;['value','perf','price'].forEach(m=>document.getElementById('sort-'+m).classList.toggle('on',m===mode));renderCompare();}
@@ -545,10 +520,10 @@ document.getElementById('share-modal-bg').addEventListener('click', e => {
 // These will be progressively replaced with event listeners as each section is
 // migrated to React.
 Object.assign(window, {
-  openPicker, bView, feedTab, setSort,
+  openPicker, bView, setSort,
   saveBuild, openShareModal, closeShareModal, postBuild,
   togBuildLike, openBuildDetail, postBuildCmt,
-  openVideo, openNewsItem,
+  setCommunityFilter, cloneBuild,
   openEditProfile, saveProfile, changePass,
   openYtKey, saveYtKey, openFeeds, addCh, rmCh, resetCh,
   toggleDark, togBtn,
