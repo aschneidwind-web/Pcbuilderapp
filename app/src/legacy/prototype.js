@@ -94,7 +94,7 @@ function tiles(){
       <div class="comp-icon" style="background:${comp.ib};color:${comp.ic};">${comp.icon}</div>
       <div class="comp-info">
         <div class="comp-cat">${comp.label}</div>
-        ${v?`<div class="comp-name">${v.n}</div><div class="comp-spec">${v.s}</div>`:`<div class="comp-name empty">Choose ${comp.label}</div>`}
+        ${v?`<div class="comp-name">${v.n}</div><div class="comp-spec">${v.s}</div>`:''}
       </div>
       <div class="comp-right">
         ${v?`<span class="comp-price">$${v.p}</span>`:''}
@@ -166,7 +166,7 @@ function saveBuild(){
   const name=document.getElementById('bname').value.trim()||'My build '+(saves.length+1);
   const total=Object.values(sel).reduce((s,v)=>s+(v?v.p:0),0);
   saves.unshift({name,date:new Date().toLocaleDateString(),total,components:JSON.parse(JSON.stringify(sel))});
-  persist();document.getElementById('bname').value='';
+  persist();
   const btn=document.getElementById('sbtn');btn.textContent='Saved!';btn.style.background='#34C759';
   setTimeout(()=>{btn.textContent='Save';btn.style.background='';},1500);
   showNotif('Build saved!');
@@ -477,6 +477,12 @@ document.querySelectorAll('.tab[id^="t-"]').forEach(btn => {
 // All back/close buttons (use data-close attribute to target the slide)
 document.querySelectorAll('[data-close]').forEach(btn => {
   btn.addEventListener('click', () => closeSlide(btn.dataset.close));
+});
+
+// Build name → header title sync
+document.getElementById('bname').addEventListener('input', e => {
+  const title = document.getElementById('build-title');
+  if (title) title.textContent = e.target.value.trim() || 'Build';
 });
 
 // Share modal: close when tapping the backdrop itself
