@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { Routes, Route, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { AuthScreen } from './components/AuthScreen'
@@ -24,6 +25,22 @@ export function App() {
   const { session, loading } = useAuth()
   const { loadBuild } = useBuild()
   const navigate = useNavigate()
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const handleIframeLoad = () => {
+    if (!iframeRef.current || !session) return
+    const u = session.user
+    iframeRef.current.contentWindow?.postMessage({
+      type: 'SUPABASE_SESSION',
+      user: {
+        name: u.user_metadata?.full_name || u.email?.split('@')[0] || 'User',
+        email: u.email || '',
+        bio: '',
+        avatarIdx: 0,
+        joined: new Date().toLocaleDateString(),
+      }
+    }, '*')
+  }
 
   if (loading) {
     return <div style={{ height: '100vh', width: '100vw', background: '#0b0b0e' }} />
@@ -48,9 +65,11 @@ export function App() {
             path="*"
             element={
               <iframe
+                ref={iframeRef}
                 title="PC Builder"
                 srcDoc={legacyHtml}
                 style={{ width: '100%', height: '100%', border: 0 }}
+                onLoad={handleIframeLoad}
               />
             }
           />

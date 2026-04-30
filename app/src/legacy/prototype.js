@@ -320,7 +320,39 @@ function delBuild(i){saves.splice(i,1);persist();renderSaves();}
 
 function renderAccount(){
   const el=document.getElementById('account-main');
-  if(!user){renderSignUp(el);return;}
+  const prefHtml=()=>`
+    <div class="sec-hdr">Preferences</div>
+    <div class="grp">
+      <div class="srow"><div class="srow-left"><div class="sico" style="background:#EEEDFE;color:#534AB7;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div><span class="slabel">Dark mode</span></div><button class="toggle${darkMode?' on':''}" id="dark-tog" onclick="toggleDark()"><div class="tog-thumb" style="${darkMode?'left:20px;':''}"></div></button></div>
+      <div class="srow" onclick="openSlide('slide-notifications')"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Notifications</span></div><span class="sarrow">›</span></div>
+      <div class="srow" onclick="openSlide('slide-privacy')"><div class="srow-left"><div class="sico" style="background:#E1F5EE;color:#0F6E56;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="slabel">Privacy &amp; data</span></div><span class="sarrow">›</span></div>
+    </div>
+    <div class="sec-hdr">Support</div>
+    <div class="grp">
+      <div class="srow" onclick="openSlide('slide-about')"><div class="srow-left"><div class="sico" style="background:#F1EFE8;color:#5F5E5A;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="slabel">About</span></div><span class="sarrow">›</span></div>
+      <div class="srow" onclick="showNotif('Thanks for the feedback!')"><div class="srow-left"><div class="sico" style="background:#E6F1FB;color:#185FA5;"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="slabel">Send feedback</span></div><span class="sarrow">›</span></div>
+    </div>`;
+
+  if(!user){
+    el.innerHTML=`
+      <div class="navbar"><div class="nav-title">Account</div></div>
+      <div style="padding:0 16px;">
+        <div class="grp" style="margin-bottom:4px;">
+          <div style="padding:16px 14px;">
+            <div style="font-size:14px;font-weight:500;color:var(--t1);margin-bottom:3px;">Sync your builds</div>
+            <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.5;">Sign in to save builds to the cloud and share with the community.</div>
+            <div style="display:flex;gap:8px;">
+              <button class="form-btn" style="flex:1;margin:0;padding:10px;" onclick="renderLogin()">Sign in</button>
+              <button class="form-btn sec" style="flex:1;margin:0;padding:10px;" onclick="renderSignUp(document.getElementById('account-main'))">Create account</button>
+            </div>
+          </div>
+        </div>
+        ${prefHtml()}
+        <div style="height:20px;"></div>
+      </div>`;
+    return;
+  }
+
   const col=COLS[user.avatarIdx%COLS.length];
   const myShared=sharedBuilds.filter(b=>b.user===user.name).length;
   el.innerHTML=`
@@ -347,17 +379,7 @@ function renderAccount(){
         <div class="srow" onclick="openYtKey()"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg></div><span class="slabel">YouTube API key</span></div><span class="svalue" style="margin-right:6px;">${ytKey?'Connected':'Not set'}</span><span class="sarrow">›</span></div>
         <div class="srow" onclick="openFeeds()"><div class="srow-left"><div class="sico" style="background:#E1F5EE;color:#0F6E56;"><svg viewBox="0 0 24 24"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg></div><span class="slabel">Feed sources</span></div><span class="svalue" style="margin-right:6px;">${channels.length} channels</span><span class="sarrow">›</span></div>
       </div>
-      <div class="sec-hdr">Preferences</div>
-      <div class="grp">
-        <div class="srow"><div class="srow-left"><div class="sico" style="background:#EEEDFE;color:#534AB7;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div><span class="slabel">Dark mode</span></div><button class="toggle${darkMode?' on':''}" id="dark-tog" onclick="toggleDark()"><div class="tog-thumb" style="${darkMode?'left:20px;':''}"></div></button></div>
-        <div class="srow" onclick="openSlide('slide-notifications')"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Notifications</span></div><span class="sarrow">›</span></div>
-        <div class="srow" onclick="openSlide('slide-privacy')"><div class="srow-left"><div class="sico" style="background:#E1F5EE;color:#0F6E56;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="slabel">Privacy &amp; data</span></div><span class="sarrow">›</span></div>
-      </div>
-      <div class="sec-hdr">Support</div>
-      <div class="grp">
-        <div class="srow" onclick="openSlide('slide-about')"><div class="srow-left"><div class="sico" style="background:#F1EFE8;color:#5F5E5A;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><span class="slabel">About</span></div><span class="sarrow">›</span></div>
-        <div class="srow" onclick="showNotif('Thanks for the feedback!')"><div class="srow-left"><div class="sico" style="background:#E6F1FB;color:#185FA5;"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><span class="slabel">Send feedback</span></div><span class="sarrow">›</span></div>
-      </div>
+      ${prefHtml()}
       <div class="grp" style="margin-top:4px;">
         <div class="srow" onclick="signOut()"><div class="srow-left"><div class="sico" style="background:#FFECEB;color:#C0392B;"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div><span class="danger-label">Sign out</span></div></div>
       </div>
@@ -484,6 +506,17 @@ function toggleDark(){
 function togBtn(btn){btn.classList.toggle('on');const thumb=btn.querySelector('.tog-thumb');if(thumb)thumb.style.left=btn.classList.contains('on')?'20px':'2px';}
 
 tiles();totals();applyDark();
+
+// Receive Supabase session from the React parent (App.tsx posts after iframe load)
+window.addEventListener('message', e => {
+  if (e.data?.type === 'SUPABASE_SESSION' && !user) {
+    user = e.data.user;
+    persist();
+    if (document.getElementById('pg-account')?.classList.contains('active')) {
+      renderAccount();
+    }
+  }
+});
 
 // --- Event wiring (replacing inline onclick attributes) ---
 
