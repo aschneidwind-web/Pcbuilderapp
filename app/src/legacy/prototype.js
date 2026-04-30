@@ -40,7 +40,7 @@ try{
   acmts=JSON.parse(localStorage.getItem('pcb11_ac')||'{}');
   const u=localStorage.getItem('pcb11_user');if(u)user=JSON.parse(u);
   const sb=localStorage.getItem('pcb11_sb');if(sb)sharedBuilds=[...JSON.parse(sb),...SAMPLE_BUILDS];
-}catch(e){}
+}catch(e){console.warn('[pcb] localStorage read failed:',e);}
 
 function persist(){
   try{
@@ -50,7 +50,7 @@ function persist(){
     localStorage.setItem('pcb11_al',JSON.stringify(alikes));
     localStorage.setItem('pcb11_ac',JSON.stringify(acmts));
     if(user)localStorage.setItem('pcb11_user',JSON.stringify(user));
-  }catch(e){}
+  }catch(e){console.warn('[pcb] localStorage write failed:',e);}
 }
 
 
@@ -110,6 +110,7 @@ function totals(){
   updateQuickScore();
 }
 function openPicker(slot){
+  if(!C[slot]){console.warn('[pcb] openPicker: unknown slot',slot);return;}
   document.getElementById('picker-title').textContent=C[slot].label;
   const body=document.getElementById('picker-body');body.innerHTML='';
   let mx=0;C[slot].opts.forEach(o=>{if(o.pm){const v=Math.round(o.pm/o.p);if(v>mx)mx=v;}});
@@ -138,7 +139,7 @@ function renderSummary(){
   h+='</div>';
   if(cpu||gpu){
     const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);
-    let tier=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){tier=TIERS[i];break;}}
+    const tier=tierFromScore(combined);
     const pct=Math.min(100,Math.round((combined/80000)*100));const circ=Math.round(pct*1.885);
     h+=`<div style="padding:0 16px;"><div class="sec-hdr">Build report</div><div class="bench-hero"><div class="tier-row"><div><div class="tier-name" style="color:${tier.color};">${tier.name}</div><div class="tier-sub">Score: ${combined.toLocaleString()}</div></div><div class="ring-wrap"><svg width="68" height="68" viewBox="0 0 68 68"><circle cx="34" cy="34" r="28" fill="none" stroke="var(--bd)" stroke-width="5"/><circle cx="34" cy="34" r="28" fill="none" stroke="${tier.color}" stroke-width="5" stroke-linecap="round" stroke-dasharray="${circ} 175.9" transform="rotate(-90 34 34)"/></svg><div class="ring-pct">${pct}%</div></div></div><div class="tier-desc">${tier.desc}</div></div><div class="cat-grid">`;
     CATS.forEach(cat=>{const score=cat.score(sc);const lbl=getLabel(score,cat.thresholds,cat.labels);const bdg=bStyle(score,cat.thresholds);h+=`<div class="cat-card"><div class="cat-top"><div class="cat-ico" style="background:${cat.ib};color:${cat.ic};">${cat.icon}</div><span class="cat-badge" style="background:${bdg.bg};color:${bdg.c};">${lbl}</span></div><div class="cat-name">${cat.label}</div><div class="btr"><div class="bfill" style="width:${score}%;background:${cat.bar};"></div></div><div class="cat-pct">${score}%</div></div>`;});
@@ -163,13 +164,14 @@ function updateQuickScore(){
   el.style.display='block';
   const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};
   const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);
-  let tier=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){tier=TIERS[i];break;}}
+  const tier=tierFromScore(combined);
   const pct=Math.min(100,Math.round((combined/80000)*100));
   const cats=[CATS[0],CATS[2],CATS[3]];
   const badges=cats.map(cat=>{const score=cat.score(sc);const lbl=getLabel(score,cat.thresholds,cat.labels);const bdg=bStyle(score,cat.thresholds);return`<span class="qs-badge" style="background:${bdg.bg};color:${bdg.c};">${cat.label}: ${lbl}</span>`;}).join('');
   el.innerHTML=`<div class="qs-top"><div><div class="qs-tier" style="color:${tier.color};">${tier.name}</div><div class="qs-meta">Score ${combined.toLocaleString()} · ${pct}% of max</div></div></div><div class="qs-cats">${badges}</div>`;
 }
-function getTier(){const cpu=sel.cpu,gpu=sel.gpu;if(!cpu&&!gpu)return null;const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);let t=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){t=TIERS[i];break;}}return t;}
+function tierFromScore(combined){let t=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){t=TIERS[i];break;}}return t;}
+function getTier(){const cpu=sel.cpu,gpu=sel.gpu;if(!cpu&&!gpu)return null;const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);return tierFromScore(combined);}
 function saveBuild(){
   const name=document.getElementById('bname').value.trim()||'My build '+(saves.length+1);
   const total=Object.values(sel).reduce((s,v)=>s+(v?v.p:0),0);
@@ -200,7 +202,7 @@ function postBuild(){
   const nm=user?user.name:'You';const ai=user?user.avatarIdx:0;
   const nb={id:'ub'+Date.now(),user:nm,avatar:ai,time:'Just now',buildName:name,caption,total,tier:tier||{name:'Entry level',color:'#8E8E93'},components,likes:0};
   sharedBuilds.unshift(nb);
-  try{const my=JSON.parse(localStorage.getItem('pcb11_sb')||'[]');my.unshift(nb);localStorage.setItem('pcb11_sb',JSON.stringify(my));}catch(e){}
+  try{const my=JSON.parse(localStorage.getItem('pcb11_sb')||'[]');my.unshift(nb);localStorage.setItem('pcb11_sb',JSON.stringify(my));}catch(e){console.warn('[pcb] postBuild persist failed:',e);}
   closeShareModal();showNotif('Build shared!');
   if(document.getElementById('pg-community').classList.contains('active'))renderCommunity();
 }
@@ -217,7 +219,7 @@ function renderCommunityFilters(){
 }
 function setCommunityFilter(f){communityFilter=f;renderCommunityFilters();renderBuilds(document.getElementById('feed-content'));}
 function cloneBuild(id){
-  const b=sharedBuilds.find(x=>x.id===id);if(!b)return;
+  const b=sharedBuilds.find(x=>x.id===id);if(!b){console.warn('[pcb] cloneBuild: build not found',id);return;}
   const fresh={cpu:null,gpu:null,motherboard:null,ram:null,storage:null,psu:null,case:null};
   b.components.forEach(c=>{Object.entries(C).forEach(([slot,cat])=>{const match=cat.opts.find(o=>o.n===c.n);if(match&&!fresh[slot])fresh[slot]=match;});});
   Object.assign(sel,fresh);goPage('build');tiles();totals();showNotif('Build loaded — make it yours!');
@@ -245,7 +247,7 @@ function renderBuilds(el){
 }
 function togBuildLike(id,btn,base){const was=alikes['b_'+id+'_l']||false;alikes['b_'+id+'_l']=!was;alikes['b_'+id]=(alikes['b_'+id]||0)+(!was?1:-1);persist();btn.classList.toggle('liked',!was);const lc=document.getElementById('bslc-'+id);if(lc)lc.textContent=base+(alikes['b_'+id]||0);}
 function openBuildDetail(id){
-  const b=sharedBuilds.find(x=>x.id===id);if(!b)return;
+  const b=sharedBuilds.find(x=>x.id===id);if(!b){console.warn('[pcb] openBuildDetail: build not found',id);return;}
   const liked=alikes['b_'+b.id+'_l']||false;const lc=(alikes['b_'+b.id]||0)+b.likes;
   const cmts=acmts['b_'+b.id]||[];const col=COLS[b.avatar%COLS.length];
   document.getElementById('art-ext').style.display='none';
@@ -389,14 +391,15 @@ function renderLogin(){
       <div class="auth-switch">Don't have an account? <span onclick="renderAccount()">Sign up</span></div>
     </div>`;
 }
+function showFormError(el,msg){el.style.display='block';el.textContent=msg;}
 function signUp(){
   const name=document.getElementById('reg-name')?.value.trim();
   const email=document.getElementById('reg-email')?.value.trim();
   const pass=document.getElementById('reg-pass')?.value;
   const err=document.getElementById('reg-err');
-  if(!name){err.style.display='block';err.textContent='Please enter your name.';return;}
-  if(!email||!email.includes('@')){err.style.display='block';err.textContent='Please enter a valid email address.';return;}
-  if(!pass||pass.length<6){err.style.display='block';err.textContent='Password must be at least 6 characters.';return;}
+  if(!name){showFormError(err,'Please enter your name.');return;}
+  if(!email||!email.includes('@')){showFormError(err,'Please enter a valid email address.');return;}
+  if(!pass||pass.length<6){showFormError(err,'Password must be at least 6 characters.');return;}
   user={name,email,bio:'',avatarIdx:0,joined:new Date().toLocaleDateString()};
   persist();renderAccount();showNotif('Welcome, '+name.split(' ')[0]+'!');
 }
@@ -404,8 +407,8 @@ function signIn(){
   const email=document.getElementById('li-email')?.value.trim();
   const pass=document.getElementById('li-pass')?.value;
   const err=document.getElementById('li-err');
-  if(!email||!pass){err.style.display='block';err.textContent='Please fill in all fields.';return;}
-  if(!email.includes('@')){err.style.display='block';err.textContent='Please enter a valid email address.';return;}
+  if(!email||!pass){showFormError(err,'Please fill in all fields.');return;}
+  if(!email.includes('@')){showFormError(err,'Please enter a valid email address.');return;}
   user={name:email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()),email,bio:'',avatarIdx:Math.floor(Math.random()*COLS.length),joined:new Date().toLocaleDateString()};
   persist();renderAccount();showNotif('Signed in!');
 }

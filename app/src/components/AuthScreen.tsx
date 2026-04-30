@@ -10,27 +10,44 @@ export function AuthScreen() {
   const [loading, setLoading] = useState(false)
   const [confirmation, setConfirmation] = useState(false)
 
+  const handleSignUp = async () => {
+    const { data, error } = await supabase.auth.signUp({ email, password })
+    if (error) {
+      if (error.code === 'user_already_exists') throw new Error('An account with this email already exists.')
+      if (error.code === 'weak_password') throw new Error('Password is too weak. Use at least 6 characters.')
+      if (error.code === 'over_email_send_rate_limit') throw new Error('Too many attempts. Please wait a moment.')
+      throw new Error(error.message)
+    }
+    if (data.user) {
+      await supabase.from('profiles').insert({
+        id: data.user.id,
+        username: username || email.split('@')[0],
+      })
+    }
+    setConfirmation(true)
+  }
+
+  const handleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) {
+      if (error.code === 'invalid_credentials') throw new Error('Incorrect email or password.')
+      if (error.code === 'email_not_confirmed') throw new Error('Please confirm your email before signing in.')
+      throw new Error(error.message)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
-
-    if (mode === 'signup') {
-      const { data, error } = await supabase.auth.signUp({ email, password })
-      if (error) { setError(error.message); setLoading(false); return }
-      if (data.user) {
-        await supabase.from('profiles').insert({
-          id: data.user.id,
-          username: username || email.split('@')[0],
-        })
-      }
-      setConfirmation(true)
-    } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) { setError(error.message); setLoading(false); return }
+    try {
+      if (mode === 'signup') await handleSignUp()
+      else await handleSignIn()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong.')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   if (confirmation) {
