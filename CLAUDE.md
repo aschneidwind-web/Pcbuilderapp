@@ -43,6 +43,14 @@ Always push to dev. Merge to main only when feature is complete.
 
 All five tabs (Build, Compare, Saves, Account, Community) are fully migrated to React feature slices with Supabase backing. Legacy prototype is dead—do not edit or reference it.
 
+## Quality Bar
+
+This is a production app, not a prototype. Every change must:
+- **Be scalable** — no localStorage for user data, no hardcoded state
+- **Be testable** — new logic gets unit tests before implementation
+- **Be clean** — no TODO comments left in committed code without a GitHub issue
+- **Match existing patterns** — check neighboring feature slices before inventing new ones
+
 ## General Coding Rules
 - **Modularization:** Follow the Single Responsibility Principle (SRP). Keep functions and classes small.
 - **Modern Idioms:** Use the most current, officially recommended patterns for the language/framework (e.g., Python 3.12+ type hints, React functional components).
