@@ -214,10 +214,11 @@ function renderCommunity(){
   renderCommunityFilters();
   renderBuilds(document.getElementById('feed-content'));
 }
+const TIER_GROUPS={budget:['Entry level','Capable'],'mid-range':['Mid-range'],'high-end':['Enthusiast','Beast']};
 function renderCommunityFilters(){
   const el=document.getElementById('community-filters');if(!el)return;
-  const tiers=['all',...TIERS.map(t=>t.name)];
-  el.innerHTML=tiers.map(t=>`<button class="filter-chip${communityFilter===t?' on':''}" onclick="setCommunityFilter('${t}')">${t==='all'?'All':t}</button>`).join('');
+  const filters=[{id:'all',label:'All'},{id:'budget',label:'Budget'},{id:'mid-range',label:'Mid-range'},{id:'high-end',label:'High-end'}];
+  el.innerHTML=filters.map(f=>`<button class="filter-chip${communityFilter===f.id?' on':''}" onclick="setCommunityFilter('${f.id}')">${f.label}</button>`).join('');
 }
 function setCommunityFilter(f){communityFilter=f;renderCommunityFilters();renderBuilds(document.getElementById('feed-content'));}
 function cloneBuild(id){
@@ -228,7 +229,7 @@ function cloneBuild(id){
 }
 function renderBuilds(el){
   el.innerHTML='';
-  const list=communityFilter==='all'?sharedBuilds:sharedBuilds.filter(b=>b.tier&&b.tier.name===communityFilter);
+  const list=communityFilter==='all'?sharedBuilds:sharedBuilds.filter(b=>b.tier&&(TIER_GROUPS[communityFilter]||[]).includes(b.tier.name));
   if(!list.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No builds here yet</div>Be the first to share one.</div>';return;}
   list.forEach(b=>{
     const liked=alikes['b_'+b.id+'_l']||false;const lc=(alikes['b_'+b.id]||0)+b.likes;
