@@ -30,7 +30,7 @@ const SAMPLE_BUILDS=[{id:'sb1',user:'Alex K.',avatar:0,time:'2h ago',buildName:'
 let sel={cpu:null,gpu:null,motherboard:null,ram:null,storage:null,psu:null,case:null};
 let saves=[];let cmpCat='cpu';let sortMode='value';let communityFilter='all';let savedBuildName='';
 let ytKey='';let channels=[...YT_DEF];let alikes={};let acmts={};
-let sharedBuilds=[...SAMPLE_BUILDS];let user=null;let darkMode=false;let notifTimer=null;
+let sharedBuilds=[...SAMPLE_BUILDS];let user=null;let notifTimer=null;
 
 try{
   saves=JSON.parse(localStorage.getItem('pcb11_s')||'[]');
@@ -39,7 +39,6 @@ try{
   alikes=JSON.parse(localStorage.getItem('pcb11_al')||'{}');
   acmts=JSON.parse(localStorage.getItem('pcb11_ac')||'{}');
   const u=localStorage.getItem('pcb11_user');if(u)user=JSON.parse(u);
-  darkMode=localStorage.getItem('pcb11_dark')==='true';
   const sb=localStorage.getItem('pcb11_sb');if(sb)sharedBuilds=[...JSON.parse(sb),...SAMPLE_BUILDS];
 }catch(e){}
 
@@ -50,14 +49,10 @@ function persist(){
     localStorage.setItem('pcb11_ch',JSON.stringify(channels));
     localStorage.setItem('pcb11_al',JSON.stringify(alikes));
     localStorage.setItem('pcb11_ac',JSON.stringify(acmts));
-    localStorage.setItem('pcb11_dark',darkMode);
     if(user)localStorage.setItem('pcb11_user',JSON.stringify(user));
   }catch(e){}
 }
 
-function applyDark(){
-  document.getElementById('app').classList.toggle('dark',darkMode);
-}
 
 function showNotif(msg){
   const el=document.getElementById('notif');el.textContent=msg;el.classList.add('show');
@@ -299,7 +294,6 @@ function renderAccount(){
   const prefHtml=()=>`
     <div class="sec-hdr">Preferences</div>
     <div class="grp">
-      <div class="srow"><div class="srow-left"><div class="sico" style="background:#EEEDFE;color:#534AB7;"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div><span class="slabel">Dark mode</span></div><button class="toggle${darkMode?' on':''}" id="dark-tog" onclick="toggleDark()"><div class="tog-thumb" style="${darkMode?'left:20px;':''}"></div></button></div>
       <div class="srow" onclick="openSlide('slide-notifications')"><div class="srow-left"><div class="sico" style="background:#FAEEDA;color:#854F0B;"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Notifications</span></div><span class="sarrow">›</span></div>
       <div class="srow" onclick="openSlide('slide-privacy')"><div class="srow-left"><div class="sico" style="background:#E1F5EE;color:#0F6E56;"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><span class="slabel">Privacy &amp; data</span></div><span class="sarrow">›</span></div>
     </div>
@@ -473,15 +467,9 @@ function addCh(){const id=document.getElementById('ch-id').value.trim();const nm
 function rmCh(i){channels.splice(i,1);persist();const chips=document.getElementById('ch-chips');if(chips)chips.innerHTML=channels.map((c,i2)=>`<span class="ch-chip">${c.name}<button class="chip-x" onclick="rmCh(${i2})">×</button></span>`).join('');showNotif('Channel removed');}
 function resetCh(){channels=[...YT_DEF];persist();const chips=document.getElementById('ch-chips');if(chips)chips.innerHTML=channels.map((c,i)=>`<span class="ch-chip">${c.name}<button class="chip-x" onclick="rmCh(${i})">×</button></span>`).join('');showNotif('Reset to defaults');}
 
-function toggleDark(){
-  darkMode=!darkMode;persist();applyDark();
-  const tog=document.getElementById('dark-tog');
-  if(tog){tog.classList.toggle('on',darkMode);const thumb=tog.querySelector('.tog-thumb');if(thumb)thumb.style.left=darkMode?'20px':'2px';}
-  showNotif(darkMode?'Dark mode on':'Dark mode off');
-}
 function togBtn(btn){btn.classList.toggle('on');const thumb=btn.querySelector('.tog-thumb');if(thumb)thumb.style.left=btn.classList.contains('on')?'20px':'2px';}
 
-tiles();totals();applyDark();
+tiles();totals();
 
 // Receive Supabase session from the React parent (App.tsx posts after iframe load)
 window.addEventListener('message', e => {
@@ -527,7 +515,7 @@ Object.assign(window, {
   setCommunityFilter, cloneBuild,
   openEditProfile, saveProfile, changePass,
   openYtKey, saveYtKey, openFeeds, addCh, rmCh, resetCh,
-  toggleDark, togBtn,
+  togBtn,
   renderAccount, renderLogin, signUp, signIn, signInGoogle, signOut, deleteAccount,
   loadBuild, delBuild, showNotif, openSlide, closeSlide,
 });
