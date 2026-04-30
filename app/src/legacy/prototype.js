@@ -29,7 +29,7 @@ const NAMES=['Alex K.','Jordan M.','Sam T.','Riley P.','Casey W.','Morgan L.'];
 const SAMPLE_BUILDS=[{id:'sb1',user:'Alex K.',avatar:0,time:'2h ago',buildName:'Budget 1080p Beast',caption:'First build! Under $900.',total:849,tier:{name:'Capable',color:'#FF9500'},components:[{n:'Core i5-14600K'},{n:'RTX 4060'},{n:'MSI PRO Z790-A WiFi'},{n:'Corsair Vengeance 16GB'}],likes:24},{id:'sb2',user:'Jordan M.',avatar:1,time:'5h ago',buildName:'1440p Workstation',caption:'Great for gaming and video editing.',total:1489,tier:{name:'Enthusiast',color:'#34C759'},components:[{n:'Ryzen 7 7800X3D'},{n:'RTX 4070 Super'},{n:'G.Skill Trident Z5 32GB'},{n:'WD Black SN850X 2TB'}],likes:61},{id:'sb3',user:'Sam T.',avatar:2,time:'1d ago',buildName:'The Silent Beast',caption:'Noise levels were the priority.',total:1240,tier:{name:'Mid-range',color:'#0A84FF'},components:[{n:'Core i7-14700K'},{n:'RTX 4070 Super'},{n:'Seasonic Focus GX-1000'}],likes:38}];
 
 let sel={cpu:null,gpu:null,motherboard:null,ram:null,storage:null,psu:null,case:null};
-let saves=[];let cmpCat='cpu';let sortMode='value';let curFeedTab='builds';
+let saves=[];let cmpCat='cpu';let sortMode='value';let curFeedTab='builds';let savedBuildName='';
 let ytKey='';let channels=[...YT_DEF];let alikes={};let acmts={};
 let sharedBuilds=[...SAMPLE_BUILDS];let user=null;let darkMode=false;let notifTimer=null;
 
@@ -113,6 +113,7 @@ function totals(){
   const cpu=sel.cpu,mb=sel.motherboard,pill=document.getElementById('cpill');
   if(cpu&&mb){pill.style.display='inline-block';if(cpu.sk&&mb.sk&&cpu.sk!==mb.sk){pill.textContent='Socket mismatch';pill.className='pill pill-err';}else{pill.textContent='Compatible';pill.className='pill pill-ok';}}
   else pill.style.display='none';
+  updateQuickScore();
 }
 function openPicker(slot){
   document.getElementById('picker-title').textContent=C[slot].label;
@@ -161,14 +162,31 @@ function renderSummary(){
   }
   el.innerHTML=h;
 }
+function updateQuickScore(){
+  const el=document.getElementById('quick-score');if(!el)return;
+  const cpu=sel.cpu,gpu=sel.gpu;
+  if(!cpu&&!gpu){el.style.display='none';return;}
+  el.style.display='block';
+  const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};
+  const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);
+  let tier=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){tier=TIERS[i];break;}}
+  const pct=Math.min(100,Math.round((combined/80000)*100));
+  const cats=[CATS[0],CATS[2],CATS[3]];
+  const badges=cats.map(cat=>{const score=cat.score(sc);const lbl=getLabel(score,cat.thresholds,cat.labels);const bdg=bStyle(score,cat.thresholds);return`<span class="qs-badge" style="background:${bdg.bg};color:${bdg.c};">${cat.label}: ${lbl}</span>`;}).join('');
+  el.innerHTML=`<div class="qs-top"><div><div class="qs-tier" style="color:${tier.color};">${tier.name}</div><div class="qs-meta">Score ${combined.toLocaleString()} · ${pct}% of max</div></div></div><div class="qs-cats">${badges}</div>`;
+}
 function getTier(){const cpu=sel.cpu,gpu=sel.gpu;if(!cpu&&!gpu)return null;const sc={cpu:cpu?cpu.pm:0,gpu:gpu?gpu.pm:0};const combined=Math.round(sc.cpu*0.45+sc.gpu*0.55);let t=TIERS[0];for(let i=TIERS.length-1;i>=0;i--){if(combined>=TIERS[i].min){t=TIERS[i];break;}}return t;}
 function saveBuild(){
   const name=document.getElementById('bname').value.trim()||'My build '+(saves.length+1);
   const total=Object.values(sel).reduce((s,v)=>s+(v?v.p:0),0);
   saves.unshift({name,date:new Date().toLocaleDateString(),total,components:JSON.parse(JSON.stringify(sel))});
   persist();
-  const btn=document.getElementById('sbtn');btn.textContent='Saved!';btn.style.background='#34C759';
-  setTimeout(()=>{btn.textContent='Save';btn.style.background='';},1500);
+  savedBuildName=name;
+  document.getElementById('bname').value='';
+  const title=document.getElementById('build-title');if(title)title.textContent=name;
+  const btn=document.getElementById('sbtn');
+  if(btn){const prev=btn.innerHTML;btn.innerHTML='✓ Saved';btn.style.background='#34C759';btn.style.borderColor='#34C759';
+    setTimeout(()=>{btn.innerHTML=prev;btn.style.background='';btn.style.borderColor='';},1800);}
   showNotif('Build saved!');
 }
 function openShareModal(){
@@ -482,7 +500,7 @@ document.querySelectorAll('[data-close]').forEach(btn => {
 // Build name → header title sync
 document.getElementById('bname').addEventListener('input', e => {
   const title = document.getElementById('build-title');
-  if (title) title.textContent = e.target.value.trim() || 'Build';
+  if (title) title.textContent = e.target.value.trim() || savedBuildName || 'Build';
 });
 
 // Share modal: close when tapping the backdrop itself
