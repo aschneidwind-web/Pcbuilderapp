@@ -16,7 +16,7 @@ const ChevronIcon = () => (
 export function ComponentRow({ slotKey: _slotKey, slot, selected, onClick }: Props) {
   return (
     <div style={s.row} onClick={onClick}>
-      <div style={{ ...s.icon, background: slot.ib }}>
+      <div style={{ ...s.icon, background: '#7B2FFF' }}>
         <svg
           viewBox="0 0 24 24"
           width="20"
