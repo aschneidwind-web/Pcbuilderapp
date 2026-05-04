@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import { createElement } from 'react'
 import { BuildProvider, useBuild } from './BuildContext'
+import { SLOT_KEYS } from './build.types'
 import type { CatalogOption } from './build.types'
 
 const wrapper = ({ children }: { children: React.ReactNode }) =>
@@ -19,6 +20,11 @@ describe('BuildProvider', () => {
     expect(result.current.build).toEqual({})
     expect(result.current.totalPrice).toBe(0)
     expect(result.current.componentCount).toBe(0)
+  })
+
+  it('SLOT_KEYS has 8 entries', () => {
+    expect(SLOT_KEYS).toHaveLength(8)
+    expect(SLOT_KEYS).toContain('cooler')
   })
 
   it('selectComponent sets the correct slot', () => {
@@ -60,6 +66,15 @@ describe('BuildProvider', () => {
     expect(result.current.componentCount).toBe(2)
   })
 
+  it('selectComponent works for the cooler slot', () => {
+    const cooler: CatalogOption = { n: 'Noctua NH-D15', s: 'Air | 250W TDP', p: 110, tdp: 250 }
+    const { result } = renderHook(() => useBuild(), { wrapper })
+    act(() => result.current.selectComponent('cooler', cooler))
+    expect(result.current.build.cooler).toBe(cooler)
+    expect(result.current.componentCount).toBe(1)
+    expect(result.current.totalPrice).toBe(110)
+  })
+
   describe('socketCompatible', () => {
     it('is null when neither CPU nor motherboard are selected', () => {
       const { result } = renderHook(() => useBuild(), { wrapper })
@@ -75,8 +90,8 @@ describe('BuildProvider', () => {
     it('is true when CPU and motherboard sockets match', () => {
       const { result } = renderHook(() => useBuild(), { wrapper })
       act(() => {
-        result.current.selectComponent('cpu', ryzen)         // AM5
-        result.current.selectComponent('motherboard', am5Board)  // AM5
+        result.current.selectComponent('cpu', ryzen)
+        result.current.selectComponent('motherboard', am5Board)
       })
       expect(result.current.socketCompatible).toBe(true)
     })
@@ -84,8 +99,8 @@ describe('BuildProvider', () => {
     it('is false when CPU and motherboard sockets differ', () => {
       const { result } = renderHook(() => useBuild(), { wrapper })
       act(() => {
-        result.current.selectComponent('cpu', ryzen)               // AM5
-        result.current.selectComponent('motherboard', lga1700Board) // LGA1700
+        result.current.selectComponent('cpu', ryzen)
+        result.current.selectComponent('motherboard', lga1700Board)
       })
       expect(result.current.socketCompatible).toBe(false)
     })
@@ -98,7 +113,6 @@ describe('BuildProvider', () => {
         cpu: { name: 'Ryzen 7 7800X3D' },
         gpu: { name: 'RTX 4070 Super' },
       }))
-      // Should resolve to the actual catalog objects
       expect(result.current.build.cpu?.n).toBe('Ryzen 7 7800X3D')
       expect(result.current.build.gpu?.n).toBe('RTX 4070 Super')
       expect(result.current.componentCount).toBe(2)
@@ -111,6 +125,15 @@ describe('BuildProvider', () => {
       }))
       expect(result.current.build.cpu).toBeUndefined()
       expect(result.current.componentCount).toBe(0)
+    })
+
+    it('loads cooler from saved build', () => {
+      const { result } = renderHook(() => useBuild(), { wrapper })
+      act(() => result.current.loadBuild({
+        cooler: { name: 'Noctua NH-D15' },
+      }))
+      expect(result.current.build.cooler?.n).toBe('Noctua NH-D15')
+      expect(result.current.build.cooler?.tdp).toBe(250)
     })
   })
 })

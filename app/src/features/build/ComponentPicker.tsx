@@ -8,7 +8,6 @@ interface Props {
 }
 
 export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
-  // Find the highest pts/$ ratio to badge the best-value option
   let maxPtp = 0
   for (const o of slot.opts) {
     if (o.pm) {
@@ -39,10 +38,7 @@ export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
             return (
               <div
                 key={opt.n}
-                style={{
-                  ...s.optRow,
-                  ...(isSel ? s.optRowSel : {}),
-                }}
+                style={{ ...s.optRow, ...(isSel ? s.optRowSel : {}) }}
                 onClick={() => { onSelect(opt); onClose() }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -57,7 +53,7 @@ export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
                   {ptp && <span style={s.optPts}>{ptp} pts/$</span>}
                 </div>
                 {isSel && (
-                  <div style={{ color: '#0A84FF', flexShrink: 0 }}>
+                  <div style={{ color: '#7B2FFF', flexShrink: 0 }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="16" height="16">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
@@ -74,49 +70,97 @@ export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   overlay: {
-    position: 'absolute', inset: 0,
-    background: 'rgba(0,0,0,0.55)',
-    display: 'flex', alignItems: 'flex-end',
+    position: 'absolute',
+    inset: 0,
+    background: 'rgba(0,0,0,0.65)',
+    display: 'flex',
+    alignItems: 'flex-end',
     zIndex: 10,
   },
   sheet: {
     width: '100%',
-    background: '#1c1c1e',
+    background: '#111118',
     borderRadius: '16px 16px 0 0',
     maxHeight: '85%',
-    display: 'flex', flexDirection: 'column',
+    display: 'flex',
+    flexDirection: 'column',
+    border: '0.5px solid rgba(255,255,255,0.08)',
+    borderBottom: 'none',
   },
   header: {
-    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: '14px 16px 12px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.1)',
+    borderBottom: '0.5px solid rgba(255,255,255,0.08)',
     flexShrink: 0,
   },
   back: {
-    background: 'none', border: 'none', color: '#0A84FF',
-    cursor: 'pointer', padding: 4, display: 'flex', alignItems: 'center',
+    background: 'none',
+    border: 'none',
+    color: '#A78BFA',
+    cursor: 'pointer',
+    padding: 4,
+    display: 'flex',
+    alignItems: 'center',
   },
-  title: { fontSize: 16, fontWeight: 600, color: '#fff' },
-  list:  { overflowY: 'auto', flex: 1, padding: '0 16px' },
+  title: {
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#fff',
+  },
+  list: {
+    overflowY: 'auto',
+    flex: 1,
+    padding: '0 16px',
+  },
   optRow: {
-    display: 'flex', alignItems: 'center', gap: 10,
-    padding: '13px 0',
-    borderBottom: '0.5px solid rgba(255,255,255,0.07)',
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    padding: '14px 0',
+    borderBottom: '0.5px solid rgba(255,255,255,0.05)',
     cursor: 'pointer',
   },
   optRowSel: {
-    margin: '0 -16px', padding: '13px 16px',
-    background: 'rgba(10,132,255,0.08)',
+    margin: '0 -16px',
+    padding: '14px 16px',
+    background: 'rgba(123,47,255,0.08)',
   },
-  optName:  { fontSize: 13, fontWeight: 500, color: '#fff', marginBottom: 2 },
-  optSpec:  { fontSize: 12, color: '#8E8E93' },
-  optRight: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 2, flexShrink: 0 },
-  optPrice: { fontSize: 13, fontWeight: 600, color: '#fff' },
-  optPts:   { fontSize: 11, color: '#8E8E93' },
+  optName: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: '#fff',
+    marginBottom: 2,
+  },
+  optSpec: {
+    fontSize: 12,
+    color: '#6B6B80',
+  },
+  optRight: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    gap: 2,
+    flexShrink: 0,
+  },
+  optPrice: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#fff',
+  },
+  optPts: {
+    fontSize: 11,
+    color: '#6B6B80',
+  },
   badge: {
-    display: 'inline-block', marginLeft: 6,
-    fontSize: 10, fontWeight: 600, color: '#34C759',
-    background: 'rgba(52,199,89,0.15)', borderRadius: 5,
+    display: 'inline-block',
+    marginLeft: 6,
+    fontSize: 10,
+    fontWeight: 600,
+    color: '#10B981',
+    background: 'rgba(16,185,129,0.15)',
+    borderRadius: 5,
     padding: '1px 5px',
   },
 }
