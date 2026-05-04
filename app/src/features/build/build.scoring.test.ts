@@ -68,9 +68,15 @@ describe('build.scoring', () => {
   })
 
   describe('getCategoryScores', () => {
-    it('returns scores for all categories', () => {
+    it('returns exactly 3 categories', () => {
+      expect(CATEGORIES).toHaveLength(3)
       const scores = getCategoryScores(fullBuild)
-      expect(scores).toHaveLength(CATEGORIES.length)
+      expect(scores).toHaveLength(3)
+    })
+
+    it('categories are Gaming, Desktop, Workstation', () => {
+      const ids = CATEGORIES.map(c => c.id)
+      expect(ids).toEqual(['gaming', 'desktop', 'workstation'])
     })
 
     it('each category score is 0-100', () => {
@@ -88,12 +94,27 @@ describe('build.scoring', () => {
       }
     })
 
-    it('GPU-heavy categories (gaming) score higher with better GPU', () => {
-      const lowGpu = getCategoryScores({ gpu: { n: '', s: '', p: 100, pm: 16400 } })
-      const highGpu = getCategoryScores({ gpu: { n: '', s: '', p: 100, pm: 38500 } })
-      const gaming1080Low = lowGpu.find(c => c.id === 'g1080')!
-      const gaming1080High = highGpu.find(c => c.id === 'g1080')!
-      expect(gaming1080High.score).toBeGreaterThan(gaming1080Low.score)
+    it('Gaming scores higher with better GPU', () => {
+      const low = getCategoryScores({ gpu: { n: '', s: '', p: 100, pm: 16400 } })
+      const high = getCategoryScores({ gpu: { n: '', s: '', p: 100, pm: 38500 } })
+      const gamingLow = low.find(c => c.id === 'gaming')!
+      const gamingHigh = high.find(c => c.id === 'gaming')!
+      expect(gamingHigh.score).toBeGreaterThan(gamingLow.score)
+    })
+
+    it('Desktop scores higher with better CPU', () => {
+      const low = getCategoryScores({ cpu: { n: '', s: '', p: 100, pm: 25000 } })
+      const high = getCategoryScores({ cpu: { n: '', s: '', p: 100, pm: 48500 } })
+      expect(high.find(c => c.id === 'desktop')!.score)
+        .toBeGreaterThan(low.find(c => c.id === 'desktop')!.score)
+    })
+
+    it('assigns tier names matching the 4-tier system', () => {
+      const scores = getCategoryScores(fullBuild)
+      const validNames = ['Entry', 'Mid-range', 'High-end', 'Extreme']
+      for (const s of scores) {
+        expect(validNames).toContain(s.tierName)
+      }
     })
   })
 
@@ -123,7 +144,6 @@ describe('build.scoring', () => {
         psu: { n: 'Seasonic 1000W', s: '1000W · Gold', p: 189, watts: 1000 },
         cooler: { n: 'Noctua NH-D15', s: 'Air · 250W', p: 110, tdp: 250 },
       }
-      // A beast-tier build with 32GB RAM and NVMe should have few/no suggestions
       const suggestions = getUpgradeSuggestions(beast)
       expect(suggestions.length).toBeLessThanOrEqual(1)
     })
