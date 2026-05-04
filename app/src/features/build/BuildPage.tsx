@@ -4,6 +4,7 @@ import { useSaves } from '../saves'
 import { ComponentRow } from './ComponentRow'
 import { ComponentPicker } from './ComponentPicker'
 import { BuildIllustration } from './BuildIllustration'
+import { BuildReport } from './BuildReport'
 import { CATALOG } from './build.catalog'
 import { SLOT_KEYS } from './build.types'
 import type { SlotKey } from './build.types'
@@ -37,9 +38,8 @@ export function BuildPage() {
       await createSave({ name, components: toBuildComponents(build) })
       setSaveMsg('Saved!')
       setBuildName('')
-    } catch (err) {
-      console.error('Save failed:', err)
-      setSaveMsg(err instanceof Error ? err.message : 'Failed to save')
+    } catch {
+      setSaveMsg('Failed to save')
     } finally {
       setSaving(false)
       setTimeout(() => setSaveMsg(null), 2000)
@@ -87,6 +87,9 @@ export function BuildPage() {
           <BuildIllustration build={build} />
         </div>
 
+        {/* Build Report — appears once CPU or GPU is selected */}
+        <BuildReport build={build} />
+
         {/* Components section */}
         <div style={s.componentsSection}>
           <div style={s.sectionHeader}>
@@ -110,7 +113,7 @@ export function BuildPage() {
               style={s.nameInput}
               value={buildName}
               onChange={e => setBuildName(e.target.value)}
-              placeholder="Build name"
+              placeholder="Build name (optional)"
             />
             <button style={btnStyle} onClick={handleSave} disabled={saving || componentCount === 0}>
               {saveMsg ?? (saving ? 'Saving…' : 'Save build')}

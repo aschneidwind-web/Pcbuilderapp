@@ -1,4 +1,5 @@
 export { BuildPage } from './BuildPage'
 export { BuildProvider, useBuild } from './BuildContext'
 export { BuildIllustration } from './BuildIllustration'
+export { BuildReport } from './BuildReport'
 export type { BuildState, CatalogOption, SlotKey } from './build.types'
