@@ -476,9 +476,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;}
       <div class="slide-nav"><button class="back" onclick="closeSlide('slide-about')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Back</button><span class="slide-title">About</span><div style="width:50px;"></div></div>
       <div class="slide-body">
         <div style="text-align:center;padding:24px 0 20px;">
-          <div style="width:64px;height:64px;background:#0A84FF;border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg></div>
-          <div style="font-size:20px;font-weight:500;color:var(--t1);">PC Builder</div>
-          <div style="font-size:13px;color:var(--t3);margin-top:4px;">Version 1.0.0 (beta)</div>
+          <div style="width:64px;height:64px;background:linear-gradient(135deg,#7B2FFF,#FF6B9D);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4 L14 4 L20 12 L14 20 L4 20 Z"/><circle cx="17" cy="12" r="3" fill="#fff" stroke="none"/></svg></div>
+          <div style="font-size:20px;font-weight:500;color:var(--t1);">PartFlow</div>
+          <div style="font-size:13px;color:var(--t3);margin-top:4px;">Version 0.1.0 (beta)</div>
         </div>
         <div class="grp">
           <div class="srow" onclick="showNotif('Opening privacy policy…')"><div class="srow-left"><span class="slabel">Privacy policy</span></div><span class="sarrow">›</span></div>
@@ -566,25 +566,25 @@ let ytKey='';let channels=[...YT_DEF];let alikes={};let acmts={};
 let sharedBuilds=[...SAMPLE_BUILDS];let user=null;let darkMode=false;let notifTimer=null;
 
 try{
-  saves=JSON.parse(localStorage.getItem('pcb11_s')||'[]');
-  ytKey=localStorage.getItem('pcb11_yt')||'';
-  const ch=localStorage.getItem('pcb11_ch');if(ch)channels=JSON.parse(ch);
-  alikes=JSON.parse(localStorage.getItem('pcb11_al')||'{}');
-  acmts=JSON.parse(localStorage.getItem('pcb11_ac')||'{}');
-  const u=localStorage.getItem('pcb11_user');if(u)user=JSON.parse(u);
-  darkMode=localStorage.getItem('pcb11_dark')==='true';
-  const sb=localStorage.getItem('pcb11_sb');if(sb)sharedBuilds=[...JSON.parse(sb),...SAMPLE_BUILDS];
+  saves=JSON.parse(localStorage.getItem('pf_s')||'[]');
+  ytKey=localStorage.getItem('pf_yt')||'';
+  const ch=localStorage.getItem('pf_ch');if(ch)channels=JSON.parse(ch);
+  alikes=JSON.parse(localStorage.getItem('pf_al')||'{}');
+  acmts=JSON.parse(localStorage.getItem('pf_ac')||'{}');
+  const u=localStorage.getItem('pf_user');if(u)user=JSON.parse(u);
+  darkMode=localStorage.getItem('pf_dark')==='true';
+  const sb=localStorage.getItem('pf_sb');if(sb)sharedBuilds=[...JSON.parse(sb),...SAMPLE_BUILDS];
 }catch(e){}
 
 function persist(){
   try{
-    localStorage.setItem('pcb11_s',JSON.stringify(saves));
-    localStorage.setItem('pcb11_yt',ytKey);
-    localStorage.setItem('pcb11_ch',JSON.stringify(channels));
-    localStorage.setItem('pcb11_al',JSON.stringify(alikes));
-    localStorage.setItem('pcb11_ac',JSON.stringify(acmts));
-    localStorage.setItem('pcb11_dark',darkMode);
-    if(user)localStorage.setItem('pcb11_user',JSON.stringify(user));
+    localStorage.setItem('pf_s',JSON.stringify(saves));
+    localStorage.setItem('pf_yt',ytKey);
+    localStorage.setItem('pf_ch',JSON.stringify(channels));
+    localStorage.setItem('pf_al',JSON.stringify(alikes));
+    localStorage.setItem('pf_ac',JSON.stringify(acmts));
+    localStorage.setItem('pf_dark',darkMode);
+    if(user)localStorage.setItem('pf_user',JSON.stringify(user));
   }catch(e){}
 }
 
@@ -706,7 +706,7 @@ function postBuild(){
   const nm=user?user.name:'You';const ai=user?user.avatarIdx:0;
   const nb={id:'ub'+Date.now(),user:nm,avatar:ai,time:'Just now',buildName:name,caption,total,tier:tier||{name:'Entry level',color:'#8E8E93'},components,likes:0};
   sharedBuilds.unshift(nb);
-  try{const my=JSON.parse(localStorage.getItem('pcb11_sb')||'[]');my.unshift(nb);localStorage.setItem('pcb11_sb',JSON.stringify(my));}catch(e){}
+  try{const my=JSON.parse(localStorage.getItem('pf_sb')||'[]');my.unshift(nb);localStorage.setItem('pf_sb',JSON.stringify(my));}catch(e){}
   closeShareModal();showNotif('Build shared!');
   if(document.getElementById('pg-community').classList.contains('active'))renderFeed();
 }
@@ -887,7 +887,7 @@ function renderLogin(){
     <div class="auth-wrap" style="padding-top:16px;">
       <div class="auth-logo"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
       <div class="auth-title">Welcome back</div>
-      <div class="auth-sub">Sign in to your PC Builder account.</div>
+      <div class="auth-sub">Sign in to your PartFlow account.</div>
       <div class="field"><label>Email</label><input class="auth-in" id="li-email" placeholder="you@example.com" type="email"/></div>
       <div class="field"><label>Password</label><input class="auth-in" id="li-pass" placeholder="Your password" type="password"/></div>
       <button class="auth-btn" onclick="signIn()">Sign in</button>
@@ -923,7 +923,7 @@ function signInGoogle(){
 }
 function signOut(){
   if(!confirm('Sign out of your account?'))return;
-  user=null;localStorage.removeItem('pcb11_user');renderAccount();showNotif('Signed out');
+  user=null;localStorage.removeItem('pf_user');renderAccount();showNotif('Signed out');
 }
 function deleteAccount(){
   if(!confirm('Delete your account? This cannot be undone.'))return;

@@ -73,7 +73,7 @@ export function AuthScreen() {
         </div>
 
         <h2 style={styles.title}>{mode === 'signin' ? 'Welcome back' : 'Create account'}</h2>
-        <p style={styles.sub}>{mode === 'signin' ? 'Sign in to your PC Builder account.' : 'Save builds, share with the community, and sync across devices.'}</p>
+        <p style={styles.sub}>{mode === 'signin' ? 'Sign in to your PartFlow account.' : 'Save builds, share with the community, and sync across devices.'}</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>
           {mode === 'signup' && (

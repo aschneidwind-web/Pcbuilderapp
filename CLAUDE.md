@@ -1,4 +1,4 @@
-﻿# PC Builder — Claude Code Instructions
+﻿# PartFlow — Claude Code Instructions
 
 ## CRITICAL RULES — READ BEFORE DOING ANYTHING
 

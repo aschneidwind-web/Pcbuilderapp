@@ -1,4 +1,4 @@
-# PC Builder (static web app)
+# PartFlow (static web app)
 
 This is a single-file HTML app (no build step).
 
