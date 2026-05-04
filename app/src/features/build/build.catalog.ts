@@ -4,7 +4,8 @@ export const CATALOG: Catalog = {
   cpu: {
     label: 'CPU',
     ib: '#7B2FFF', ic: '#ffffff', hasPM: true,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>',
+    // Chip die with contact pads on all sides
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="5" y="5" width="14" height="14" rx="2.5"/><rect x="8" y="8" width="8" height="8" rx="1"/><line x1="8" y1="2" x2="8" y2="5"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="16" y1="2" x2="16" y2="5"/><line x1="8" y1="19" x2="8" y2="22"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="16" y1="19" x2="16" y2="22"/><line x1="2" y1="8" x2="5" y2="8"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="2" y1="16" x2="5" y2="16"/><line x1="19" y1="8" x2="22" y2="8"/><line x1="19" y1="12" x2="22" y2="12"/><line x1="19" y1="16" x2="22" y2="16"/></svg>',
     opts: [
       { n: 'Ryzen 5 7600X',   s: '6-core · 4.7GHz · AM5',      p: 229, sk: 'AM5',     pm: 25140 },
       { n: 'Ryzen 7 7800X3D', s: '8-core · 4.5GHz · AM5',      p: 449, sk: 'AM5',     pm: 33180 },
@@ -16,7 +17,8 @@ export const CATALOG: Catalog = {
   cooler: {
     label: 'CPU Cooler',
     ib: '#10B981', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>',
+    // Tower heatsink with fins and a fan
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/><line x1="12" y1="6" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="18"/><line x1="6" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="18" y2="12"/><line x1="8.5" y1="8.5" x2="10" y2="10"/><line x1="14" y1="14" x2="15.5" y2="15.5"/></svg>',
     opts: [
       { n: 'Cooler Master Hyper 212',         s: 'Air | 150W TDP',          p: 45,  tdp: 150 },
       { n: 'Arctic Freezer 34 eSports DUO',   s: 'Air | 210W TDP',          p: 40,  tdp: 210 },
@@ -31,7 +33,8 @@ export const CATALOG: Catalog = {
   gpu: {
     label: 'GPU',
     ib: '#FF6B9D', ic: '#ffffff', hasPM: true,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="7" width="20" height="12" rx="2"/><circle cx="8" cy="13" r="2"/><circle cx="16" cy="13" r="2"/><path d="M6 7V4M10 7V4M14 7V4M18 7V4"/></svg>',
+    // Graphics card with dual fans and PCIe bracket
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="7" width="22" height="12" rx="2.5"/><circle cx="7.5" cy="13" r="3.5"/><circle cx="16.5" cy="13" r="3.5"/><line x1="4" y1="7" x2="4" y2="4"/><line x1="8" y1="7" x2="8" y2="4"/><line x1="12" y1="7" x2="12" y2="4"/><circle cx="7.5" cy="13" r="1"/><circle cx="16.5" cy="13" r="1"/></svg>',
     opts: [
       { n: 'RTX 4060',       s: '8GB GDDR6 · 1080p',    p: 299, pm: 18900 },
       { n: 'RTX 4070 Super', s: '12GB GDDR6X · 1440p',   p: 599, pm: 28700 },
@@ -43,7 +46,8 @@ export const CATALOG: Catalog = {
   motherboard: {
     label: 'Motherboard',
     ib: '#6366F1', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><line x1="7" y1="15" x2="17" y2="15"/><line x1="7" y1="18" x2="17" y2="18"/></svg>',
+    // PCB with socket, slots, and chipset
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="20" rx="2"/><rect x="6" y="5" width="5" height="5" rx="1"/><line x1="6" y1="14" x2="18" y2="14"/><line x1="6" y1="17" x2="18" y2="17"/><rect x="14" y="5" width="4" height="3" rx="0.5"/><circle cx="16" cy="11" r="1.5"/><line x1="2" y1="8" x2="4" y2="8"/><line x1="2" y1="12" x2="4" y2="12"/></svg>',
     opts: [
       { n: 'ASUS ROG B650E-F',      s: 'AM5 · DDR5 · ATX',      p: 299, sk: 'AM5',     vrs: 4, feat: 'WiFi 6E, PCIe 5.0, 14+2 VRM' },
       { n: 'MSI MAG B650 Tomahawk', s: 'AM5 · DDR5 · ATX',      p: 199, sk: 'AM5',     vrs: 4, feat: 'WiFi 6E, PCIe 4.0, 12+2 VRM' },
@@ -55,7 +59,8 @@ export const CATALOG: Catalog = {
   ram: {
     label: 'RAM',
     ib: '#F59E0B', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="7" width="18" height="10" rx="1"/><line x1="7" y1="7" x2="7" y2="17"/><line x1="11" y1="7" x2="11" y2="17"/><line x1="15" y1="7" x2="15" y2="17"/><line x1="3" y1="12" x2="21" y2="12"/></svg>',
+    // Memory stick with heatspreader and notch
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="3" width="16" height="18" rx="1.5"/><line x1="4" y1="7" x2="20" y2="7"/><rect x="7" y="9" width="3" height="5" rx="0.5"/><rect x="12" y="9" width="3" height="5" rx="0.5"/><line x1="10" y1="18" x2="14" y2="18"/><line x1="4" y1="16" x2="20" y2="16"/></svg>',
     opts: [
       { n: 'TeamGroup T-Force 16GB',  s: 'DDR5-5200 · 2×8GB',  p: 65,  mhz: 5200, gb: 16 },
       { n: 'Corsair Vengeance 16GB',  s: 'DDR5-5600 · 2×8GB',  p: 79,  mhz: 5600, gb: 16 },
@@ -66,7 +71,8 @@ export const CATALOG: Catalog = {
   storage: {
     label: 'Storage',
     ib: '#06B6D4', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="16" cy="12" r="2"/><line x1="6" y1="12" x2="10" y2="12"/></svg>',
+    // M.2 / SSD drive
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="8" width="20" height="8" rx="2"/><circle cx="6" cy="12" r="1.5"/><rect x="10" y="10" width="8" height="4" rx="1"/><line x1="19" y1="10" x2="19" y2="14"/></svg>',
     opts: [
       { n: 'Seagate Barracuda 4TB',     s: 'HDD · 4TB',           p: 69,  read: 220,  tb: 4 },
       { n: 'Samsung 970 Evo 1TB',       s: 'NVMe Gen3 · 1TB',     p: 89,  read: 3500, tb: 1 },
@@ -78,7 +84,8 @@ export const CATALOG: Catalog = {
   psu: {
     label: 'PSU',
     ib: '#EF4444', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M13 10l-2 4h4l-2 4"/></svg>',
+    // Power supply with lightning bolt and fan vent
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="M13 8l-2 4h4l-2 4"/><circle cx="7" cy="12" r="3" stroke-dasharray="2 1.5"/><line x1="17" y1="8" x2="17" y2="16"/></svg>',
     opts: [
       { n: "be quiet! Pure Power 650W", s: '650W · 80+ Gold · Modular',  p: 89,  watts: 650  },
       { n: 'Corsair RM750x',            s: '750W · 80+ Gold · Modular',  p: 119, watts: 750  },
@@ -89,7 +96,8 @@ export const CATALOG: Catalog = {
   case: {
     label: 'Case',
     ib: '#8B5CF6', ic: '#ffffff', hasPM: false,
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><circle cx="12" cy="17" r="1"/></svg>',
+    // PC tower case with front mesh and side panel
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="4" y="1" width="16" height="22" rx="2.5"/><line x1="4" y1="6" x2="20" y2="6"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="16" x2="15" y2="16"/><circle cx="12" cy="20" r="1"/><rect x="8" y="2.5" width="3" height="2" rx="0.5"/></svg>',
     opts: [
       { n: 'NZXT H510',              s: 'Mid-tower · ATX · Glass',   p: 89  },
       { n: 'Corsair 4000D Airflow',  s: 'Mid-tower · ATX · Mesh',    p: 104 },
