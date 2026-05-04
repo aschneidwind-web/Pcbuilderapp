@@ -1,10 +1,12 @@
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { AuthScreen } from './components/AuthScreen'
+import { TabBar } from './components/TabBar'
 import { SavesPage } from './features/saves'
 import { BuildPage, useBuild } from './features/build'
 import { ComparePage } from './features/compare'
 import { AccountPage } from './features/account'
+import { CommunityPage } from './features/community/CommunityPage'
 import type { SavedBuild } from './features/saves'
 
 const shell: React.CSSProperties = {
@@ -19,6 +21,8 @@ const panel: React.CSSProperties = {
   background: '#1c1c1e',
   overflow: 'hidden',
   boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+  display: 'flex',
+  flexDirection: 'column',
 }
 
 export function App() {
@@ -42,13 +46,17 @@ export function App() {
   return (
     <div style={shell}>
       <div style={panel}>
-        <Routes>
-          <Route path="/build"   element={<BuildPage />} />
-          <Route path="/saves"   element={<SavesPage onLoad={handleLoadBuild} />} />
-          <Route path="/compare" element={<ComparePage />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/" element={<Navigate to="/build" replace />} />
-        </Routes>
+        <div style={{ flex: 1, overflow: 'hidden' }}>
+          <Routes>
+            <Route path="/build"     element={<BuildPage />} />
+            <Route path="/community" element={<CommunityPage />} />
+            <Route path="/compare"   element={<ComparePage />} />
+            <Route path="/saves"     element={<SavesPage onLoad={handleLoadBuild} />} />
+            <Route path="/account"   element={<AccountPage />} />
+            <Route path="/" element={<Navigate to="/build" replace />} />
+          </Routes>
+        </div>
+        <TabBar />
       </div>
     </div>
   )
