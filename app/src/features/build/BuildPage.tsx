@@ -65,7 +65,7 @@ export function BuildPage() {
             </svg>
             <span style={s.shareTxt}>Share</span>
           </button>
-          <img src="/favicon.svg" alt="PartFlow" style={s.logo} />
+          <img src="/logo.png" alt="PartFlow" style={s.logo} />
           <div style={s.avatar}>A</div>
         </div>
 
@@ -173,8 +173,9 @@ const s: Record<string, React.CSSProperties> = {
     color: '#A78BFA',
   },
   logo: {
-    width: 24,
-    height: 24,
+    width: 36,
+    height: 36,
+    borderRadius: 8,
   },
   avatar: {
     width: 34,
