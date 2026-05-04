@@ -14,13 +14,13 @@ export interface Tier {
 }
 
 export const TIERS: readonly Tier[] = [
-  { name: 'Entry',     color: '#8E8E93', min: 0,
+  { name: 'Entry',    color: '#8E8E93', min: 0,
     desc: 'Good for web browsing, office work, and light gaming at 1080p on low settings.' },
-  { name: 'Mid-range', color: '#0A84FF', min: 11000,
+  { name: 'Mid-range', color: '#0A84FF', min: 15000,
     desc: 'Solid 1080p and 1440p gaming, content creation, and everyday multitasking.' },
-  { name: 'High-end',  color: '#34C759', min: 22000,
+  { name: 'High-end',  color: '#34C759', min: 28000,
     desc: 'Excels at 4K gaming, professional video editing, 3D rendering, and heavy workloads.' },
-  { name: 'Extreme',   color: '#BF5AF2', min: 34000,
+  { name: 'Extreme',   color: '#BF5AF2', min: 38000,
     desc: 'No compromises. Handles 4K gaming, AI/ML workloads, and real-time 3D without breaking a sweat.' },
 ]
 

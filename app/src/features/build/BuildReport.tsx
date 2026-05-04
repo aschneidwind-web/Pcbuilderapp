@@ -11,7 +11,18 @@ interface Props {
   build: BuildState
 }
 
-const MAX_SCORE = 80000
+const MAX_SCORE = 43000 // actual catalog ceiling: i9-14900K + RTX 4080 Super
+
+// Muted bar fill — single color for all category bars
+const BAR_COLOR = 'rgba(255,255,255,0.25)'
+// Slightly brighter for the breakdown bars so they read as distinct sections
+const BK_CPU_COLOR = 'rgba(167,139,250,0.5)'  // soft purple
+const BK_GPU_COLOR = 'rgba(255,143,173,0.45)'  // soft pink
+const BK_COMBINED_COLOR = 'rgba(255,255,255,0.15)'
+
+// Badge color: single muted tone regardless of category
+const BADGE_FG = '#9999A8'
+const BADGE_BG = 'rgba(255,255,255,0.06)'
 
 export function BuildReport({ build }: Props) {
   const tier = useMemo(() => getTier(build), [build])
@@ -19,11 +30,9 @@ export function BuildReport({ build }: Props) {
   const categories = useMemo(() => getCategoryScores(build), [build])
   const suggestions = useMemo(() => getUpgradeSuggestions(build), [build])
 
-  // Don't render until at least CPU or GPU is selected
   if (!tier) return null
 
   const pct = Math.min(100, Math.round((score / MAX_SCORE) * 100))
-  // SVG ring math: circumference = 2πr, r=28 → C≈175.9
   const circum = 175.9
   const dashLen = Math.round(pct * circum / 100)
 
@@ -57,15 +66,13 @@ export function BuildReport({ build }: Props) {
           <div key={cat.id} style={s.catRow}>
             <div style={s.catTop}>
               <span style={s.catLabel}>{cat.label}</span>
-              <span style={{ ...s.catBadge, color: cat.color, background: `${cat.color}18` }}>
-                {cat.rating}
-              </span>
+              <span style={s.catBadge}>{cat.rating}</span>
             </div>
             <div style={s.barTrack}>
               <div style={{
                 ...s.barFill,
                 width: `${cat.score}%`,
-                background: cat.color,
+                background: BAR_COLOR,
               }} />
             </div>
             <div style={s.catPct}>{cat.score}%</div>
@@ -76,12 +83,12 @@ export function BuildReport({ build }: Props) {
       {/* ── Score breakdown ── */}
       <div style={s.breakdownTitle}>Score breakdown</div>
       {build.cpu?.pm != null && (
-        <BreakdownRow label="CPU" value={build.cpu.pm} max={48500} color="#7B2FFF" />
+        <BreakdownRow label="CPU" value={build.cpu.pm} max={48500} color={BK_CPU_COLOR} />
       )}
       {build.gpu?.pm != null && (
-        <BreakdownRow label="GPU" value={build.gpu.pm} max={38500} color="#FF6B9D" />
+        <BreakdownRow label="GPU" value={build.gpu.pm} max={38500} color={BK_GPU_COLOR} />
       )}
-      <BreakdownRow label="Combined" value={score} max={MAX_SCORE} color="#6B6B80" />
+      <BreakdownRow label="Combined" value={score} max={MAX_SCORE} color={BK_COMBINED_COLOR} />
 
       {/* ── Upgrade suggestions ── */}
       {suggestions.length > 0 && (
@@ -99,8 +106,6 @@ export function BuildReport({ build }: Props) {
   )
 }
 
-// ── Breakdown bar sub-component ──
-
 function BreakdownRow({ label, value, max, color }: {
   label: string; value: number; max: number; color: string
 }) {
@@ -116,14 +121,11 @@ function BreakdownRow({ label, value, max, color }: {
   )
 }
 
-// ── Styles ──
-
 const s: Record<string, React.CSSProperties> = {
   wrap: {
     padding: '0 20px 16px',
   },
 
-  // Hero
   hero: {
     display: 'flex',
     alignItems: 'center',
@@ -165,7 +167,6 @@ const s: Record<string, React.CSSProperties> = {
     borderBottom: '0.5px solid rgba(255,255,255,0.06)',
   },
 
-  // Category bars
   catGrid: {
     paddingTop: 14,
     display: 'flex',
@@ -189,25 +190,27 @@ const s: Record<string, React.CSSProperties> = {
   catLabel: {
     fontSize: 12,
     fontWeight: 500,
-    color: '#FFFFFF',
+    color: '#AAAABC',
   },
   catBadge: {
     fontSize: 10,
     fontWeight: 600,
+    color: BADGE_FG,
+    background: BADGE_BG,
     borderRadius: 4,
     padding: '1px 5px',
     alignSelf: 'flex-start' as const,
   },
   barTrack: {
     flex: 1,
-    height: 5,
+    height: 4,
     background: 'rgba(255,255,255,0.06)',
-    borderRadius: 3,
+    borderRadius: 2,
     overflow: 'hidden',
   },
   barFill: {
     height: '100%',
-    borderRadius: 3,
+    borderRadius: 2,
     transition: 'width 0.4s ease',
   },
   catPct: {
@@ -218,7 +221,6 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
 
-  // Breakdown
   breakdownTitle: {
     fontSize: 14,
     fontWeight: 600,
@@ -255,11 +257,10 @@ const s: Record<string, React.CSSProperties> = {
     textAlign: 'right' as const,
     fontSize: 12,
     fontWeight: 500,
-    color: '#FFFFFF',
+    color: '#AAAABC',
     flexShrink: 0,
   },
 
-  // Suggestions
   suggestWrap: {
     marginTop: 14,
     background: 'rgba(255,255,255,0.03)',
@@ -270,7 +271,7 @@ const s: Record<string, React.CSSProperties> = {
   suggestTitle: {
     fontSize: 13,
     fontWeight: 600,
-    color: '#FFFFFF',
+    color: '#AAAABC',
     marginBottom: 10,
   },
   suggestRow: {
@@ -283,7 +284,7 @@ const s: Record<string, React.CSSProperties> = {
     width: 5,
     height: 5,
     borderRadius: '50%',
-    background: '#F59E0B',
+    background: 'rgba(255,255,255,0.25)',
     marginTop: 5,
     flexShrink: 0,
   },

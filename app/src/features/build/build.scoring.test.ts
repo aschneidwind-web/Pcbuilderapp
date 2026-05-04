@@ -18,7 +18,7 @@ const rtx: BuildState = {
 }
 
 const fullBuild: BuildState = {
-  cpu: { n: 'Ryzen 7 7800X3D', s: '8-core · AM5', p: 449, sk: 'AM5', pm: 33180 },
+  cpu: { n: 'Core i9-14900K', s: '24-core · LGA1700', p: 549, sk: 'LGA1700', pm: 48500 },
   gpu: { n: 'RTX 4080 Super', s: '16GB · 4K', p: 999, pm: 38500 },
   ram: { n: 'G.Skill Trident Z5 32GB', s: 'DDR5-6000 · 2×16GB', p: 119, mhz: 6000, gb: 32 },
   storage: { n: 'Samsung 990 Pro 2TB', s: 'NVMe Gen4 · 2TB', p: 159, read: 7450, tb: 2 },
