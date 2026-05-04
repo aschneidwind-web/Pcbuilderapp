@@ -13,6 +13,21 @@ export const CATALOG: Catalog = {
       { n: 'Core i9-14900K',  s: '24-core · 3.2GHz · LGA1700', p: 549, sk: 'LGA1700', pm: 48500 },
     ],
   },
+  cooler: {
+    label: 'CPU Cooler',
+    ib: '#10B981', ic: '#ffffff', hasPM: false,
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M19.07 4.93l-2.83 2.83M7.76 16.24l-2.83 2.83"/></svg>',
+    opts: [
+      { n: 'Cooler Master Hyper 212',       s: 'Air | 150W TDP',        p: 45,  tdp: 150 },
+      { n: 'Arctic Freezer 34 eSports DUO', s: 'Air | 210W TDP',        p: 40,  tdp: 210 },
+      { n: 'DeepCool AK620',               s: 'Air | 260W TDP',        p: 65,  tdp: 260 },
+      { n: 'be quiet! Dark Rock Pro 5',    s: 'Air | 270W TDP',        p: 90,  tdp: 270 },
+      { n: 'Noctua NH-D15',               s: 'Air | 250W TDP',        p: 110, tdp: 250 },
+      { n: 'NZXT Kraken X63',             s: '280mm AIO | 300W TDP',  p: 150, tdp: 300 },
+      { n: 'Lian Li Galahad II Trinity',   s: '360mm AIO | 300W TDP',  p: 130, tdp: 300 },
+      { n: 'Corsair iCUE H150i',          s: '360mm AIO | 350W TDP',  p: 170, tdp: 350 },
+    ],
+  },
   gpu: {
     label: 'GPU',
     ib: '#FCEBEB', ic: '#A32D2D', hasPM: true,

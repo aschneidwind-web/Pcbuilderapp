@@ -1,7 +1,7 @@
-export type SlotKey = 'cpu' | 'gpu' | 'motherboard' | 'ram' | 'storage' | 'psu' | 'case'
+export type SlotKey = 'cpu' | 'cooler' | 'gpu' | 'motherboard' | 'ram' | 'storage' | 'psu' | 'case'
 
 export const SLOT_KEYS: readonly SlotKey[] = [
-  'cpu', 'gpu', 'motherboard', 'ram', 'storage', 'psu', 'case',
+  'cpu', 'cooler', 'gpu', 'motherboard', 'ram', 'storage', 'psu', 'case',
 ]
 
 export interface CatalogOption {
@@ -17,6 +17,7 @@ export interface CatalogOption {
   watts?: number  // PSU wattage
   feat?: string   // motherboard features string
   vrs?: number    // PCIe version
+  tdp?: number    // cooler TDP rating in watts
 }
 
 export interface CatalogSlot {
