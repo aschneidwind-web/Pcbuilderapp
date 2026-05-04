@@ -109,7 +109,7 @@ export function BuildPage() {
               style={s.nameInput}
               value={buildName}
               onChange={e => setBuildName(e.target.value)}
-              placeholder="Build name (optional)"
+              placeholder="Build name"
             />
             <button style={btnStyle} onClick={handleSave} disabled={saving || componentCount === 0}>
               {saveMsg ?? (saving ? 'Saving…' : 'Save build')}
