@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { AuthScreen } from './components/AuthScreen'
 import { SavesPage } from './features/saves'
@@ -7,7 +6,6 @@ import { BuildPage, useBuild } from './features/build'
 import { ComparePage } from './features/compare'
 import { AccountPage } from './features/account'
 import type { SavedBuild } from './features/saves'
-import legacyHtml from './legacy/prototype.html?raw'
 
 const shell: React.CSSProperties = {
   height: '100vh', width: '100vw',
@@ -27,22 +25,6 @@ export function App() {
   const { session, loading } = useAuth()
   const { loadBuild } = useBuild()
   const navigate = useNavigate()
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-
-  const handleIframeLoad = () => {
-    if (!iframeRef.current || !session) return
-    const u = session.user
-    iframeRef.current.contentWindow?.postMessage({
-      type: 'SUPABASE_SESSION',
-      user: {
-        name: u.user_metadata?.full_name || u.email?.split('@')[0] || 'User',
-        email: u.email || '',
-        bio: '',
-        avatarIdx: 0,
-        joined: new Date().toLocaleDateString(),
-      }
-    }, '*')
-  }
 
   if (loading) {
     return <div style={{ height: '100vh', width: '100vw', background: '#0b0b0e' }} />
@@ -65,18 +47,7 @@ export function App() {
           <Route path="/saves"   element={<SavesPage onLoad={handleLoadBuild} />} />
           <Route path="/compare" element={<ComparePage />} />
           <Route path="/account" element={<AccountPage />} />
-          <Route
-            path="*"
-            element={
-              <iframe
-                ref={iframeRef}
-                title="PC Builder"
-                srcDoc={legacyHtml}
-                style={{ width: '100%', height: '100%', border: 0 }}
-                onLoad={handleIframeLoad}
-              />
-            }
-          />
+          <Route path="/" element={<Navigate to="/build" replace />} />
         </Routes>
       </div>
     </div>
