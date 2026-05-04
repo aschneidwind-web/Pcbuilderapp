@@ -53,7 +53,7 @@ export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
                   {ptp && <span style={s.optPts}>{ptp} pts/$</span>}
                 </div>
                 {isSel && (
-                  <div style={{ color: '#7B2FFF', flexShrink: 0 }}>
+                  <div style={{ color: '#6B6B80', flexShrink: 0 }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="16" height="16">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
@@ -125,7 +125,7 @@ const s: Record<string, React.CSSProperties> = {
   optRowSel: {
     margin: '0 -16px',
     padding: '14px 16px',
-    background: 'rgba(123,47,255,0.08)',
+    background: 'rgba(255,255,255,0.04)',
   },
   optName: {
     fontSize: 13,
