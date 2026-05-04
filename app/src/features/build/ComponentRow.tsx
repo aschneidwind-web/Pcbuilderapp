@@ -21,7 +21,11 @@ export function ComponentRow({ slotKey: _slotKey, slot, selected, onClick }: Pro
           viewBox="0 0 24 24"
           width="20"
           height="20"
-          style={{ display: 'block', color: slot.ic }}
+          fill="none"
+          stroke={slot.ic}
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          style={{ display: 'block' }}
           dangerouslySetInnerHTML={{ __html: slot.icon.replace(/<svg[^>]*>/, '').replace(/<\/svg>/, '') }}
         />
       </div>
