@@ -8,15 +8,13 @@ export function AboutSlide({ onClose }: Props) {
     <SlideBase title="About" onClose={onClose}>
       <div style={s.hero}>
         <div style={s.logoWrap}>
-          <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round">
-            <rect x="3" y="3" width="8" height="8" rx="1.5"/>
-            <rect x="13" y="3" width="8" height="8" rx="1.5"/>
-            <rect x="3" y="13" width="8" height="8" rx="1.5"/>
-            <rect x="13" y="13" width="8" height="8" rx="1.5"/>
+          <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 4 L14 4 L20 12 L14 20 L4 20 Z"/>
+            <circle cx="17" cy="12" r="3" fill="#fff" stroke="none"/>
           </svg>
         </div>
-        <div style={s.appName}>PC Builder</div>
-        <div style={s.version}>Version 1.0.0 (beta)</div>
+        <div style={s.appName}>PartFlow</div>
+        <div style={s.version}>Version 0.1.0 (beta)</div>
       </div>
 
       <SettingsGroup>
@@ -38,7 +36,7 @@ export function AboutSlide({ onClose }: Props) {
 const s: Record<string, React.CSSProperties> = {
   hero:    { textAlign: 'center', padding: '24px 0 20px' },
   logoWrap: {
-    width: 64, height: 64, background: '#0A84FF', borderRadius: 18,
+    width: 64, height: 64, background: 'linear-gradient(135deg, #7B2FFF, #FF6B9D)', borderRadius: 18,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 14px',
   },
