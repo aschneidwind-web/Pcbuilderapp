@@ -6,7 +6,7 @@ import type {
   SavedBuildRow,
 } from './saves.types'
 
-const TABLE = 'saved_builds'
+const TABLE = 'builds'
 
 const toDomain = (row: SavedBuildRow): SavedBuild => ({
   id: row.id,

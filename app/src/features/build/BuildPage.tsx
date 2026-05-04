@@ -37,8 +37,9 @@ export function BuildPage() {
       await createSave({ name, components: toBuildComponents(build) })
       setSaveMsg('Saved!')
       setBuildName('')
-    } catch {
-      setSaveMsg('Failed to save')
+    } catch (err) {
+      console.error('Save failed:', err)
+      setSaveMsg(err instanceof Error ? err.message : 'Failed to save')
     } finally {
       setSaving(false)
       setTimeout(() => setSaveMsg(null), 2000)
