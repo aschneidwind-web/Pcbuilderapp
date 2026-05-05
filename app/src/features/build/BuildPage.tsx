@@ -52,7 +52,7 @@ export function BuildPage() {
     <div style={s.page}>
       <div style={s.navbar}>
         <div style={s.navLeft}>
-          <img src="/favicon.svg" width="18" height="17" alt="" />
+          <img src="/logo.png" width="18" height="17" alt="" />
           <div style={s.navTitle}>Build</div>
         </div>
         <div style={s.navSub}>{componentCount} / 7</div>

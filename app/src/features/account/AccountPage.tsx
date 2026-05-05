@@ -84,7 +84,7 @@ export function AccountPage() {
     <div style={s.page}>
       <div style={s.navbar}>
         <div style={s.navLeft}>
-          <img src="/favicon.svg" width="18" height="17" alt="" />
+          <img src="/logo.png" width="18" height="17" alt="" />
           <div style={s.navTitle}>Account</div>
         </div>
       </div>
