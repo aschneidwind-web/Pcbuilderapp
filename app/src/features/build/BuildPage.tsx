@@ -129,7 +129,7 @@ export function BuildPage() {
           selected={build[activePicker]}
           onSelect={opt => selectComponent(activePicker, opt)}
           onClose={() => setActivePicker(null)}
-          onClear={() => { clearComponent(activePicker); setActivePicker(null) }}
+          onClear={() => clearComponent(activePicker)}
         />
       )}
     </div>

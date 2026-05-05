@@ -31,35 +31,23 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
         </div>
 
         <div style={s.list}>
-          {selected !== undefined && (
-            <button
-              style={{
-                background: 'rgba(255,69,58,0.1)',
-                color: '#FF453A',
-                border: '0.5px solid rgba(255,69,58,0.2)',
-                borderRadius: 10,
-                padding: '10px 0',
-                fontSize: 14,
-                fontWeight: 500,
-                cursor: 'pointer',
-                marginBottom: 12,
-                width: '100%',
-              }}
-              onClick={() => { onClear(); onClose() }}
-            >
-              Remove component
-            </button>
-          )}
           {slot.opts.map(opt => {
             const ptp = opt.pm ? Math.round(opt.pm / opt.p) : null
             const isBestValue = ptp != null && ptp === maxPtp
-            const isSel = selected === opt
+            const isSel = selected?.n === opt.n
 
             return (
               <div
                 key={opt.n}
                 style={{ ...s.optRow, ...(isSel ? s.optRowSel : {}) }}
-                onClick={() => { onSelect(opt); onClose() }}
+                onClick={() => {
+                  if (isSel) {
+                    onClear()
+                  } else {
+                    onSelect(opt)
+                  }
+                  onClose()
+                }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={s.optName}>
@@ -73,10 +61,11 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
                   {ptp && <span style={s.optPts}>{ptp} pts/$</span>}
                 </div>
                 {isSel && (
-                  <div style={{ color: '#6B6B80', flexShrink: 0 }}>
+                  <div style={{ color: '#A78BFA', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="16" height="16">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
+                    <span style={{ fontSize: 9, color: '#6B6B80', letterSpacing: 0.2 }}>tap to remove</span>
                   </div>
                 )}
               </div>
