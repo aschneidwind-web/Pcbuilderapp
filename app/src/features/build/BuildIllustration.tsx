@@ -17,15 +17,22 @@ interface PartStyle {
   stroke: string
   dasharray: string | undefined
   opacity: number
+  animation: string | undefined
 }
 
-function partStyle(build: BuildState, slot: string): PartStyle {
+function partStyle(build: BuildState, slot: string, allComplete: boolean): PartStyle {
   const selected = build[slot as SlotKey] != null
   if (!selected) {
-    return { fill: 'none', stroke: '#4A4A5A', dasharray: '3 2', opacity: 0.15 }
+    return { fill: 'none', stroke: '#4A4A5A', dasharray: '3 2', opacity: 0.15, animation: undefined }
   }
   const [c1] = COLORS[slot]
-  return { fill: `${c1}18`, stroke: c1, dasharray: undefined, opacity: 1 }
+  return {
+    fill: `${c1}18`,
+    stroke: c1,
+    dasharray: undefined,
+    opacity: 1,
+    animation: allComplete ? 'borderPulse 2s ease-in-out infinite' : undefined,
+  }
 }
 
 interface Props {
@@ -34,13 +41,13 @@ interface Props {
 
 export function BuildIllustration({ build }: Props) {
   const allSelected = SLOT_KEYS.every(k => build[k] != null)
-  const mb = partStyle(build, 'motherboard')
-  const cpu = partStyle(build, 'cpu')
-  const cooler = partStyle(build, 'cooler')
-  const gpu = partStyle(build, 'gpu')
-  const ram = partStyle(build, 'ram')
-  const stor = partStyle(build, 'storage')
-  const psu = partStyle(build, 'psu')
+  const mb   = partStyle(build, 'motherboard', allSelected)
+  const cpu  = partStyle(build, 'cpu',         allSelected)
+  const cooler = partStyle(build, 'cooler',    allSelected)
+  const gpu  = partStyle(build, 'gpu',         allSelected)
+  const ram  = partStyle(build, 'ram',         allSelected)
+  const stor = partStyle(build, 'storage',     allSelected)
+  const psu  = partStyle(build, 'psu',         allSelected)
 
   const caseOn = build.case != null
   const cStroke = caseOn ? COLORS.case[0] : '#555'
@@ -54,12 +61,10 @@ export function BuildIllustration({ build }: Props) {
     >
       <defs>
         <style>{`
-          @keyframes gp { 0%,100% { opacity:.5 } 50% { opacity:1 } }
-          .gl { animation: gp 2.5s ease-in-out infinite; }
           @media (prefers-reduced-motion: no-preference) {
-            @keyframes syncPulse { 0%,100% { opacity:0.5; } 40% { opacity:1; } 60% { opacity:1; } }
+            @keyframes borderPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
             @keyframes caseStroke { from { stroke-dashoffset: 1044; } to { stroke-dashoffset: 0; } }
-            .gl-sync { animation: syncPulse 1s ease-in-out 1; }
+            @keyframes spin { to { transform: rotate(360deg); } }
           }
         `}</style>
       </defs>
@@ -111,6 +116,7 @@ export function BuildIllustration({ build }: Props) {
       <rect x="46" y="14" width="240" height="168" rx="2"
         fill={mb.fill} stroke={mb.stroke} strokeWidth="0.6"
         strokeDasharray={mb.dasharray} opacity={mb.opacity}
+        style={{ animation: mb.animation }}
       />
       {build.motherboard && (
         <>
@@ -143,6 +149,7 @@ export function BuildIllustration({ build }: Props) {
       <rect x="140" y="28" width="42" height="42" rx="2"
         fill={cpu.fill} stroke={cpu.stroke} strokeWidth="0.6"
         strokeDasharray={cpu.dasharray} opacity={cpu.opacity}
+        style={{ animation: cpu.animation }}
       />
       {build.cpu && (
         <>
@@ -154,7 +161,6 @@ export function BuildIllustration({ build }: Props) {
               <line key={x} x1={x} y1="28" x2={x} y2="24" />
             ))}
           </g>
-          <circle cx="161" cy="49" r="1.5" fill={COLORS.cpu[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
@@ -162,6 +168,7 @@ export function BuildIllustration({ build }: Props) {
       <rect x="132" y="20" width="58" height="58" rx="3"
         fill={cooler.fill} stroke={cooler.stroke} strokeWidth="0.6"
         strokeDasharray={cooler.dasharray} opacity={cooler.opacity}
+        style={{ animation: cooler.animation }}
       />
       {build.cooler && (
         <>
@@ -198,18 +205,17 @@ export function BuildIllustration({ build }: Props) {
         fill={cooler.fill} stroke={cooler.stroke} strokeWidth="0.3"
         strokeDasharray={cooler.dasharray} opacity={cooler.opacity * 0.5}
       />
-      {build.cooler && (
-        <circle cx="186" cy="24" r="1.5" fill={COLORS.cooler[0]} className={allSelected ? "gl-sync" : "gl"} />
-      )}
 
       {/* ── RAM ── */}
       <rect x="218" y="24" width="7" height="56" rx="1"
         fill={ram.fill} stroke={ram.stroke} strokeWidth="0.5"
         strokeDasharray={ram.dasharray} opacity={ram.opacity}
+        style={{ animation: ram.animation }}
       />
       <rect x="229" y="24" width="7" height="56" rx="1"
         fill={ram.fill} stroke={ram.stroke} strokeWidth="0.5"
         strokeDasharray={ram.dasharray} opacity={ram.opacity}
+        style={{ animation: ram.animation }}
       />
       {build.ram && (
         <>
@@ -227,7 +233,6 @@ export function BuildIllustration({ build }: Props) {
             <line x1="221.5" y1="24" x2="221.5" y2="21" />
             <line x1="232.5" y1="24" x2="232.5" y2="21" />
           </g>
-          <circle cx="225" cy="27" r="1.5" fill={COLORS.ram[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
@@ -235,6 +240,7 @@ export function BuildIllustration({ build }: Props) {
       <rect x="50" y="96" width="200" height="28" rx="2.5"
         fill={gpu.fill} stroke={gpu.stroke} strokeWidth="0.6"
         strokeDasharray={gpu.dasharray} opacity={gpu.opacity}
+        style={{ animation: gpu.animation }}
       />
       {build.gpu && (
         <>
@@ -274,15 +280,13 @@ export function BuildIllustration({ build }: Props) {
           )}
         </g>
       ))}
-      {build.gpu && (
-        <circle cx="54" cy="100" r="1.5" fill={COLORS.gpu[0]} className={allSelected ? "gl-sync" : "gl"} />
-      )}
 
       {/* ── Storage ── */}
       {/* M.2 on motherboard */}
       <rect x="190" y="150" width="48" height="6" rx="1.5"
         fill={stor.fill} stroke={stor.stroke} strokeWidth="0.5"
         strokeDasharray={stor.dasharray} opacity={stor.opacity}
+        style={{ animation: stor.animation }}
       />
       {build.storage && (
         <>
@@ -298,15 +302,14 @@ export function BuildIllustration({ build }: Props) {
       <rect x="256" y="192" width="36" height="24" rx="2"
         fill={stor.fill} stroke={stor.stroke} strokeWidth="0.5"
         strokeDasharray={stor.dasharray} opacity={stor.opacity}
+        style={{ animation: stor.animation }}
       />
-      {build.storage && (
-        <circle cx="288" cy="196" r="1.5" fill={COLORS.storage[0]} className={allSelected ? "gl-sync" : "gl"} />
-      )}
 
       {/* ── PSU ── */}
       <rect x="40" y="192" width="108" height="42" rx="3"
         fill={psu.fill} stroke={psu.stroke} strokeWidth="0.6"
         strokeDasharray={psu.dasharray} opacity={psu.opacity}
+        style={{ animation: psu.animation }}
       />
       <circle cx="94" cy="213" r="15"
         fill="none" stroke={psu.stroke} strokeWidth="0.35"
@@ -333,7 +336,6 @@ export function BuildIllustration({ build }: Props) {
             <path d="M148 213 Q170 213 185 200 Q200 188 220 186" />
             <path d="M148 221 Q175 221 195 208 Q215 195 240 186" />
           </g>
-          <circle cx="44" cy="196" r="1.5" fill={COLORS.psu[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
