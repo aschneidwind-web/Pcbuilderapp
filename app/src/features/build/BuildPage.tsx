@@ -22,7 +22,7 @@ const toBuildComponents = (build: ReturnType<typeof useBuild>['build']): BuildCo
 }
 
 export function BuildPage() {
-  const { build, totalPrice, componentCount, socketCompatible, selectComponent } = useBuild()
+  const { build, totalPrice, componentCount, socketCompatible, selectComponent, clearComponent } = useBuild()
   const { createSave } = useSaves()
 
   const [activePicker, setActivePicker] = useState<SlotKey | null>(null)
@@ -129,6 +129,7 @@ export function BuildPage() {
           selected={build[activePicker]}
           onSelect={opt => selectComponent(activePicker, opt)}
           onClose={() => setActivePicker(null)}
+          onClear={() => { clearComponent(activePicker); setActivePicker(null) }}
         />
       )}
     </div>

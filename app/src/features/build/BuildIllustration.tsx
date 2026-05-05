@@ -1,4 +1,5 @@
 import type { BuildState, SlotKey } from './build.types'
+import { SLOT_KEYS } from './build.types'
 
 const COLORS: Record<string, [string, string]> = {
   cpu:         ['#7B2FFF', '#A855F7'],
@@ -32,6 +33,7 @@ interface Props {
 }
 
 export function BuildIllustration({ build }: Props) {
+  const allSelected = SLOT_KEYS.every(k => build[k] != null)
   const mb = partStyle(build, 'motherboard')
   const cpu = partStyle(build, 'cpu')
   const cooler = partStyle(build, 'cooler')
@@ -54,13 +56,33 @@ export function BuildIllustration({ build }: Props) {
         <style>{`
           @keyframes gp { 0%,100% { opacity:.5 } 50% { opacity:1 } }
           .gl { animation: gp 2.5s ease-in-out infinite; }
+          @media (prefers-reduced-motion: no-preference) {
+            @keyframes spin { to { transform: rotate(360deg); } }
+            @keyframes rgbSweep { 0% { stroke-dashoffset: 40; } 100% { stroke-dashoffset: 0; } }
+            @keyframes powerGlow { 0%,100% { opacity: 0.03; } 50% { opacity: 0.08; } }
+            @keyframes ledOn { 0% { opacity: 0; } 100% { opacity: 1; } }
+          }
         `}</style>
+        {allSelected && (
+          <linearGradient id="rgbGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FF0000" />
+            <stop offset="33%" stopColor="#00FF00" />
+            <stop offset="66%" stopColor="#0000FF" />
+            <stop offset="100%" stopColor="#FF0000" />
+          </linearGradient>
+        )}
       </defs>
 
       {/* ── Case shell ── */}
       <rect x="25" y="8" width="290" height="232" rx="5"
         fill="none" stroke={cStroke} strokeWidth="1.5" opacity={cOp}
       />
+      {allSelected && (
+        <rect x="25" y="8" width="290" height="232" rx="5"
+          fill="#7B2FFF" className="power-glow"
+          style={{ animation: 'powerGlow 3s ease-in-out infinite' }}
+        />
+      )}
       {/* Front panel */}
       <rect x="295" y="8" width="20" height="232" fill="#1a1a1f"
         stroke={cStroke} strokeWidth="0.6" opacity={cOp * 0.6}
@@ -71,6 +93,18 @@ export function BuildIllustration({ build }: Props) {
           stroke="#555" strokeWidth="0.4" opacity={cOp * 0.4}
         />
       ))}
+      {allSelected && (
+        <>
+          <rect x="296" y="12" width="2" height="224" rx="1"
+            fill="none" stroke="url(#rgbGrad)" strokeWidth="2"
+            strokeDasharray="20 20"
+            style={{ animation: 'rgbSweep 2s linear infinite' }}
+          />
+          <circle cx="303" cy="226" r="2" fill="#34C759"
+            style={{ animation: 'ledOn 0.5s ease-out forwards' }}
+          />
+        </>
+      )}
       {/* Back panel */}
       <rect x="25" y="8" width="12" height="232" rx="5"
         fill="#1a1a1f" stroke={cStroke} strokeWidth="0.6" opacity={cOp * 0.6}
@@ -155,15 +189,17 @@ export function BuildIllustration({ build }: Props) {
             ))}
           </g>
           {/* Fan blades */}
-          <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
-            <line x1="161" y1="32" x2="161" y2="40" />
-            <line x1="161" y1="58" x2="161" y2="66" />
-            <line x1="144" y1="49" x2="152" y2="49" />
-            <line x1="170" y1="49" x2="178" y2="49" />
-            <line x1="149" y1="37" x2="155" y2="43" />
-            <line x1="167" y1="55" x2="173" y2="61" />
-            <line x1="173" y1="37" x2="167" y2="43" />
-            <line x1="155" y1="55" x2="149" y2="61" />
+          <g style={allSelected ? { transformOrigin: '161px 49px', animation: 'spin 3s linear infinite' } : undefined}>
+            <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
+              <line x1="161" y1="32" x2="161" y2="40" />
+              <line x1="161" y1="58" x2="161" y2="66" />
+              <line x1="144" y1="49" x2="152" y2="49" />
+              <line x1="170" y1="49" x2="178" y2="49" />
+              <line x1="149" y1="37" x2="155" y2="43" />
+              <line x1="167" y1="55" x2="173" y2="61" />
+              <line x1="173" y1="37" x2="167" y2="43" />
+              <line x1="155" y1="55" x2="149" y2="61" />
+            </g>
           </g>
           {/* Heatpipes */}
           <g fill="none" stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.2">
@@ -247,11 +283,13 @@ export function BuildIllustration({ build }: Props) {
               <circle cx={cx} cy="110" r="2.5"
                 fill={`${COLORS.gpu[0]}18`} stroke={COLORS.gpu[1]} strokeWidth="0.3"
               />
-              <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
-                <line x1={cx} y1="102" x2={cx} y2="106" />
-                <line x1={cx} y1="114" x2={cx} y2="118" />
-                <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
-                <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
+              <g style={allSelected ? { transformOrigin: `${cx}px 110px`, animation: 'spin 3s linear infinite' } : undefined}>
+                <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
+                  <line x1={cx} y1="102" x2={cx} y2="106" />
+                  <line x1={cx} y1="114" x2={cx} y2="118" />
+                  <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
+                  <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
+                </g>
               </g>
             </>
           )}

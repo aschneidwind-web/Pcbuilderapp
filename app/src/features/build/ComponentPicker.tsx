@@ -5,9 +5,10 @@ interface Props {
   selected: CatalogOption | undefined
   onSelect: (option: CatalogOption) => void
   onClose: () => void
+  onClear: () => void
 }
 
-export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
+export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: Props) {
   let maxPtp = 0
   for (const o of slot.opts) {
     if (o.pm) {
@@ -30,6 +31,25 @@ export function ComponentPicker({ slot, selected, onSelect, onClose }: Props) {
         </div>
 
         <div style={s.list}>
+          {selected !== undefined && (
+            <button
+              style={{
+                background: 'rgba(255,69,58,0.1)',
+                color: '#FF453A',
+                border: '0.5px solid rgba(255,69,58,0.2)',
+                borderRadius: 10,
+                padding: '10px 0',
+                fontSize: 14,
+                fontWeight: 500,
+                cursor: 'pointer',
+                marginBottom: 12,
+                width: '100%',
+              }}
+              onClick={() => { onClear(); onClose() }}
+            >
+              Remove component
+            </button>
+          )}
           {slot.opts.map(opt => {
             const ptp = opt.pm ? Math.round(opt.pm / opt.p) : null
             const isBestValue = ptp != null && ptp === maxPtp
