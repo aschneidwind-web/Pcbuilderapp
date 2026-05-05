@@ -31,7 +31,7 @@ function partStyle(build: BuildState, slot: string, allComplete: boolean): PartS
     stroke: c1,
     dasharray: undefined,
     opacity: 1,
-    animation: allComplete ? 'borderPulse 2s ease-in-out infinite' : undefined,
+    animation: allComplete ? 'borderPulse 4s ease-in-out infinite' : undefined,
   }
 }
 
