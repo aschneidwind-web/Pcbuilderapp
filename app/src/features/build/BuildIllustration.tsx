@@ -57,20 +57,11 @@ export function BuildIllustration({ build }: Props) {
           @keyframes gp { 0%,100% { opacity:.5 } 50% { opacity:1 } }
           .gl { animation: gp 2.5s ease-in-out infinite; }
           @media (prefers-reduced-motion: no-preference) {
-            @keyframes spin { to { transform: rotate(360deg); } }
-            @keyframes rgbSweep { 0% { stroke-dashoffset: 40; } 100% { stroke-dashoffset: 0; } }
-            @keyframes powerGlow { 0%,100% { opacity: 0.03; } 50% { opacity: 0.08; } }
-            @keyframes ledOn { 0% { opacity: 0; } 100% { opacity: 1; } }
+            @keyframes syncPulse { 0%,100% { opacity:0.5; } 40% { opacity:1; } 60% { opacity:1; } }
+            @keyframes caseStroke { from { stroke-dashoffset: 1044; } to { stroke-dashoffset: 0; } }
+            .gl-sync { animation: syncPulse 1s ease-in-out 1; }
           }
         `}</style>
-        {allSelected && (
-          <linearGradient id="rgbGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#FF0000" />
-            <stop offset="33%" stopColor="#00FF00" />
-            <stop offset="66%" stopColor="#0000FF" />
-            <stop offset="100%" stopColor="#FF0000" />
-          </linearGradient>
-        )}
       </defs>
 
       {/* ── Case shell ── */}
@@ -79,8 +70,12 @@ export function BuildIllustration({ build }: Props) {
       />
       {allSelected && (
         <rect x="25" y="8" width="290" height="232" rx="5"
-          fill="#7B2FFF" className="power-glow"
-          style={{ animation: 'powerGlow 3s ease-in-out infinite' }}
+          fill="none"
+          stroke={COLORS.case[0]}
+          strokeWidth="1.5"
+          strokeDasharray="1044"
+          strokeDashoffset="1044"
+          style={{ animation: 'caseStroke 1.2s ease-out forwards' }}
         />
       )}
       {/* Front panel */}
@@ -93,18 +88,6 @@ export function BuildIllustration({ build }: Props) {
           stroke="#555" strokeWidth="0.4" opacity={cOp * 0.4}
         />
       ))}
-      {allSelected && (
-        <>
-          <rect x="296" y="12" width="2" height="224" rx="1"
-            fill="none" stroke="url(#rgbGrad)" strokeWidth="2"
-            strokeDasharray="20 20"
-            style={{ animation: 'rgbSweep 2s linear infinite' }}
-          />
-          <circle cx="303" cy="226" r="2" fill="#34C759"
-            style={{ animation: 'ledOn 0.5s ease-out forwards' }}
-          />
-        </>
-      )}
       {/* Back panel */}
       <rect x="25" y="8" width="12" height="232" rx="5"
         fill="#1a1a1f" stroke={cStroke} strokeWidth="0.6" opacity={cOp * 0.6}
@@ -171,7 +154,7 @@ export function BuildIllustration({ build }: Props) {
               <line key={x} x1={x} y1="28" x2={x} y2="24" />
             ))}
           </g>
-          <circle cx="161" cy="49" r="1.5" fill={COLORS.cpu[0]} className="gl" />
+          <circle cx="161" cy="49" r="1.5" fill={COLORS.cpu[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
@@ -189,17 +172,15 @@ export function BuildIllustration({ build }: Props) {
             ))}
           </g>
           {/* Fan blades */}
-          <g style={allSelected ? { transformOrigin: '161px 49px', animation: 'spin 3s linear infinite' } : undefined}>
-            <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
-              <line x1="161" y1="32" x2="161" y2="40" />
-              <line x1="161" y1="58" x2="161" y2="66" />
-              <line x1="144" y1="49" x2="152" y2="49" />
-              <line x1="170" y1="49" x2="178" y2="49" />
-              <line x1="149" y1="37" x2="155" y2="43" />
-              <line x1="167" y1="55" x2="173" y2="61" />
-              <line x1="173" y1="37" x2="167" y2="43" />
-              <line x1="155" y1="55" x2="149" y2="61" />
-            </g>
+          <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
+            <line x1="161" y1="32" x2="161" y2="40" />
+            <line x1="161" y1="58" x2="161" y2="66" />
+            <line x1="144" y1="49" x2="152" y2="49" />
+            <line x1="170" y1="49" x2="178" y2="49" />
+            <line x1="149" y1="37" x2="155" y2="43" />
+            <line x1="167" y1="55" x2="173" y2="61" />
+            <line x1="173" y1="37" x2="167" y2="43" />
+            <line x1="155" y1="55" x2="149" y2="61" />
           </g>
           {/* Heatpipes */}
           <g fill="none" stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.2">
@@ -218,7 +199,7 @@ export function BuildIllustration({ build }: Props) {
         strokeDasharray={cooler.dasharray} opacity={cooler.opacity * 0.5}
       />
       {build.cooler && (
-        <circle cx="186" cy="24" r="1.5" fill={COLORS.cooler[0]} className="gl" />
+        <circle cx="186" cy="24" r="1.5" fill={COLORS.cooler[0]} className={allSelected ? "gl-sync" : "gl"} />
       )}
 
       {/* ── RAM ── */}
@@ -246,7 +227,7 @@ export function BuildIllustration({ build }: Props) {
             <line x1="221.5" y1="24" x2="221.5" y2="21" />
             <line x1="232.5" y1="24" x2="232.5" y2="21" />
           </g>
-          <circle cx="225" cy="27" r="1.5" fill={COLORS.ram[0]} className="gl" />
+          <circle cx="225" cy="27" r="1.5" fill={COLORS.ram[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
@@ -283,20 +264,18 @@ export function BuildIllustration({ build }: Props) {
               <circle cx={cx} cy="110" r="2.5"
                 fill={`${COLORS.gpu[0]}18`} stroke={COLORS.gpu[1]} strokeWidth="0.3"
               />
-              <g style={allSelected ? { transformOrigin: `${cx}px 110px`, animation: 'spin 3s linear infinite' } : undefined}>
-                <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
-                  <line x1={cx} y1="102" x2={cx} y2="106" />
-                  <line x1={cx} y1="114" x2={cx} y2="118" />
-                  <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
-                  <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
-                </g>
+              <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
+                <line x1={cx} y1="102" x2={cx} y2="106" />
+                <line x1={cx} y1="114" x2={cx} y2="118" />
+                <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
+                <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
               </g>
             </>
           )}
         </g>
       ))}
       {build.gpu && (
-        <circle cx="54" cy="100" r="1.5" fill={COLORS.gpu[0]} className="gl" />
+        <circle cx="54" cy="100" r="1.5" fill={COLORS.gpu[0]} className={allSelected ? "gl-sync" : "gl"} />
       )}
 
       {/* ── Storage ── */}
@@ -321,7 +300,7 @@ export function BuildIllustration({ build }: Props) {
         strokeDasharray={stor.dasharray} opacity={stor.opacity}
       />
       {build.storage && (
-        <circle cx="288" cy="196" r="1.5" fill={COLORS.storage[0]} className="gl" />
+        <circle cx="288" cy="196" r="1.5" fill={COLORS.storage[0]} className={allSelected ? "gl-sync" : "gl"} />
       )}
 
       {/* ── PSU ── */}
@@ -354,7 +333,7 @@ export function BuildIllustration({ build }: Props) {
             <path d="M148 213 Q170 213 185 200 Q200 188 220 186" />
             <path d="M148 221 Q175 221 195 208 Q215 195 240 186" />
           </g>
-          <circle cx="44" cy="196" r="1.5" fill={COLORS.psu[0]} className="gl" />
+          <circle cx="44" cy="196" r="1.5" fill={COLORS.psu[0]} className={allSelected ? "gl-sync" : "gl"} />
         </>
       )}
 
