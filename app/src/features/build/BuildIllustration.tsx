@@ -61,11 +61,9 @@ export function BuildIllustration({ build }: Props) {
     >
       <defs>
         <style>{`
-          @media (prefers-reduced-motion: no-preference) {
-            @keyframes borderPulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-            @keyframes caseStroke { from { stroke-dashoffset: 1044; } to { stroke-dashoffset: 0; } }
-            @keyframes spin { to { transform: rotate(360deg); } }
-          }
+          @keyframes borderPulse { 0%,100% { opacity:1; stroke-width:0.6; } 50% { opacity:0.2; stroke-width:2.5; } }
+          @keyframes caseStroke { from { stroke-dashoffset:1044; } to { stroke-dashoffset:0; } }
+          @keyframes spin { to { transform:rotate(360deg); } }
         `}</style>
       </defs>
 
@@ -179,15 +177,17 @@ export function BuildIllustration({ build }: Props) {
             ))}
           </g>
           {/* Fan blades */}
-          <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
-            <line x1="161" y1="32" x2="161" y2="40" />
-            <line x1="161" y1="58" x2="161" y2="66" />
-            <line x1="144" y1="49" x2="152" y2="49" />
-            <line x1="170" y1="49" x2="178" y2="49" />
-            <line x1="149" y1="37" x2="155" y2="43" />
-            <line x1="167" y1="55" x2="173" y2="61" />
-            <line x1="173" y1="37" x2="167" y2="43" />
-            <line x1="155" y1="55" x2="149" y2="61" />
+          <g style={allSelected ? { transformBox: 'fill-box', transformOrigin: 'center', animation: 'spin 1.5s linear infinite' } : undefined}>
+            <g stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.18">
+              <line x1="161" y1="32" x2="161" y2="40" />
+              <line x1="161" y1="58" x2="161" y2="66" />
+              <line x1="144" y1="49" x2="152" y2="49" />
+              <line x1="170" y1="49" x2="178" y2="49" />
+              <line x1="149" y1="37" x2="155" y2="43" />
+              <line x1="167" y1="55" x2="173" y2="61" />
+              <line x1="173" y1="37" x2="167" y2="43" />
+              <line x1="155" y1="55" x2="149" y2="61" />
+            </g>
           </g>
           {/* Heatpipes */}
           <g fill="none" stroke={COLORS.cooler[1]} strokeWidth="0.35" opacity="0.2">
@@ -270,11 +270,13 @@ export function BuildIllustration({ build }: Props) {
               <circle cx={cx} cy="110" r="2.5"
                 fill={`${COLORS.gpu[0]}18`} stroke={COLORS.gpu[1]} strokeWidth="0.3"
               />
-              <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
-                <line x1={cx} y1="102" x2={cx} y2="106" />
-                <line x1={cx} y1="114" x2={cx} y2="118" />
-                <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
-                <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
+              <g style={allSelected ? { transformBox: 'fill-box', transformOrigin: 'center', animation: 'spin 1.5s linear infinite' } : undefined}>
+                <g stroke={COLORS.gpu[1]} strokeWidth="0.3" opacity="0.18">
+                  <line x1={cx} y1="102" x2={cx} y2="106" />
+                  <line x1={cx} y1="114" x2={cx} y2="118" />
+                  <line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
+                  <line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
+                </g>
               </g>
             </>
           )}
