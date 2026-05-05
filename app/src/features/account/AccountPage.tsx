@@ -83,7 +83,10 @@ export function AccountPage() {
   return (
     <div style={s.page}>
       <div style={s.navbar}>
-        <div style={s.navTitle}>Account</div>
+        <div style={s.navLeft}>
+          <img src="/favicon.svg" width="18" height="17" alt="" />
+          <div style={s.navTitle}>Account</div>
+        </div>
       </div>
 
       <div style={s.scroll}>
@@ -165,6 +168,7 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex', alignItems: 'center', padding: '16px 16px 12px',
     borderBottom: '0.5px solid rgba(255,255,255,0.08)', flexShrink: 0,
   },
+  navLeft: { display: 'flex', alignItems: 'center', gap: 8 },
   navTitle: { fontSize: 17, fontWeight: 600, color: '#fff' },
   scroll:   { flex: 1, overflowY: 'auto', padding: '0 16px' },
   secHdr: {

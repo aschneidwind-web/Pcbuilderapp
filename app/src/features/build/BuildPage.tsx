@@ -51,7 +51,10 @@ export function BuildPage() {
   return (
     <div style={s.page}>
       <div style={s.navbar}>
-        <div style={s.navTitle}>Build</div>
+        <div style={s.navLeft}>
+          <img src="/favicon.svg" width="18" height="17" alt="" />
+          <div style={s.navTitle}>Build</div>
+        </div>
         <div style={s.navSub}>{componentCount} / 7</div>
       </div>
 
@@ -113,6 +116,7 @@ const s: Record<string, React.CSSProperties> = {
     borderBottom: '0.5px solid rgba(255,255,255,0.08)',
     flexShrink: 0,
   },
+  navLeft: { display: 'flex', alignItems: 'center', gap: 8 },
   navTitle: { fontSize: 17, fontWeight: 600, color: '#fff' },
   navSub:   { fontSize: 13, color: '#8E8E93' },
   scroll:   { flex: 1, overflowY: 'auto', padding: '0 16px' },

@@ -66,10 +66,7 @@ export function AuthScreen() {
     <div style={styles.root}>
       <div style={styles.card}>
         <div style={styles.logo}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round">
-            <rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/>
-            <rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/>
-          </svg>
+          <img src="/favicon.svg" width="40" height="38" alt="PC Builder" />
         </div>
 
         <h2 style={styles.title}>{mode === 'signin' ? 'Welcome back' : 'Create account'}</h2>
@@ -119,7 +116,7 @@ const styles: Record<string, React.CSSProperties> = {
     border: '0.5px solid rgba(255,255,255,0.1)',
   },
   logo: {
-    width: 56, height: 56, background: '#0A84FF', borderRadius: 16,
+    width: 56, height: 56, background: 'rgba(134,59,255,0.15)', borderRadius: 16,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 20px', fontSize: 28,
   },
