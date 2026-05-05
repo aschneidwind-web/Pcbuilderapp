@@ -111,6 +111,6 @@ const s: Record<string, React.CSSProperties> = {
   },
   sortBtnOn: {
     background: 'rgba(10,132,255,0.15)', color: '#0A84FF',
-    borderColor: '#0A84FF',
+    border: '0.5px solid #0A84FF',
   },
 }

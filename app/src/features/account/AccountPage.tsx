@@ -74,7 +74,7 @@ export function AccountPage() {
           iconBg="#E6F1FB" iconColor="#185FA5"
           icon={<svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>}
           label="Send feedback"
-          onClick={() => {}}
+          onClick={() => window.open('mailto:feedback@partflow.app', '_blank')}
         />
       </SettingsGroup>
     </>
@@ -138,7 +138,7 @@ export function AccountPage() {
                 icon={<svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>}
                 label="Sign out"
                 danger
-                onClick={() => { if (confirm('Sign out of your account?')) void signOut() }}
+                onClick={() => void signOut()}
               />
             </SettingsGroup>
           </>
