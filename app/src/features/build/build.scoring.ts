@@ -1,8 +1,10 @@
 import type { BuildState } from './build.types'
 
+import { CATALOG } from './build.catalog'
+
 // ── Reference ceilings (best options in our catalog) ──
-const MAX_CPU_PM = 48500   // i9-14900K
-const MAX_GPU_PM = 38500   // RTX 4080 Super
+const MAX_CPU_PM = Math.max(...CATALOG.cpu.opts.map(o => o.pm ?? 0))
+const MAX_GPU_PM = Math.max(...CATALOG.gpu.opts.map(o => o.pm ?? 0))
 
 // ── Overall tiers ──
 

@@ -5,7 +5,7 @@ import { ComponentRow } from './ComponentRow'
 import { ComponentPicker } from './ComponentPicker'
 import { BuildIllustration } from './BuildIllustration'
 import { BuildReport } from './BuildReport'
-import { CATALOG } from './build.catalog'
+import { useCatalog } from './CatalogContext'
 import { SLOT_KEYS } from './build.types'
 import type { SlotKey } from './build.types'
 import type { BuildComponents } from '../saves'
@@ -24,6 +24,7 @@ const toBuildComponents = (build: ReturnType<typeof useBuild>['build']): BuildCo
 
 export function BuildPage() {
   const { build, totalPrice, componentCount, socketCompatible, selectComponent, clearComponent } = useBuild()
+  const { catalog } = useCatalog()
   const { createSave } = useSaves()
 
   const [activePicker, setActivePicker] = useState<SlotKey | null>(null)
@@ -104,7 +105,7 @@ export function BuildPage() {
             <ComponentRow
               key={key}
               slotKey={key}
-              slot={CATALOG[key]}
+              slot={catalog[key]}
               selected={build[key]}
               onClick={() => setActivePicker(key)}
             />
@@ -127,7 +128,7 @@ export function BuildPage() {
 
       {activePicker && (
         <ComponentPicker
-          slot={CATALOG[activePicker]}
+          slot={catalog[activePicker]}
           selected={build[activePicker]}
           onSelect={opt => selectComponent(activePicker, opt)}
           onClose={() => setActivePicker(null)}

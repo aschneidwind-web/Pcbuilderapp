@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CATALOG } from '../build/build.catalog'
+import { useCatalog } from '../build/CatalogContext'
 import { SLOT_KEYS } from '../build/build.types'
 import type { SlotKey } from '../build/build.types'
 import type { SortMode } from './compare.types'
@@ -14,10 +14,11 @@ const SORT_MODES: { id: SortMode; label: string }[] = [
 ]
 
 export function ComparePage() {
+  const { catalog } = useCatalog()
   const [slot, setSlot]   = useState<SlotKey>('cpu')
   const [sort, setSort]   = useState<SortMode>('value')
 
-  const cat    = CATALOG[slot]
+  const cat    = catalog[slot]
   const hasPM  = cat.hasPM
 
   const cards = hasPM
@@ -49,7 +50,7 @@ export function ComparePage() {
             onChange={e => setSlot(e.target.value as SlotKey)}
           >
             {SLOT_KEYS.map(key => (
-              <option key={key} value={key}>{CATALOG[key].label}</option>
+              <option key={key} value={key}>{catalog[key].label}</option>
             ))}
           </select>
           <div style={s.chevron}>

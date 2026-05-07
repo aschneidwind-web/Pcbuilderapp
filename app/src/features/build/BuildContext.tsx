@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { CATALOG } from './build.catalog'
+import { useCatalog } from './CatalogContext'
 import { SLOT_KEYS } from './build.types'
 import type { BuildState, CatalogOption, SlotKey } from './build.types'
 
@@ -28,6 +28,7 @@ export const BuildContext = createContext<BuildContextValue>({
 })
 
 export function BuildProvider({ children }: { children: React.ReactNode }) {
+  const { catalog } = useCatalog()
   const [build, setBuild] = useState<BuildState>({})
 
   const selectComponent = useCallback((slot: SlotKey, option: CatalogOption) => {
@@ -49,12 +50,12 @@ export function BuildProvider({ children }: { children: React.ReactNode }) {
     for (const slot of SLOT_KEYS) {
       const ref = components[slot]
       if (ref) {
-        const found = CATALOG[slot].opts.find(o => o.n === ref.name)
+        const found = catalog[slot].opts.find(o => o.n === ref.name)
         if (found) next[slot] = found
       }
     }
     setBuild(next)
-  }, [])
+  }, [catalog])
 
   const totalPrice = useMemo(
     () => SLOT_KEYS.reduce((sum, k) => sum + (build[k]?.p ?? 0), 0),
