@@ -10,6 +10,7 @@ import { NotificationsSlide } from './NotificationsSlide'
 import { PrivacySlide } from './PrivacySlide'
 import { AboutSlide } from './AboutSlide'
 import { AVATAR_COLS } from './account.types'
+import { color, radius, font } from '../../theme'
 
 type SlideId = 'editProfile' | 'changePass' | 'notifications' | 'privacy' | 'about'
 
@@ -158,44 +159,42 @@ export function AccountPage() {
 const s: Record<string, React.CSSProperties> = {
   page: {
     height: '100%', display: 'flex', flexDirection: 'column',
-    background: '#0b0b0e', position: 'relative', overflow: 'hidden',
-    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    background: color.bgApp, position: 'relative', overflow: 'hidden',
+    fontFamily: font.family,
   },
   navbar: {
     display: 'flex', alignItems: 'center', padding: '16px 16px 12px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.08)', flexShrink: 0,
+    borderBottom: color.borderSubtle, flexShrink: 0,
   },
-  navTitle: { fontSize: 17, fontWeight: 600, color: '#fff' },
+  navTitle: { fontSize: font.size.xxl, fontWeight: font.weight.semibold, color: color.textPrimary },
   scroll:   { flex: 1, overflowY: 'auto', padding: '0 16px' },
   secHdr: {
-    fontSize: 11, fontWeight: 600, color: '#8E8E93',
+    fontSize: font.size.sm, fontWeight: font.weight.semibold, color: color.textTertiary,
     textTransform: 'uppercase', letterSpacing: 0.5,
     padding: '16px 4px 6px',
   },
-  // Profile hero
   hero: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)',
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border,
     padding: '20px 16px', marginTop: 14, marginBottom: 12,
     display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
   },
-  avatar: { width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: 500 },
-  name:   { fontSize: 17, fontWeight: 500, color: '#f2f2f7' },
-  email:  { fontSize: 13, color: '#AEAEB2' },
-  bio:    { fontSize: 13, color: '#AEAEB2', textAlign: 'center', lineHeight: 1.5 },
+  avatar: { width: 64, height: 64, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, fontWeight: font.weight.medium },
+  name:   { fontSize: font.size.xxl, fontWeight: font.weight.medium, color: color.textPrimary },
+  email:  { fontSize: font.size.body, color: color.textSecondary },
+  bio:    { fontSize: font.size.body, color: color.textSecondary, textAlign: 'center', lineHeight: 1.5 },
   stats:  { display: 'flex', width: '100%', marginTop: 4 },
   stat:   { flex: 1, textAlign: 'center' },
-  statV:  { fontSize: 16, fontWeight: 500, color: '#f2f2f7' },
-  statL:  { fontSize: 11, color: '#8E8E93', marginTop: 2 },
-  // Sync card (logged-out)
+  statV:  { fontSize: font.size.xl, fontWeight: font.weight.medium, color: color.textPrimary },
+  statL:  { fontSize: font.size.sm, color: color.textTertiary, marginTop: 2 },
   syncCard: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)',
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border,
     padding: '16px 14px', marginTop: 14, marginBottom: 12,
   },
-  syncTitle:  { fontSize: 14, fontWeight: 500, color: '#f2f2f7', marginBottom: 3 },
-  syncSub:    { fontSize: 12, color: '#AEAEB2', marginBottom: 12, lineHeight: 1.5 },
+  syncTitle:  { fontSize: font.size.base, fontWeight: font.weight.medium, color: color.textPrimary, marginBottom: 3 },
+  syncSub:    { fontSize: font.size.md, color: color.textSecondary, marginBottom: 12, lineHeight: 1.5 },
   syncBtns:   { display: 'flex', gap: 8 },
-  syncBtn:    { flex: 1, padding: 10, borderRadius: 10, border: 'none', background: '#0A84FF', color: '#fff', fontSize: 14, fontWeight: 500, cursor: 'pointer' },
-  syncBtnSec: { background: '#2c2c2e', color: '#AEAEB2', border: '0.5px solid rgba(255,255,255,0.08)' },
+  syncBtn:    { flex: 1, padding: 10, borderRadius: 10, border: 'none', background: color.info, color: color.textPrimary, fontSize: font.size.base, fontWeight: font.weight.medium, cursor: 'pointer' },
+  syncBtnSec: { background: color.bgInput, color: color.textSecondary, border: color.borderSubtle },
 }

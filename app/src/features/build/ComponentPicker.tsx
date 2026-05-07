@@ -1,4 +1,5 @@
 import type { CatalogOption, CatalogSlot } from './build.types'
+import { color, font } from '../../theme'
 
 interface Props {
   slot: CatalogSlot
@@ -61,11 +62,11 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
                   {ptp && <span style={s.optPts}>{ptp} pts/$</span>}
                 </div>
                 {isSel && (
-                  <div style={{ color: '#A78BFA', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                  <div style={{ color: color.primaryLight, flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" width="16" height="16">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
-                    <span style={{ fontSize: 9, color: '#6B6B80', letterSpacing: 0.2 }}>tap to remove</span>
+                    <span style={{ fontSize: font.size.xs - 1, color: color.textDim, letterSpacing: 0.2 }}>tap to remove</span>
                   </div>
                 )}
               </div>
@@ -88,12 +89,12 @@ const s: Record<string, React.CSSProperties> = {
   },
   sheet: {
     width: '100%',
-    background: '#111118',
+    background: color.bgApp,
     borderRadius: '16px 16px 0 0',
     maxHeight: '85%',
     display: 'flex',
     flexDirection: 'column',
-    border: '0.5px solid rgba(255,255,255,0.08)',
+    border: color.borderSubtle,
     borderBottom: 'none',
   },
   header: {
@@ -101,22 +102,22 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '14px 16px 12px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.08)',
+    borderBottom: color.borderSubtle,
     flexShrink: 0,
   },
   back: {
     background: 'none',
     border: 'none',
-    color: '#A78BFA',
+    color: color.primaryLight,
     cursor: 'pointer',
     padding: 4,
     display: 'flex',
     alignItems: 'center',
   },
   title: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#fff',
+    fontSize: font.size.xl,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
   },
   list: {
     overflowY: 'auto',
@@ -128,23 +129,23 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 10,
     padding: '14px 0',
-    borderBottom: '0.5px solid rgba(255,255,255,0.05)',
+    borderBottom: color.borderFaint,
     cursor: 'pointer',
   },
   optRowSel: {
     margin: '0 -16px',
     padding: '14px 16px',
-    background: 'rgba(255,255,255,0.04)',
+    background: color.bgHover,
   },
   optName: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#fff',
+    fontSize: font.size.body,
+    fontWeight: font.weight.medium,
+    color: color.textPrimary,
     marginBottom: 2,
   },
   optSpec: {
-    fontSize: 12,
-    color: '#6B6B80',
+    fontSize: font.size.md,
+    color: color.textDim,
   },
   optRight: {
     display: 'flex',
@@ -154,21 +155,21 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   optPrice: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#fff',
+    fontSize: font.size.body,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
   },
   optPts: {
-    fontSize: 11,
-    color: '#6B6B80',
+    fontSize: font.size.sm,
+    color: color.textDim,
   },
   badge: {
     display: 'inline-block',
     marginLeft: 6,
-    fontSize: 10,
-    fontWeight: 600,
-    color: '#10B981',
-    background: 'rgba(16,185,129,0.15)',
+    fontSize: font.size.xs,
+    fontWeight: font.weight.semibold,
+    color: color.success,
+    background: color.successBg,
     borderRadius: 5,
     padding: '1px 5px',
   },

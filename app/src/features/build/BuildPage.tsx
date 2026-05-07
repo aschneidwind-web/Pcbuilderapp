@@ -9,6 +9,7 @@ import { CATALOG } from './build.catalog'
 import { SLOT_KEYS } from './build.types'
 import type { SlotKey } from './build.types'
 import type { BuildComponents } from '../saves'
+import { color, radius, font } from '../../theme'
 
 const TOTAL_SLOTS = SLOT_KEYS.length
 
@@ -59,7 +60,7 @@ export function BuildPage() {
         <div style={s.headerRow}>
           {/* TODO: implement share flow */}
           <button style={s.shareBtn} onClick={() => {}}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="#A78BFA" strokeWidth="2" strokeLinecap="round" width="14" height="14">
+            <svg viewBox="0 0 24 24" fill="none" stroke={color.primaryLight} strokeWidth="2" strokeLinecap="round" width="14" height="14">
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
               <polyline points="16 6 12 2 8 6" />
               <line x1="12" y1="2" x2="12" y2="15" />
@@ -142,10 +143,10 @@ const s: Record<string, React.CSSProperties> = {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
-    background: '#0A0A0F',
+    background: color.bgApp,
     position: 'relative',
     overflow: 'hidden',
-    fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif",
+    fontFamily: font.family,
   },
   scroll: {
     flex: 1,
@@ -163,66 +164,66 @@ const s: Record<string, React.CSSProperties> = {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
-    background: 'rgba(255,255,255,0.06)',
+    background: color.bgHover,
     border: 'none',
-    borderRadius: 20,
+    borderRadius: radius.pill,
     padding: '7px 14px',
     cursor: 'pointer',
   },
   shareTxt: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#A78BFA',
+    fontSize: font.size.body,
+    fontWeight: font.weight.medium,
+    color: color.primaryLight,
   },
   logo: {
     width: 36,
     height: 36,
-    borderRadius: 8,
+    borderRadius: radius.sm,
   },
   avatar: {
     width: 34,
     height: 34,
-    borderRadius: '50%',
-    background: 'linear-gradient(135deg, #7B2FFF, #FF6B9D)',
+    borderRadius: radius.full,
+    background: color.gradient,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#fff',
+    fontSize: font.size.base,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
   },
 
   // Price area
   subtitle: {
-    fontSize: 13,
-    color: '#6B6B80',
+    fontSize: font.size.body,
+    color: color.textDim,
     padding: '20px 20px 4px',
   },
   price: {
-    fontSize: 40,
-    fontWeight: 700,
-    color: '#FFFFFF',
+    fontSize: font.size.hero,
+    fontWeight: font.weight.bold,
+    color: color.textPrimary,
     letterSpacing: '-1px',
     padding: '0 20px',
     lineHeight: 1.1,
   },
   errPill: {
     display: 'inline-block',
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#FF453A',
-    background: 'rgba(255,69,58,0.12)',
-    borderRadius: 8,
+    fontSize: font.size.sm,
+    fontWeight: font.weight.semibold,
+    color: color.error,
+    background: color.errorBg,
+    borderRadius: radius.sm,
     padding: '3px 10px',
     margin: '8px 20px 0',
   },
   okPill: {
     display: 'inline-block',
-    fontSize: 11,
-    fontWeight: 600,
-    color: '#34C759',
-    background: 'rgba(52,199,89,0.12)',
-    borderRadius: 8,
+    fontSize: font.size.sm,
+    fontWeight: font.weight.semibold,
+    color: color.success,
+    background: color.successBg,
+    borderRadius: radius.sm,
     padding: '3px 10px',
     margin: '8px 20px 0',
   },
@@ -234,8 +235,8 @@ const s: Record<string, React.CSSProperties> = {
 
   // Components section
   componentsSection: {
-    background: 'rgba(255,255,255,0.03)',
-    borderTop: '0.5px solid rgba(255,255,255,0.06)',
+    background: color.bgElevated,
+    borderTop: color.borderSubtle,
     borderRadius: '24px 24px 0 0',
     paddingBottom: 20,
     minHeight: 200,
@@ -247,13 +248,13 @@ const s: Record<string, React.CSSProperties> = {
     padding: '18px 20px 6px',
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 600,
-    color: '#FFFFFF',
+    fontSize: font.size.xl,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
   },
   sectionCount: {
-    fontSize: 13,
-    color: '#6B6B80',
+    fontSize: font.size.body,
+    color: color.textDim,
   },
 
   // Save area
@@ -263,12 +264,12 @@ const s: Record<string, React.CSSProperties> = {
   nameInput: {
     width: '100%',
     boxSizing: 'border-box' as const,
-    background: 'rgba(255,255,255,0.04)',
-    border: '0.5px solid rgba(255,255,255,0.08)',
-    borderRadius: 12,
+    background: color.bgElevated,
+    border: color.borderSubtle,
+    borderRadius: radius.md,
     padding: '11px 14px',
-    color: '#fff',
-    fontSize: 14,
+    color: color.textPrimary,
+    fontSize: font.size.base,
     marginBottom: 10,
     outline: 'none',
     fontFamily: 'inherit',
@@ -276,22 +277,22 @@ const s: Record<string, React.CSSProperties> = {
   saveBtn: {
     width: '100%',
     padding: 14,
-    borderRadius: 14,
+    borderRadius: radius.lg,
     border: 'none',
-    background: '#7B2FFF',
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: 600,
+    background: color.primary,
+    color: color.textPrimary,
+    fontSize: font.size.lg,
+    fontWeight: font.weight.semibold,
     cursor: 'pointer',
     transition: 'background 0.2s',
     fontFamily: 'inherit',
   },
   saveBtnOff: {
-    background: 'rgba(255,255,255,0.06)',
-    color: '#4A4A5A',
+    background: color.bgHover,
+    color: color.textDisabled,
     cursor: 'default',
   },
   saveBtnOk: {
-    background: '#10B981',
+    background: color.success,
   },
 }

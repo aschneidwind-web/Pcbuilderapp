@@ -1,4 +1,5 @@
 import type { SortMode, ComparableOption } from './compare.types'
+import { color, radius, font } from '../../theme'
 
 interface PmProps {
   variant: 'pm'
@@ -83,8 +84,8 @@ export function CompareCard(props: Props) {
         </div>
         <div style={s.price}>${opt.p}</div>
       </div>
-      <Bar label="Performance" pct={perfPct}  color="#0A84FF" />
-      <Bar label="Value score" pct={valuePct} color="#34C759" />
+      <Bar label="Performance" pct={perfPct}  color={color.info} />
+      <Bar label="Value score" pct={valuePct} color={color.success} />
       <div style={s.statsRow}>
         <Stat value={opt.pm.toLocaleString()} label="PassMark" />
         <Stat value={String(opt.ptp)}         label="pts per $" />
@@ -96,33 +97,33 @@ export function CompareCard(props: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   card: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)',
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border,
     padding: 14, marginBottom: 10,
   },
-  winner: { border: '2px solid #34C759' },
+  winner: { border: `2px solid ${color.success}` },
   badge: {
-    display: 'inline-block', fontSize: 10, fontWeight: 500,
-    background: 'rgba(52,199,89,0.15)', color: '#30d158',
-    padding: '2px 8px', borderRadius: 20, marginBottom: 8,
+    display: 'inline-block', fontSize: font.size.xs, fontWeight: font.weight.medium,
+    background: color.successBg, color: color.success,
+    padding: '2px 8px', borderRadius: radius.pill, marginBottom: 8,
   },
   head: {
     display: 'flex', justifyContent: 'space-between',
     alignItems: 'flex-start', marginBottom: 10, gap: 8,
   },
-  name:  { fontSize: 14, fontWeight: 500, color: '#f2f2f7' },
-  spec:  { fontSize: 11, color: '#AEAEB2', marginTop: 2 },
-  price: { fontSize: 16, fontWeight: 500, color: '#f2f2f7', whiteSpace: 'nowrap' },
+  name:  { fontSize: font.size.base, fontWeight: font.weight.medium, color: color.textPrimary },
+  spec:  { fontSize: font.size.sm, color: color.textSecondary, marginTop: 2 },
+  price: { fontSize: font.size.xl, fontWeight: font.weight.medium, color: color.textPrimary, whiteSpace: 'nowrap' },
   barRow: { display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 },
-  barLabel: { fontSize: 11, color: '#AEAEB2', width: 80, flexShrink: 0 },
-  barTrack: { flex: 1, height: 5, background: '#2c2c2e', borderRadius: 3, overflow: 'hidden' },
+  barLabel: { fontSize: font.size.sm, color: color.textSecondary, width: 80, flexShrink: 0 },
+  barTrack: { flex: 1, height: 5, background: color.bgInput, borderRadius: 3, overflow: 'hidden' },
   barFill:  { height: '100%', borderRadius: 3 },
-  barPct:   { fontSize: 11, color: '#AEAEB2', width: 40, textAlign: 'right', flexShrink: 0 },
+  barPct:   { fontSize: font.size.sm, color: color.textSecondary, width: 40, textAlign: 'right', flexShrink: 0 },
   statsRow: {
     display: 'flex', marginTop: 12, paddingTop: 10,
-    borderTop: '0.5px solid rgba(255,255,255,0.08)',
+    borderTop: color.borderSubtle,
   },
   stat:      { flex: 1, textAlign: 'center' },
-  statVal:   { fontSize: 14, fontWeight: 500, color: '#f2f2f7' },
-  statLabel: { fontSize: 10, color: '#AEAEB2', marginTop: 1 },
+  statVal:   { fontSize: font.size.base, fontWeight: font.weight.medium, color: color.textPrimary },
+  statLabel: { fontSize: font.size.xs, color: color.textSecondary, marginTop: 1 },
 }

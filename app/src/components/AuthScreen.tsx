@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { color, radius, font } from '../theme'
 
 export function AuthScreen() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -112,31 +113,31 @@ export function AuthScreen() {
 const styles: Record<string, React.CSSProperties> = {
   root: {
     height: '100vh', width: '100vw', display: 'grid', placeItems: 'center',
-    background: '#0b0b0e', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    background: color.bgApp, fontFamily: font.family,
   },
   card: {
-    background: '#1c1c1e', borderRadius: 20, padding: '32px 28px', width: 340,
-    border: '0.5px solid rgba(255,255,255,0.1)',
+    background: color.bgCard, borderRadius: radius.pill, padding: '32px 28px', width: 340,
+    border: color.border,
   },
   logo: {
-    width: 56, height: 56, background: '#0A84FF', borderRadius: 16,
+    width: 56, height: 56, background: color.primary, borderRadius: 16,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 20px', fontSize: 28,
   },
-  title: { color: '#fff', fontSize: 22, fontWeight: 600, textAlign: 'center', margin: '0 0 6px' },
-  sub: { color: '#AEAEB2', fontSize: 14, textAlign: 'center', margin: '0 0 24px', lineHeight: 1.5 },
+  title: { color: color.textPrimary, fontSize: 22, fontWeight: font.weight.semibold, textAlign: 'center', margin: '0 0 6px' },
+  sub: { color: color.textSecondary, fontSize: font.size.base, textAlign: 'center', margin: '0 0 24px', lineHeight: 1.5 },
   form: { display: 'flex', flexDirection: 'column', gap: 14 },
   field: { display: 'flex', flexDirection: 'column', gap: 6 },
-  label: { color: '#AEAEB2', fontSize: 13, fontWeight: 500 },
+  label: { color: color.textSecondary, fontSize: font.size.body, fontWeight: font.weight.medium },
   input: {
-    background: '#2c2c2e', border: '0.5px solid rgba(255,255,255,0.18)', borderRadius: 12,
-    padding: '12px 14px', fontSize: 15, color: '#fff', outline: 'none',
+    background: color.bgInput, border: color.border, borderRadius: radius.md,
+    padding: '12px 14px', fontSize: font.size.lg, color: color.textPrimary, outline: 'none',
   },
-  error: { color: '#FF453A', fontSize: 13, margin: 0, textAlign: 'center' },
+  error: { color: color.error, fontSize: font.size.body, margin: 0, textAlign: 'center' },
   btn: {
-    background: '#0A84FF', color: '#fff', border: 'none', borderRadius: 12,
-    padding: 14, fontSize: 15, fontWeight: 600, cursor: 'pointer', marginTop: 4,
+    background: color.primary, color: color.textPrimary, border: 'none', borderRadius: radius.md,
+    padding: 14, fontSize: font.size.lg, fontWeight: font.weight.semibold, cursor: 'pointer', marginTop: 4,
   },
-  switch: { color: '#AEAEB2', fontSize: 13, textAlign: 'center', margin: '16px 0 0' },
-  link: { color: '#0A84FF', cursor: 'pointer', fontWeight: 500 },
+  switch: { color: color.textSecondary, fontSize: font.size.body, textAlign: 'center', margin: '16px 0 0' },
+  link: { color: color.info, cursor: 'pointer', fontWeight: font.weight.medium },
 }

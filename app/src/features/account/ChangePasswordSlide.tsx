@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SlideBase } from './SlideBase'
 import { updatePassword } from './account.api'
+import { color, radius, font } from '../../theme'
 
 interface Props { onClose: () => void }
 
@@ -58,21 +59,21 @@ function Field({ label, value, onChange, placeholder, last }: {
 
 const s: Record<string, React.CSSProperties> = {
   card: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)', padding: 16,
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border, padding: 16,
   },
-  label: { display: 'block', fontSize: 13, fontWeight: 500, color: '#AEAEB2', marginBottom: 6 },
+  label: { display: 'block', fontSize: font.size.body, fontWeight: font.weight.medium, color: color.textSecondary, marginBottom: 6 },
   input: {
     width: '100%', boxSizing: 'border-box',
-    background: '#2c2c2e', border: '0.5px solid rgba(255,255,255,0.1)',
+    background: color.bgInput, border: color.border,
     borderRadius: 10, padding: '11px 12px',
-    color: '#fff', fontSize: 15, outline: 'none',
+    color: color.textPrimary, fontSize: font.size.lg, outline: 'none',
   },
   btn: {
     width: '100%', padding: 12, borderRadius: 10, border: 'none',
-    background: '#0A84FF', color: '#fff', fontSize: 14, fontWeight: 500,
+    background: color.info, color: color.textPrimary, fontSize: font.size.base, fontWeight: font.weight.medium,
     cursor: 'pointer', marginTop: 16,
   },
-  error:   { fontSize: 12, color: '#FF453A', textAlign: 'center', marginTop: 8 },
-  success: { fontSize: 12, color: '#30d158', textAlign: 'center', marginTop: 8 },
+  error:   { fontSize: font.size.md, color: color.error, textAlign: 'center', marginTop: 8 },
+  success: { fontSize: font.size.md, color: color.success, textAlign: 'center', marginTop: 8 },
 }

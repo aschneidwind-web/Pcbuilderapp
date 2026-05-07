@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { SlideBase } from './SlideBase'
 import { AVATAR_COLS } from './account.types'
+import { color, radius, font } from '../../theme'
 import type { Profile, UpdateProfileInput } from './account.types'
 
 interface Props {
@@ -55,7 +56,7 @@ export function EditProfileSlide({ profile, onSave, onClose }: Props) {
               onClick={() => setAvatarIdx(i)}
               style={{
                 width: 36, height: 36, borderRadius: '50%', background: col,
-                border: avatarIdx === i ? '3px solid #fff' : '3px solid transparent',
+                border: avatarIdx === i ? `3px solid ${color.textPrimary}` : '3px solid transparent',
                 cursor: 'pointer', flexShrink: 0, transition: 'border 0.15s',
               }}
             />
@@ -68,26 +69,26 @@ export function EditProfileSlide({ profile, onSave, onClose }: Props) {
 
 const s: Record<string, React.CSSProperties> = {
   card: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)',
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border,
     padding: 16, marginBottom: 12,
   },
   cardTitle: {
-    fontSize: 11, fontWeight: 500, color: '#8E8E93',
+    fontSize: font.size.sm, fontWeight: font.weight.medium, color: color.textTertiary,
     textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8,
   },
   input: {
     width: '100%', boxSizing: 'border-box',
-    background: '#2c2c2e', border: '0.5px solid rgba(255,255,255,0.1)',
+    background: color.bgInput, border: color.border,
     borderRadius: 10, padding: '11px 12px',
-    color: '#fff', fontSize: 15, outline: 'none', marginBottom: 14,
+    color: color.textPrimary, fontSize: font.size.lg, outline: 'none', marginBottom: 14,
   },
   btn: {
     width: '100%', padding: 12, borderRadius: 10, border: 'none',
-    background: '#0A84FF', color: '#fff', fontSize: 14, fontWeight: 500,
+    background: color.info, color: color.textPrimary, fontSize: font.size.base, fontWeight: font.weight.medium,
     cursor: 'pointer', marginTop: 4,
   },
-  error:   { fontSize: 12, color: '#FF453A', textAlign: 'center', marginTop: 8 },
-  success: { fontSize: 12, color: '#30d158', textAlign: 'center', marginTop: 8 },
+  error:   { fontSize: font.size.md, color: color.error, textAlign: 'center', marginTop: 8 },
+  success: { fontSize: font.size.md, color: color.success, textAlign: 'center', marginTop: 8 },
   colorRow: { display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 4 },
 }

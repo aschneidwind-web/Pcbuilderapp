@@ -1,3 +1,5 @@
+import { color, font } from '../../theme'
+
 interface Props {
   title: string
   onClose: () => void
@@ -25,19 +27,19 @@ export function SlideBase({ title, onClose, children }: Props) {
 const s: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-    background: '#0b0b0e', zIndex: 10, overflowY: 'auto',
-    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+    background: color.bgApp, zIndex: 10, overflowY: 'auto',
+    fontFamily: font.family,
   },
   nav: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '12px 16px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.08)',
+    borderBottom: color.borderSubtle,
   },
   back: {
     display: 'flex', alignItems: 'center', gap: 4,
-    background: 'none', border: 'none', color: '#0A84FF',
-    fontSize: 15, cursor: 'pointer', padding: 0,
+    background: 'none', border: 'none', color: color.primary,
+    fontSize: font.size.lg, cursor: 'pointer', padding: 0,
   },
-  title: { fontSize: 15, fontWeight: 600, color: '#fff' },
+  title: { fontSize: font.size.lg, fontWeight: font.weight.semibold, color: color.textPrimary },
   body:  { padding: '16px 16px 32px' },
 }

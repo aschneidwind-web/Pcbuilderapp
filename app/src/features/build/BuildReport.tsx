@@ -6,6 +6,7 @@ import {
   getCategoryScores,
   getUpgradeSuggestions,
 } from './build.scoring'
+import { color, radius, font } from '../../theme'
 
 interface Props {
   build: BuildState
@@ -34,7 +35,7 @@ export function BuildReport({ build }: Props) {
           <span style={{ ...s.toggleTier, color: tier.color }}>{tier.name}</span>
           <svg
             viewBox="0 0 24 24" width="16" height="16" fill="none"
-            stroke="#6B6B80" strokeWidth="2" strokeLinecap="round"
+            stroke={color.textDim} strokeWidth="2" strokeLinecap="round"
             style={{ transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
           >
             <polyline points="6 9 12 15 18 9" />
@@ -96,9 +97,9 @@ export function BuildReport({ build }: Props) {
 const s: Record<string, React.CSSProperties> = {
   wrap: {
     margin: '0 20px 12px',
-    background: 'rgba(255,255,255,0.03)',
-    border: '0.5px solid rgba(255,255,255,0.06)',
-    borderRadius: 14,
+    background: color.bgElevated,
+    border: color.borderSubtle,
+    borderRadius: radius.lg,
     overflow: 'hidden',
   },
 
@@ -112,9 +113,9 @@ const s: Record<string, React.CSSProperties> = {
     userSelect: 'none' as const,
   },
   toggleLabel: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#FFFFFF',
+    fontSize: font.size.base,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
   },
   toggleRight: {
     display: 'flex',
@@ -122,8 +123,8 @@ const s: Record<string, React.CSSProperties> = {
     gap: 8,
   },
   toggleTier: {
-    fontSize: 13,
-    fontWeight: 600,
+    fontSize: font.size.body,
+    fontWeight: font.weight.semibold,
   },
 
   // Body
@@ -140,18 +141,18 @@ const s: Record<string, React.CSSProperties> = {
   },
   tierName: {
     fontSize: 18,
-    fontWeight: 700,
+    fontWeight: font.weight.bold,
     letterSpacing: '-0.3px',
   },
   scoreLine: {
-    fontSize: 12,
-    color: '#6B6B80',
+    fontSize: font.size.md,
+    color: color.textDim,
     marginTop: 1,
   },
   overallBar: {
     flex: 1,
     height: 5,
-    background: 'rgba(255,255,255,0.06)',
+    background: color.bgHover,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -161,11 +162,11 @@ const s: Record<string, React.CSSProperties> = {
     transition: 'width 0.4s ease',
   },
   tierDesc: {
-    fontSize: 12,
-    color: '#6B6B80',
+    fontSize: font.size.md,
+    color: color.textDim,
     lineHeight: '1.45',
     paddingBottom: 14,
-    borderBottom: '0.5px solid rgba(255,255,255,0.06)',
+    borderBottom: color.borderSubtle,
   },
 
   // Categories
@@ -187,18 +188,18 @@ const s: Record<string, React.CSSProperties> = {
     alignItems: 'baseline',
   },
   catLabel: {
-    fontSize: 13,
-    fontWeight: 500,
-    color: '#FFFFFF',
+    fontSize: font.size.body,
+    fontWeight: font.weight.medium,
+    color: color.textPrimary,
   },
   catPct: {
-    fontSize: 13,
-    fontWeight: 600,
-    color: '#AAAABC',
+    fontSize: font.size.body,
+    fontWeight: font.weight.semibold,
+    color: color.textDim,
   },
   catBar: {
     height: 5,
-    background: 'rgba(255,255,255,0.06)',
+    background: color.bgHover,
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -208,13 +209,13 @@ const s: Record<string, React.CSSProperties> = {
     transition: 'width 0.4s ease',
   },
   catTier: {
-    fontSize: 11,
-    fontWeight: 600,
+    fontSize: font.size.sm,
+    fontWeight: font.weight.semibold,
   },
 
   // Suggestions
   suggestWrap: {
-    borderTop: '0.5px solid rgba(255,255,255,0.06)',
+    borderTop: color.borderSubtle,
     paddingTop: 12,
   },
   suggestRow: {
@@ -232,8 +233,8 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   suggestTxt: {
-    fontSize: 12,
-    color: '#6B6B80',
+    fontSize: font.size.md,
+    color: color.textDim,
     lineHeight: '1.4',
   },
 }

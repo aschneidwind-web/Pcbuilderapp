@@ -8,19 +8,20 @@ import { ComparePage } from './features/compare'
 import { AccountPage } from './features/account'
 import { CommunityPage } from './features/community/CommunityPage'
 import type { SavedBuild } from './features/saves'
+import { color, radius, layout, shadow } from './theme'
 
 const shell: React.CSSProperties = {
   height: '100vh', width: '100vw',
   display: 'grid', placeItems: 'center',
-  background: '#0b0b0e',
+  background: color.bgApp,
 }
 
 const panel: React.CSSProperties = {
-  width: 420, height: 700,
-  borderRadius: 18,
-  background: '#1c1c1e',
+  width: layout.panelWidth, height: layout.panelHeight,
+  borderRadius: radius.xl,
+  background: color.bgCard,
   overflow: 'hidden',
-  boxShadow: '0 20px 60px rgba(0,0,0,0.45)',
+  boxShadow: shadow.panel,
   display: 'flex',
   flexDirection: 'column',
 }
@@ -31,7 +32,7 @@ export function App() {
   const navigate = useNavigate()
 
   if (loading) {
-    return <div style={{ height: '100vh', width: '100vw', background: '#0b0b0e' }} />
+    return <div style={{ height: '100vh', width: '100vw', background: color.bgApp }} />
   }
 
   if (!session) {

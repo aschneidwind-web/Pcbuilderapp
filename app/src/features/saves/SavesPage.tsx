@@ -1,6 +1,7 @@
 import { useSaves } from './useSaves'
 import { SaveCard } from './SaveCard'
 import type { SavedBuild } from './saves.types'
+import { color, font } from '../../theme'
 
 interface Props {
   onLoad?: (build: SavedBuild) => void
@@ -46,10 +47,10 @@ export function SavesPage({ onLoad }: Props) {
 
 const styles: Record<string, React.CSSProperties> = {
   list: { padding: 16 },
-  count: { color: '#AEAEB2', fontSize: 13, marginBottom: 12 },
-  state: { color: '#AEAEB2', textAlign: 'center', padding: 32 },
-  error: { color: '#FF453A', textAlign: 'center', padding: 32, fontSize: 14 },
+  count: { color: color.textSecondary, fontSize: font.size.body, marginBottom: 12 },
+  state: { color: color.textSecondary, textAlign: 'center', padding: 32 },
+  error: { color: color.error, textAlign: 'center', padding: 32, fontSize: font.size.base },
   empty: { textAlign: 'center', padding: '64px 32px' },
-  emptyTitle: { color: '#fff', fontSize: 16, fontWeight: 500, marginBottom: 6 },
-  emptySub: { color: '#8E8E93', fontSize: 13 },
+  emptyTitle: { color: color.textPrimary, fontSize: font.size.xl, fontWeight: font.weight.medium, marginBottom: 6 },
+  emptySub: { color: color.textTertiary, fontSize: font.size.body },
 }

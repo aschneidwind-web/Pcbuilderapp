@@ -1,4 +1,5 @@
 import type { CatalogOption, CatalogSlot, SlotKey } from './build.types'
+import { color, radius, font } from '../../theme'
 
 interface Props {
   slotKey: SlotKey
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const ChevronIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14" style={{ color: '#4A4A5A' }}>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" width="14" height="14" style={{ color: color.textDisabled }}>
     <polyline points="9 18 15 12 9 6" />
   </svg>
 )
@@ -16,7 +17,7 @@ const ChevronIcon = () => (
 export function ComponentRow({ slotKey: _slotKey, slot, selected, onClick }: Props) {
   return (
     <div style={s.row} onClick={onClick}>
-      <div style={{ ...s.icon, background: '#7B2FFF' }}>
+      <div style={{ ...s.icon, background: color.primary }}>
         <svg
           viewBox="0 0 24 24"
           width="20"
@@ -50,13 +51,13 @@ const s: Record<string, React.CSSProperties> = {
     gap: 12,
     padding: '14px 20px',
     cursor: 'pointer',
-    borderBottom: '0.5px solid rgba(255,255,255,0.04)',
+    borderBottom: color.borderFaint,
     transition: 'background 0.15s',
   },
   icon: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: radius.md,
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
@@ -67,19 +68,19 @@ const s: Record<string, React.CSSProperties> = {
     minWidth: 0,
   },
   label: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#FFFFFF',
+    fontSize: font.size.base,
+    fontWeight: font.weight.medium,
+    color: color.textPrimary,
   },
   labelDim: {
-    fontSize: 14,
-    fontWeight: 500,
-    color: '#6B6B80',
+    fontSize: font.size.base,
+    fontWeight: font.weight.medium,
+    color: color.textDim,
   },
   partName: {
-    fontSize: 12,
-    fontWeight: 400,
-    color: '#A0A0B0',
+    fontSize: font.size.md,
+    fontWeight: font.weight.normal,
+    color: color.textSecondary,
     marginTop: 2,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -92,9 +93,9 @@ const s: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   price: {
-    fontSize: 14,
-    fontWeight: 600,
-    color: '#FFFFFF',
+    fontSize: font.size.base,
+    fontWeight: font.weight.semibold,
+    color: color.textPrimary,
     letterSpacing: '-0.3px',
   },
 }

@@ -1,5 +1,6 @@
 import { SlideBase } from './SlideBase'
 import { SettingsGroup, SettingsRow } from './SettingsRow'
+import { color, radius, font } from '../../theme'
 
 interface Props { onClose: () => void }
 
@@ -36,11 +37,11 @@ export function AboutSlide({ onClose }: Props) {
 const s: Record<string, React.CSSProperties> = {
   hero:    { textAlign: 'center', padding: '24px 0 20px' },
   logoWrap: {
-    width: 64, height: 64, background: 'linear-gradient(135deg, #7B2FFF, #FF6B9D)', borderRadius: 18,
+    width: 64, height: 64, background: color.gradient, borderRadius: radius.xl,
     display: 'flex', alignItems: 'center', justifyContent: 'center',
     margin: '0 auto 14px',
   },
-  appName: { fontSize: 20, fontWeight: 500, color: '#fff' },
-  version: { fontSize: 13, color: '#8E8E93', marginTop: 4 },
-  tagline: { fontSize: 12, color: '#8E8E93', textAlign: 'center', padding: '16px 0' },
+  appName: { fontSize: 20, fontWeight: font.weight.medium, color: color.textPrimary },
+  version: { fontSize: font.size.body, color: color.textTertiary, marginTop: 4 },
+  tagline: { fontSize: font.size.md, color: color.textTertiary, textAlign: 'center', padding: '16px 0' },
 }

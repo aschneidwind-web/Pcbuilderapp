@@ -1,3 +1,5 @@
+import { color, radius, font } from '../../theme'
+
 interface RowProps {
   iconBg: string
   iconColor: string
@@ -34,7 +36,7 @@ interface ToggleProps { on: boolean; onToggle: () => void }
 
 export function Toggle({ on, onToggle }: ToggleProps) {
   return (
-    <button onClick={e => { e.stopPropagation(); onToggle() }} style={{ ...s.toggle, background: on ? '#34C759' : 'rgba(255,255,255,0.18)' }}>
+    <button onClick={e => { e.stopPropagation(); onToggle() }} style={{ ...s.toggle, background: on ? color.success : 'rgba(255,255,255,0.18)' }}>
       <div style={{ ...s.thumb, left: on ? 20 : 2 }} />
     </button>
   )
@@ -42,32 +44,32 @@ export function Toggle({ on, onToggle }: ToggleProps) {
 
 const s: Record<string, React.CSSProperties> = {
   group: {
-    background: '#1c1c1e', borderRadius: 14,
-    border: '0.5px solid rgba(255,255,255,0.12)',
+    background: color.bgCard, borderRadius: radius.lg,
+    border: color.border,
     marginBottom: 12, overflow: 'hidden',
   },
   row: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
     padding: '13px 16px',
-    borderBottom: '0.5px solid rgba(255,255,255,0.08)',
+    borderBottom: color.borderSubtle,
     cursor: 'pointer',
   },
   left:  { display: 'flex', alignItems: 'center', gap: 10 },
   ico: {
-    width: 30, height: 30, borderRadius: 8,
+    width: 30, height: 30, borderRadius: radius.sm,
     display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
   },
-  label:       { fontSize: 14, color: '#f2f2f7' },
-  dangerLabel: { fontSize: 14, color: '#FF453A' },
+  label:       { fontSize: font.size.base, color: color.textPrimary },
+  dangerLabel: { fontSize: font.size.base, color: color.error },
   rightWrap:   { display: 'flex', alignItems: 'center', gap: 6 },
-  value:       { fontSize: 13, color: '#8E8E93' },
-  arrow:       { fontSize: 18, color: '#8E8E93' },
+  value:       { fontSize: font.size.body, color: color.textTertiary },
+  arrow:       { fontSize: 18, color: color.textTertiary },
   toggle: {
     width: 44, height: 26, borderRadius: 13, position: 'relative',
     cursor: 'pointer', border: 'none', flexShrink: 0, transition: 'background 0.2s',
   },
   thumb: {
-    width: 22, height: 22, background: '#fff', borderRadius: '50%',
+    width: 22, height: 22, background: color.textPrimary, borderRadius: '50%',
     position: 'absolute', top: 2, transition: 'left 0.2s',
   },
 }
