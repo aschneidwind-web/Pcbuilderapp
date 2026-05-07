@@ -22,9 +22,8 @@ export function BuildReport({ build }: Props) {
   const categories = useMemo(() => getCategoryScores(build), [build])
   const suggestions = useMemo(() => getUpgradeSuggestions(build), [build])
 
-  if (!tier) return null
-
-  const pct = Math.min(100, Math.round((score / MAX_SCORE) * 100))
+  const ready = !!tier
+  const pct = ready ? Math.min(100, Math.round((score / MAX_SCORE) * 100)) : 0
 
   return (
     <div style={s.wrap}>
@@ -32,7 +31,7 @@ export function BuildReport({ build }: Props) {
       <div style={s.toggle} onClick={() => setOpen(v => !v)}>
         <span style={s.toggleLabel}>Build Report</span>
         <div style={s.toggleRight}>
-          <span style={{ ...s.toggleTier, color: tier.color }}>{tier.name}</span>
+          {ready && <span style={{ ...s.toggleTier, color: tier.color }}>{tier.name}</span>}
           <svg
             viewBox="0 0 24 24" width="16" height="16" fill="none"
             stroke={color.textDim} strokeWidth="2" strokeLinecap="round"
@@ -43,7 +42,13 @@ export function BuildReport({ build }: Props) {
         </div>
       </div>
 
-      {!open ? null : (
+      {!open ? null : !ready ? (
+        <div style={s.body}>
+          <div style={s.missingMsg}>
+            Select a CPU, GPU, Motherboard, RAM, and Storage to generate your build report.
+          </div>
+        </div>
+      ) : (
         <div style={s.body}>
           {/* ── Overall score ── */}
           <div style={s.overallRow}>
@@ -92,6 +97,7 @@ export function BuildReport({ build }: Props) {
       )}
     </div>
   )
+
 }
 
 const s: Record<string, React.CSSProperties> = {
@@ -236,5 +242,13 @@ const s: Record<string, React.CSSProperties> = {
     fontSize: font.size.md,
     color: color.textDim,
     lineHeight: '1.4',
+  },
+
+  missingMsg: {
+    fontSize: font.size.body,
+    color: color.textDim,
+    lineHeight: '1.5',
+    textAlign: 'center' as const,
+    padding: '8px 0 4px',
   },
 }
