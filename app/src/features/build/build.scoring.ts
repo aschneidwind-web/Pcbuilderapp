@@ -81,9 +81,9 @@ export function computeBuildScore(build: BuildState): number {
   return Math.round(cpuPm * 0.45 + gpuPm * 0.55)
 }
 
-/** Returns the overall tier for the build, or null if neither CPU nor GPU is selected */
+/** Returns the overall tier for the build, or null if core slots are missing */
 export function getTier(build: BuildState): Tier | null {
-  if (!build.cpu && !build.gpu) return null
+  if (!build.cpu || !build.gpu || !build.motherboard || !build.ram || !build.storage) return null
   const score = computeBuildScore(build)
   let tier = TIERS[0]
   for (let i = TIERS.length - 1; i >= 0; i--) {
