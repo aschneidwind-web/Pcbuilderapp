@@ -1,11 +1,14 @@
-import { useMemo } from 'react'
-import { View } from 'react-native'
+import { useRef, useEffect, useMemo } from 'react'
+import { Animated, Easing, View } from 'react-native'
 import Svg, {
-  Rect, Circle, Line, Path, G, Defs, Style,
+  Rect, Circle, Line, Path, G,
 } from 'react-native-svg'
 import { color } from '../../theme'
 import type { BuildState, SlotKey } from './build.types'
 import { SLOT_KEYS } from './build.types'
+
+const AnimatedG = Animated.createAnimatedComponent(G)
+const AnimatedRect = Animated.createAnimatedComponent(Rect)
 
 interface PartStyle {
   fill: string
@@ -28,6 +31,54 @@ interface Props { build: BuildState }
 export function BuildIllustration({ build }: Props) {
   const allSelected = useMemo(() => SLOT_KEYS.every(k => build[k] != null), [build])
 
+  const spinAnim = useRef(new Animated.Value(0)).current
+  const pulseAnim = useRef(new Animated.Value(1)).current
+  const caseStrokeAnim = useRef(new Animated.Value(1044)).current
+
+  const spinLoop = useRef<Animated.CompositeAnimation | null>(null)
+  const pulseLoop = useRef<Animated.CompositeAnimation | null>(null)
+  const caseTiming = useRef<Animated.CompositeAnimation | null>(null)
+
+  useEffect(() => {
+    if (!allSelected) {
+      spinLoop.current?.stop()
+      pulseLoop.current?.stop()
+      caseTiming.current?.stop()
+      spinAnim.setValue(0)
+      pulseAnim.setValue(1)
+      caseStrokeAnim.setValue(1044)
+      return
+    }
+
+    spinLoop.current = Animated.loop(
+      Animated.timing(spinAnim, { toValue: 360, duration: 1500, easing: Easing.linear, useNativeDriver: false })
+    )
+    spinLoop.current.start()
+
+    pulseLoop.current = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.2, duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 1,   duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+      ])
+    )
+    pulseLoop.current.start()
+
+    caseStrokeAnim.setValue(1044)
+    caseTiming.current = Animated.timing(caseStrokeAnim, {
+      toValue: 0,
+      duration: 1200,
+      easing: Easing.out(Easing.ease),
+      useNativeDriver: false,
+    })
+    caseTiming.current.start()
+
+    return () => {
+      spinLoop.current?.stop()
+      pulseLoop.current?.stop()
+      caseTiming.current?.stop()
+    }
+  }, [allSelected])
+
   const mb     = partStyle(build, 'motherboard')
   const cpu    = partStyle(build, 'cpu')
   const cooler = partStyle(build, 'cooler')
@@ -42,6 +93,15 @@ export function BuildIllustration({ build }: Props) {
 
   const c = color.partColors
 
+  // When allSelected, animated opacity drives the pulse; otherwise use the static value.
+  const mbOp    = allSelected ? pulseAnim : mb.opacity
+  const cpuOp   = allSelected ? pulseAnim : cpu.opacity
+  const coolerOp = allSelected ? pulseAnim : cooler.opacity
+  const gpuOp   = allSelected ? pulseAnim : gpu.opacity
+  const ramOp   = allSelected ? pulseAnim : ram.opacity
+  const storOp  = allSelected ? pulseAnim : stor.opacity
+  const psuOp   = allSelected ? pulseAnim : psu.opacity
+
   return (
     <View style={{ width: '100%', aspectRatio: 340 / 250, maxWidth: 320, alignSelf: 'center' }}>
       <Svg viewBox="0 0 340 250" width="100%" height="100%">
@@ -50,6 +110,16 @@ export function BuildIllustration({ build }: Props) {
         <Rect x="25" y="8" width="290" height="232" rx="5"
           fill="none" stroke={cStroke} strokeWidth="1.5" opacity={cOp}
         />
+        {allSelected && (
+          <AnimatedRect x="25" y="8" width="290" height="232" rx="5"
+            fill="none"
+            stroke={color.partColors.case[0]}
+            strokeWidth="1.5"
+            strokeDasharray="1044"
+            strokeDashoffset={caseStrokeAnim as any}
+          />
+        )}
+
         {/* Front panel */}
         <Rect x="295" y="8" width="20" height="232" fill="#1a1a1f"
           stroke={cStroke} strokeWidth="0.6" opacity={cOp * 0.6}
@@ -59,6 +129,7 @@ export function BuildIllustration({ build }: Props) {
             stroke={color.textDisabled} strokeWidth="0.4" opacity={cOp * 0.4}
           />
         ))}
+
         {/* Back panel */}
         <Rect x="25" y="8" width="12" height="232" rx="5"
           fill="#1a1a1f" stroke={cStroke} strokeWidth="0.6" opacity={cOp * 0.6}
@@ -76,9 +147,9 @@ export function BuildIllustration({ build }: Props) {
         />
 
         {/* Motherboard */}
-        <Rect x="46" y="14" width="240" height="168" rx="2"
+        <AnimatedRect x="46" y="14" width="240" height="168" rx="2"
           fill={mb.fill} stroke={mb.stroke} strokeWidth="0.6"
-          strokeDasharray={mb.strokeDasharray} opacity={mb.opacity}
+          strokeDasharray={mb.strokeDasharray} opacity={mbOp as any}
         />
         {build.motherboard && (
           <G>
@@ -105,9 +176,9 @@ export function BuildIllustration({ build }: Props) {
         )}
 
         {/* CPU */}
-        <Rect x="140" y="28" width="42" height="42" rx="2"
+        <AnimatedRect x="140" y="28" width="42" height="42" rx="2"
           fill={cpu.fill} stroke={cpu.stroke} strokeWidth="0.6"
-          strokeDasharray={cpu.strokeDasharray} opacity={cpu.opacity}
+          strokeDasharray={cpu.strokeDasharray} opacity={cpuOp as any}
         />
         {build.cpu && (
           <G>
@@ -123,9 +194,9 @@ export function BuildIllustration({ build }: Props) {
         )}
 
         {/* CPU Cooler */}
-        <Rect x="132" y="20" width="58" height="58" rx="3"
+        <AnimatedRect x="132" y="20" width="58" height="58" rx="3"
           fill={cooler.fill} stroke={cooler.stroke} strokeWidth="0.6"
-          strokeDasharray={cooler.strokeDasharray} opacity={cooler.opacity}
+          strokeDasharray={cooler.strokeDasharray} opacity={coolerOp as any}
         />
         {build.cooler && (
           <G>
@@ -134,16 +205,22 @@ export function BuildIllustration({ build }: Props) {
                 <Line key={i} x1={x} y1="23" x2={x} y2="74" />
               ))}
             </G>
-            <G stroke={c.cooler[1]} strokeWidth="0.35" opacity="0.18">
-              <Line x1="161" y1="32" x2="161" y2="40" />
-              <Line x1="161" y1="58" x2="161" y2="66" />
-              <Line x1="144" y1="49" x2="152" y2="49" />
-              <Line x1="170" y1="49" x2="178" y2="49" />
-              <Line x1="149" y1="37" x2="155" y2="43" />
-              <Line x1="167" y1="55" x2="173" y2="61" />
-              <Line x1="173" y1="37" x2="167" y2="43" />
-              <Line x1="155" y1="55" x2="149" y2="61" />
-            </G>
+            <AnimatedG
+              rotation={allSelected ? spinAnim as any : 0}
+              originX={161}
+              originY={49}
+            >
+              <G stroke={c.cooler[1]} strokeWidth="0.35" opacity="0.18">
+                <Line x1="161" y1="32" x2="161" y2="40" />
+                <Line x1="161" y1="58" x2="161" y2="66" />
+                <Line x1="144" y1="49" x2="152" y2="49" />
+                <Line x1="170" y1="49" x2="178" y2="49" />
+                <Line x1="149" y1="37" x2="155" y2="43" />
+                <Line x1="167" y1="55" x2="173" y2="61" />
+                <Line x1="173" y1="37" x2="167" y2="43" />
+                <Line x1="155" y1="55" x2="149" y2="61" />
+              </G>
+            </AnimatedG>
             <G fill="none" stroke={c.cooler[1]} strokeWidth="0.35" opacity="0.2">
               <Path d="M153 74 Q153 79 156 81 Q161 84 161 80" />
               <Path d="M165 74 Q165 79 168 81 Q173 84 173 80" />
@@ -160,13 +237,13 @@ export function BuildIllustration({ build }: Props) {
         />
 
         {/* RAM */}
-        <Rect x="218" y="24" width="7" height="56" rx="1"
+        <AnimatedRect x="218" y="24" width="7" height="56" rx="1"
           fill={ram.fill} stroke={ram.stroke} strokeWidth="0.5"
-          strokeDasharray={ram.strokeDasharray} opacity={ram.opacity}
+          strokeDasharray={ram.strokeDasharray} opacity={ramOp as any}
         />
-        <Rect x="229" y="24" width="7" height="56" rx="1"
+        <AnimatedRect x="229" y="24" width="7" height="56" rx="1"
           fill={ram.fill} stroke={ram.stroke} strokeWidth="0.5"
-          strokeDasharray={ram.strokeDasharray} opacity={ram.opacity}
+          strokeDasharray={ram.strokeDasharray} opacity={ramOp as any}
         />
         {build.ram && (
           <G>
@@ -186,9 +263,9 @@ export function BuildIllustration({ build }: Props) {
         )}
 
         {/* GPU */}
-        <Rect x="50" y="96" width="200" height="28" rx="2.5"
+        <AnimatedRect x="50" y="96" width="200" height="28" rx="2.5"
           fill={gpu.fill} stroke={gpu.stroke} strokeWidth="0.6"
-          strokeDasharray={gpu.strokeDasharray} opacity={gpu.opacity}
+          strokeDasharray={gpu.strokeDasharray} opacity={gpuOp as any}
         />
         {build.gpu && (
           <G>
@@ -214,21 +291,27 @@ export function BuildIllustration({ build }: Props) {
                 <Circle cx={cx} cy="110" r="2.5"
                   fill={`${c.gpu[0]}18`} stroke={c.gpu[1]} strokeWidth="0.3"
                 />
-                <G stroke={c.gpu[1]} strokeWidth="0.3" opacity="0.18">
-                  <Line x1={cx} y1="102" x2={cx} y2="106" />
-                  <Line x1={cx} y1="114" x2={cx} y2="118" />
-                  <Line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
-                  <Line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
-                </G>
+                <AnimatedG
+                  rotation={allSelected ? spinAnim as any : 0}
+                  originX={cx}
+                  originY={110}
+                >
+                  <G stroke={c.gpu[1]} strokeWidth="0.3" opacity="0.18">
+                    <Line x1={cx} y1="102" x2={cx} y2="106" />
+                    <Line x1={cx} y1="114" x2={cx} y2="118" />
+                    <Line x1={cx - 6} y1="110" x2={cx - 3} y2="110" />
+                    <Line x1={cx + 3} y1="110" x2={cx + 6} y2="110" />
+                  </G>
+                </AnimatedG>
               </G>
             )}
           </G>
         ))}
 
         {/* Storage — M.2 */}
-        <Rect x="190" y="150" width="48" height="6" rx="1.5"
+        <AnimatedRect x="190" y="150" width="48" height="6" rx="1.5"
           fill={stor.fill} stroke={stor.stroke} strokeWidth="0.5"
-          strokeDasharray={stor.strokeDasharray} opacity={stor.opacity}
+          strokeDasharray={stor.strokeDasharray} opacity={storOp as any}
         />
         {build.storage && (
           <G>
@@ -241,15 +324,15 @@ export function BuildIllustration({ build }: Props) {
           </G>
         )}
         {/* Storage — 2.5" SSD */}
-        <Rect x="256" y="192" width="36" height="24" rx="2"
+        <AnimatedRect x="256" y="192" width="36" height="24" rx="2"
           fill={stor.fill} stroke={stor.stroke} strokeWidth="0.5"
-          strokeDasharray={stor.strokeDasharray} opacity={stor.opacity}
+          strokeDasharray={stor.strokeDasharray} opacity={storOp as any}
         />
 
         {/* PSU */}
-        <Rect x="40" y="192" width="108" height="42" rx="3"
+        <AnimatedRect x="40" y="192" width="108" height="42" rx="3"
           fill={psu.fill} stroke={psu.stroke} strokeWidth="0.6"
-          strokeDasharray={psu.strokeDasharray} opacity={psu.opacity}
+          strokeDasharray={psu.strokeDasharray} opacity={psuOp as any}
         />
         <Circle cx="94" cy="213" r="15"
           fill="none" stroke={psu.stroke} strokeWidth="0.35"
