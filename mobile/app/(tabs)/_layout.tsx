@@ -45,13 +45,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="community"
-        options={{
-          title: 'Community',
-          tabBarIcon: ({ focused }) => icon(focused, 'people-outline', 'people'),
-        }}
-      />
-      <Tabs.Screen
         name="account"
         options={{
           title: 'Account',

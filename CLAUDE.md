@@ -14,7 +14,6 @@ mobile/features/build/        ✅ Build tab: component picker, build summary, qu
 mobile/features/saves/        ✅ Saved builds tab: list, load, delete builds
 mobile/features/compare/      ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
 mobile/features/account/      ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
-mobile/features/community/    ✅ Community tab: builds feed, filters, post build, likes, comments, clone
 
 ### Core App
 mobile/app/_layout.tsx        <- Root layout + auth gate
