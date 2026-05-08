@@ -27,7 +27,7 @@ export const CATALOG: Catalog = {
     ],
   },
   cooler: {
-    label: 'CPU Cooler', ib: '#10B981', ic: '#ffffff', hasPM: false,
+    label: 'CPU Cooler', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'ID-COOLING SE-214-XT',           s: 'Air | 150W TDP',           p: 20,  tdp: 150 },
       { n: 'Thermalright Peerless Assassin',  s: 'Air | 260W TDP',           p: 35,  tdp: 260 },
@@ -52,7 +52,7 @@ export const CATALOG: Catalog = {
     ],
   },
   gpu: {
-    label: 'GPU', ib: '#FF6B9D', ic: '#ffffff', hasPM: true,
+    label: 'GPU', ib: '#7B2FFF', ic: '#ffffff', hasPM: true,
     opts: [
       { n: 'Intel Arc A750',      s: '8GB GDDR6 · 1080p',       p: 209,  pm: 13200 },
       { n: 'RX 7600',             s: '8GB GDDR6 · 1080p',       p: 250,  pm: 16400 },
@@ -77,7 +77,7 @@ export const CATALOG: Catalog = {
     ],
   },
   motherboard: {
-    label: 'Motherboard', ib: '#6366F1', ic: '#ffffff', hasPM: false,
+    label: 'Motherboard', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'Gigabyte B550M DS3H',           s: 'AM4 · DDR4 · mATX',       p: 75,  sk: 'AM4',     vrs: 3, feat: 'No WiFi, PCIe 3.0, 5+3 VRM' },
       { n: 'MSI B550-A PRO',                s: 'AM4 · DDR4 · ATX',        p: 110, sk: 'AM4',     vrs: 3, feat: 'No WiFi, PCIe 4.0, 10+2+1 VRM' },
@@ -102,7 +102,7 @@ export const CATALOG: Catalog = {
     ],
   },
   ram: {
-    label: 'RAM', ib: '#F59E0B', ic: '#ffffff', hasPM: false,
+    label: 'RAM', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'Corsair Vengeance LPX 16GB',      s: 'DDR4-3200 · 2×8GB',   p: 35,  mhz: 3200, gb: 16 },
       { n: 'G.Skill Ripjaws V 16GB',          s: 'DDR4-3600 · 2×8GB',   p: 40,  mhz: 3600, gb: 16 },
@@ -127,7 +127,7 @@ export const CATALOG: Catalog = {
     ],
   },
   storage: {
-    label: 'Storage', ib: '#06B6D4', ic: '#ffffff', hasPM: false,
+    label: 'Storage', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'WD Blue SN580 500GB',         s: 'NVMe Gen4 · 500GB',    p: 40,  read: 4000,  tb: 0.5 },
       { n: 'Seagate Barracuda 2TB',       s: 'HDD · 2TB · 7200rpm',  p: 50,  read: 220,   tb: 2 },
@@ -152,7 +152,7 @@ export const CATALOG: Catalog = {
     ],
   },
   psu: {
-    label: 'PSU', ib: '#EF4444', ic: '#ffffff', hasPM: false,
+    label: 'PSU', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'EVGA 600 W1',                     s: '600W · 80+ White',               p: 40,  watts: 600 },
       { n: 'Corsair CV550',                    s: '550W · 80+ Bronze',              p: 50,  watts: 550 },
@@ -177,7 +177,7 @@ export const CATALOG: Catalog = {
     ],
   },
   case: {
-    label: 'Case', ib: '#8B5CF6', ic: '#ffffff', hasPM: false,
+    label: 'Case', ib: '#7B2FFF', ic: '#ffffff', hasPM: false,
     opts: [
       { n: 'Thermaltake Versa H18',    s: 'Mini-tower · mATX · Mesh',     p: 50  },
       { n: 'Cougar MX330-G',           s: 'Mid-tower · ATX · Glass',      p: 55  },
