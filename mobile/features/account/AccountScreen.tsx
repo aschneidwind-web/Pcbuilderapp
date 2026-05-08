@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Linking,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet, Linking,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useAuth } from '../../context/AuthContext'
 import { useSaves } from '../saves/useSaves'
 import { useProfile } from './useProfile'

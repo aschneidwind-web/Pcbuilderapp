@@ -1,6 +1,7 @@
 import {
-  View, Text, FlatList, ActivityIndicator, StyleSheet, SafeAreaView,
+  View, Text, FlatList, ActivityIndicator, StyleSheet,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSaves } from './useSaves'
 import { SaveCard } from './SaveCard'
 import { useBuild } from '../build/BuildContext'

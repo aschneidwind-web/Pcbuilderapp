@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react'
 import {
-  Modal, View, Text, TouchableOpacity, FlatList, StyleSheet, SafeAreaView,
+  Modal, View, Text, TouchableOpacity, FlatList, StyleSheet,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import type { CatalogOption, CatalogSlot } from './build.types'
 import { color, font, radius, spacing } from '../../theme'

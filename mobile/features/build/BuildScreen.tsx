@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, SafeAreaView, ActivityIndicator,
+  StyleSheet, ActivityIndicator,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { useBuild } from './BuildContext'
 import { useSaves } from '../saves/useSaves'
 import { ComponentRow } from './ComponentRow'

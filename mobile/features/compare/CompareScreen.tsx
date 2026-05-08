@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import {
-  View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView,
+  View, Text, ScrollView, TouchableOpacity, StyleSheet,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { CATALOG } from '../build/build.catalog'
 import { SLOT_KEYS } from '../build/build.types'
 import type { SlotKey } from '../build/build.types'
