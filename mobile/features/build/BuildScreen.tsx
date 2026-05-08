@@ -8,6 +8,7 @@ import { useSaves } from '../saves/useSaves'
 import { ComponentRow } from './ComponentRow'
 import { ComponentPicker } from './ComponentPicker'
 import { BuildReport } from './BuildReport'
+import { BuildIllustration } from './BuildIllustration'
 import { CATALOG } from './build.catalog'
 import { SLOT_KEYS } from './build.types'
 import type { SlotKey } from './build.types'
@@ -79,6 +80,11 @@ export function BuildScreen() {
         {socketCompatible === true && (
           <View style={s.okPill}><Text style={s.okPillTxt}>Compatible</Text></View>
         )}
+
+        {/* Illustration */}
+        <View style={{ marginTop: 16, paddingHorizontal: spacing.section }}>
+          <BuildIllustration build={build} />
+        </View>
 
         {/* Build Report */}
         <View style={{ marginTop: 16 }}>

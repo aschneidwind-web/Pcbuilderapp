@@ -3,10 +3,9 @@
 ## CRITICAL RULES — READ BEFORE DOING ANYTHING
 
 1. NEVER create worktrees. Do not run git worktree add under any circumstances.
-2. NEVER run npm install or npm run dev. The dev server is already running.
-3. NEVER check if the server is running. It is. Always.
-4. Always work directly in C:\Users\Andrew\Documents\pc-builder
-5. After every meaningful file change, run: git save "description" then git push
+2. NEVER check if the server is running. It is. Always.
+3. Always work directly in C:\Users\Andrew\Documents\pc-builder
+4. After every meaningful file change, run: git save "description" then git push
 
 ## Project Structure
 
