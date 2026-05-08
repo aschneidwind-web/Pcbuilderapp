@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
+  StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Image,
 } from 'react-native'
 import { supabase } from '../lib/supabase'
 import { color, font, radius, spacing } from '../theme'
@@ -40,7 +40,7 @@ export default function AuthScreen() {
     >
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.logo}>
-          <Text style={s.logoText}>PartFlow</Text>
+          <Image source={require('../assets/logo.png')} style={s.logoImage} resizeMode="contain" />
           <Text style={s.logoSub}>Build your perfect PC</Text>
         </View>
 
@@ -90,8 +90,8 @@ const s = StyleSheet.create({
   root: { flex: 1, backgroundColor: color.bgApp },
   scroll: { flexGrow: 1, justifyContent: 'center', padding: spacing.page },
   logo: { alignItems: 'center', marginBottom: 40 },
-  logoText: { fontSize: 32, fontWeight: font.weight.bold, color: color.textPrimary, letterSpacing: -1 },
-  logoSub: { fontSize: font.size.body, color: color.textDim, marginTop: 6 },
+  logoImage: { width: 100, height: 100 },
+  logoSub: { fontSize: font.size.body, color: color.textDim, marginTop: 12 },
   card: {
     backgroundColor: color.bgCard,
     borderRadius: radius.xl,
