@@ -9,27 +9,27 @@
 
 ## Project Structure
 
-### React Features (Migrated)
-app/src/features/build/       ✅ Build tab: component picker, build summary, quick score
-app/src/features/saves/       ✅ Saved builds tab: list, load, delete builds
-app/src/features/compare/     ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
-app/src/features/account/     ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
-app/src/features/community/   ✅ Community tab: builds feed, filters, post build, likes, comments, clone
+### React Native Features (Mobile — Expo Router)
+mobile/features/build/        ✅ Build tab: component picker, build summary, quick score
+mobile/features/saves/        ✅ Saved builds tab: list, load, delete builds
+mobile/features/compare/      ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
+mobile/features/account/      ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
+mobile/features/community/    ✅ Community tab: builds feed, filters, post build, likes, comments, clone
 
 ### Core App
-app/src/App.tsx               <- Routes: /build, /saves, /compare, /account + auth gate
-app/src/context/AuthContext.tsx
-app/src/lib/supabase.ts
-app/.env.local                 <- VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY
-
-### Legacy (Dead — do NOT edit, do NOT reference)
-app/src/legacy/
+mobile/app/_layout.tsx        <- Root layout + auth gate
+mobile/app/(tabs)/_layout.tsx <- Tab navigator: build, saves, compare, account, community
+mobile/app/auth.tsx           <- Auth screen
+mobile/context/AuthContext.tsx
+mobile/lib/supabase.ts
+mobile/.env.local              <- EXPO_PUBLIC_SUPABASE_URL + EXPO_PUBLIC_SUPABASE_ANON_KEY
+mobile/theme.ts                <- Design tokens (colors, spacing, typography)
 
 ## Dev Server
 
-URL: http://localhost:5173
-Running from: C:\Users\Andrew\Documents\pc-builder\app
-Vite hot-reloads on file save. Never restart it.
+Run from: C:\Users\Andrew\Documents\pc-builder\mobile
+Command: expo start (then press 'a' for Android, 'i' for iOS, 'w' for web)
+Never restart it — Expo fast-refreshes on file save.
 
 ## Git Workflow
 
@@ -40,7 +40,7 @@ Always push to dev. Merge to main only when feature is complete.
 
 ## Architecture
 
-All five tabs (Build, Compare, Saves, Account, Community) are fully migrated to React feature slices with Supabase backing. Legacy prototype is dead—do not edit or reference it.
+All five tabs (Build, Compare, Saves, Account, Community) are React Native feature slices using Expo Router with Supabase backing. The old Vite/React web app has been deleted — do not reference it.
 
 ## Quality Bar
 
