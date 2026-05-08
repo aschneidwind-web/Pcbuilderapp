@@ -1,9 +1,12 @@
+import { useState, useMemo } from 'react'
 import {
   Modal, View, Text, TouchableOpacity, FlatList, StyleSheet, SafeAreaView,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import type { CatalogOption, CatalogSlot } from './build.types'
 import { color, font, radius, spacing } from '../../theme'
+
+type SortMode = 'default' | 'price' | 'popular'
 
 interface Props {
   slot: CatalogSlot
@@ -14,6 +17,8 @@ interface Props {
 }
 
 export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: Props) {
+  const [sortMode, setSortMode] = useState<SortMode>('default')
+
   let maxPtp = 0
   for (const o of slot.opts) {
     if (o.pm) {
@@ -21,6 +26,13 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
       if (ptp > maxPtp) maxPtp = ptp
     }
   }
+
+  const sortedOpts = useMemo(() => {
+    const opts = [...slot.opts]
+    if (sortMode === 'price')   return opts.sort((a, b) => a.p - b.p)
+    if (sortMode === 'popular') return opts.sort((a, b) => (b.pm ?? 0) - (a.pm ?? 0))
+    return opts
+  }, [slot.opts, sortMode])
 
   const handleSelect = (opt: CatalogOption) => {
     if (selected?.n === opt.n) {
@@ -42,8 +54,23 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
           <View style={{ width: 32 }} />
         </View>
 
+        <View style={s.sortBar}>
+          {(['default', 'price', 'popular'] as SortMode[]).map(mode => (
+            <TouchableOpacity
+              key={mode}
+              style={[s.sortChip, sortMode === mode && s.sortChipActive]}
+              onPress={() => setSortMode(mode)}
+              activeOpacity={0.7}
+            >
+              <Text style={[s.sortChipText, sortMode === mode && s.sortChipTextActive]}>
+                {mode === 'default' ? 'Default' : mode === 'price' ? 'Price' : 'Popular'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <FlatList
-          data={slot.opts}
+          data={sortedOpts}
           keyExtractor={o => o.n}
           renderItem={({ item: opt }) => {
             const ptp = opt.pm ? Math.round(opt.pm / opt.p) : null
@@ -101,6 +128,34 @@ const s = StyleSheet.create({
     fontSize: font.size.xxl,
     fontWeight: font.weight.semibold,
     color: color.textPrimary,
+  },
+  sortBar: {
+    flexDirection: 'row',
+    gap: 8,
+    paddingHorizontal: spacing.page,
+    paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: color.borderFaint,
+  },
+  sortChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    borderWidth: 1,
+    borderColor: color.borderSubtle,
+    backgroundColor: 'transparent',
+  },
+  sortChipActive: {
+    borderColor: color.primary,
+    backgroundColor: `${color.primary}18`,
+  },
+  sortChipText: {
+    fontSize: font.size.sm,
+    fontWeight: font.weight.medium,
+    color: color.textDim,
+  },
+  sortChipTextActive: {
+    color: color.primaryLight,
   },
   optRow: {
     flexDirection: 'row',

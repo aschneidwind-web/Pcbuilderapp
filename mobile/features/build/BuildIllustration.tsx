@@ -7,8 +7,21 @@ import { color } from '../../theme'
 import type { BuildState, SlotKey } from './build.types'
 import { SLOT_KEYS } from './build.types'
 
-const AnimatedG = Animated.createAnimatedComponent(G)
-const AnimatedRect = Animated.createAnimatedComponent(Rect)
+const AnimatedG      = Animated.createAnimatedComponent(G)
+const AnimatedRect   = Animated.createAnimatedComponent(Rect)
+const AnimatedCircle = Animated.createAnimatedComponent(Circle)
+
+// Sparks: each starts on the case border and shoots outward
+const SPARKS = [
+  { x: 95,  y: 12,  dx: -5,  dy: -10 },
+  { x: 195, y: 12,  dx:  3,  dy: -11 },
+  { x: 270, y: 12,  dx:  9,  dy: -8  },
+  { x: 312, y: 75,  dx: 12,  dy: -6  },
+  { x: 312, y: 155, dx: 11,  dy:  7  },
+  { x: 200, y: 236, dx:  4,  dy: 10  },
+  { x: 90,  y: 236, dx: -8,  dy:  9  },
+  { x: 29,  y: 120, dx: -11, dy: -4  },
+]
 
 interface PartStyle {
   fill: string
@@ -31,22 +44,38 @@ interface Props { build: BuildState }
 export function BuildIllustration({ build }: Props) {
   const allSelected = useMemo(() => SLOT_KEYS.every(k => build[k] != null), [build])
 
-  const spinAnim = useRef(new Animated.Value(0)).current
-  const pulseAnim = useRef(new Animated.Value(1)).current
+  const spinAnim       = useRef(new Animated.Value(0)).current
+  const pulseAnim      = useRef(new Animated.Value(1)).current
   const caseStrokeAnim = useRef(new Animated.Value(1044)).current
 
-  const spinLoop = useRef<Animated.CompositeAnimation | null>(null)
-  const pulseLoop = useRef<Animated.CompositeAnimation | null>(null)
+  // One animated cx, cy, opacity per spark
+  const sparkAnims = useRef(
+    SPARKS.map(s => ({
+      cx:      new Animated.Value(s.x),
+      cy:      new Animated.Value(s.y),
+      opacity: new Animated.Value(0),
+    }))
+  ).current
+
+  const spinLoop   = useRef<Animated.CompositeAnimation | null>(null)
+  const pulseLoop  = useRef<Animated.CompositeAnimation | null>(null)
   const caseTiming = useRef<Animated.CompositeAnimation | null>(null)
+  const sparkLoops = useRef<Animated.CompositeAnimation[]>([])
 
   useEffect(() => {
     if (!allSelected) {
       spinLoop.current?.stop()
       pulseLoop.current?.stop()
       caseTiming.current?.stop()
+      sparkLoops.current.forEach(l => l.stop())
       spinAnim.setValue(0)
       pulseAnim.setValue(1)
       caseStrokeAnim.setValue(1044)
+      sparkAnims.forEach((a, i) => {
+        a.cx.setValue(SPARKS[i].x)
+        a.cy.setValue(SPARKS[i].y)
+        a.opacity.setValue(0)
+      })
       return
     }
 
@@ -55,52 +84,83 @@ export function BuildIllustration({ build }: Props) {
     )
     spinLoop.current.start()
 
+    // Brighter pulse: floor raised to 0.5, faster 3s cycle
     pulseLoop.current = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 0.2, duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
-        Animated.timing(pulseAnim, { toValue: 1,   duration: 2000, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 0.5, duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 1,   duration: 1500, easing: Easing.inOut(Easing.ease), useNativeDriver: false }),
       ])
     )
     pulseLoop.current.start()
 
     caseStrokeAnim.setValue(1044)
     caseTiming.current = Animated.timing(caseStrokeAnim, {
-      toValue: 0,
-      duration: 1200,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: false,
+      toValue: 0, duration: 1200, easing: Easing.out(Easing.ease), useNativeDriver: false,
     })
     caseTiming.current.start()
+
+    // Sparks: staggered loops, each fires then rests before repeating
+    sparkLoops.current = sparkAnims.map((anim, i) => {
+      anim.cx.setValue(SPARKS[i].x)
+      anim.cy.setValue(SPARKS[i].y)
+      anim.opacity.setValue(0)
+      const loop = Animated.loop(
+        Animated.sequence([
+          Animated.delay(i * 280),
+          Animated.parallel([
+            Animated.timing(anim.cx, {
+              toValue: SPARKS[i].x + SPARKS[i].dx,
+              duration: 550,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: false,
+            }),
+            Animated.timing(anim.cy, {
+              toValue: SPARKS[i].y + SPARKS[i].dy,
+              duration: 550,
+              easing: Easing.out(Easing.quad),
+              useNativeDriver: false,
+            }),
+            Animated.sequence([
+              Animated.timing(anim.opacity, { toValue: 1, duration: 80, useNativeDriver: false }),
+              Animated.timing(anim.opacity, { toValue: 0, duration: 470, useNativeDriver: false }),
+            ]),
+          ]),
+          Animated.delay(500 + i * 120),
+        ])
+      )
+      loop.start()
+      return loop
+    })
 
     return () => {
       spinLoop.current?.stop()
       pulseLoop.current?.stop()
       caseTiming.current?.stop()
+      sparkLoops.current.forEach(l => l.stop())
     }
   }, [allSelected])
 
-  const mb     = partStyle(build, 'motherboard')
-  const cpu    = partStyle(build, 'cpu')
-  const cooler = partStyle(build, 'cooler')
-  const gpu    = partStyle(build, 'gpu')
-  const ram    = partStyle(build, 'ram')
-  const stor   = partStyle(build, 'storage')
-  const psu    = partStyle(build, 'psu')
+  const mb      = partStyle(build, 'motherboard')
+  const cpu     = partStyle(build, 'cpu')
+  const cooler  = partStyle(build, 'cooler')
+  const gpu     = partStyle(build, 'gpu')
+  const ram     = partStyle(build, 'ram')
+  const stor    = partStyle(build, 'storage')
+  const psu     = partStyle(build, 'psu')
 
-  const caseOn = build.case != null
+  const caseOn  = build.case != null
   const cStroke = caseOn ? color.partColors.case[0] : '#555'
-  const cOp = caseOn ? 0.7 : 0.35
+  const cOp     = caseOn ? 0.7 : 0.35
 
   const c = color.partColors
 
-  // When allSelected, animated opacity drives the pulse; otherwise use the static value.
-  const mbOp    = allSelected ? pulseAnim : mb.opacity
-  const cpuOp   = allSelected ? pulseAnim : cpu.opacity
+  const mbOp     = allSelected ? pulseAnim : mb.opacity
+  const cpuOp    = allSelected ? pulseAnim : cpu.opacity
   const coolerOp = allSelected ? pulseAnim : cooler.opacity
-  const gpuOp   = allSelected ? pulseAnim : gpu.opacity
-  const ramOp   = allSelected ? pulseAnim : ram.opacity
-  const storOp  = allSelected ? pulseAnim : stor.opacity
-  const psuOp   = allSelected ? pulseAnim : psu.opacity
+  const gpuOp    = allSelected ? pulseAnim : gpu.opacity
+  const ramOp    = allSelected ? pulseAnim : ram.opacity
+  const storOp   = allSelected ? pulseAnim : stor.opacity
+  const psuOp    = allSelected ? pulseAnim : psu.opacity
 
   return (
     <View style={{ width: '100%', aspectRatio: 340 / 250, maxWidth: 320, alignSelf: 'center' }}>
@@ -366,6 +426,18 @@ export function BuildIllustration({ build }: Props) {
           <Circle cx="175" cy="14" r="5" fill="none" stroke={c.case[0]} strokeWidth="0.4" />
           <Circle cx="32" cy="85" r="7" fill="none" stroke={c.case[0]} strokeWidth="0.4" />
         </G>
+
+        {/* Sparks — only when full build */}
+        {allSelected && sparkAnims.map((anim, i) => (
+          <AnimatedCircle
+            key={i}
+            cx={anim.cx as any}
+            cy={anim.cy as any}
+            r={i % 3 === 0 ? 2 : 1.5}
+            fill="#FFD580"
+            opacity={anim.opacity as any}
+          />
+        ))}
 
       </Svg>
     </View>
