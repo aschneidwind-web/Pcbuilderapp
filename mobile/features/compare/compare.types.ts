@@ -1,6 +1,6 @@
 import type { SlotKey } from '../build/build.types'
 
-export type SortMode = 'value' | 'perf' | 'price'
+export type SortMode = 'value' | 'perf' | 'price_asc' | 'price_desc'
 
 export interface ComparableOption {
   n: string

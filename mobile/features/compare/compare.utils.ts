@@ -13,8 +13,9 @@ export function toComparable(opt: CatalogOption): ComparableOption {
 
 export function sortByMode(items: ComparableOption[], mode: SortMode): ComparableOption[] {
   const sorted = [...items]
-  if (mode === 'value') return sorted.sort((a, b) => b.ptp - a.ptp)
-  if (mode === 'perf')  return sorted.sort((a, b) => b.pm - a.pm)
+  if (mode === 'value')      return sorted.sort((a, b) => b.ptp - a.ptp)
+  if (mode === 'perf')       return sorted.sort((a, b) => b.pm - a.pm)
+  if (mode === 'price_desc') return sorted.sort((a, b) => b.p - a.p)
   return sorted.sort((a, b) => a.p - b.p)
 }
 

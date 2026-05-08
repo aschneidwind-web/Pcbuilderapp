@@ -24,7 +24,7 @@ type Props = PmProps | PriceProps
 function winnerLabel(sort: SortMode): string {
   if (sort === 'value') return 'Top value'
   if (sort === 'perf')  return 'Top performer'
-  return 'Best price'
+  return 'Best price'  // covers price_asc and price_desc
 }
 
 function Bar({ label, pct, barColor }: { label: string; pct: number; barColor: string }) {

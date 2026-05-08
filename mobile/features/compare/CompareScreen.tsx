@@ -10,18 +10,30 @@ import { toComparable, sortByMode, sortByPrice } from './compare.utils'
 import { CompareCard } from './CompareCard'
 import { color, font, radius, spacing } from '../../theme'
 
-const SORT_MODES: { id: SortMode; label: string }[] = [
-  { id: 'value', label: 'Best value' },
-  { id: 'perf',  label: 'Performance' },
-  { id: 'price', label: 'Price' },
-]
-
 export function CompareScreen() {
-  const [slot, setSlot] = useState<SlotKey>('cpu')
-  const [sort, setSort] = useState<SortMode>('value')
+  const [slot, setSlot]         = useState<SlotKey>('cpu')
+  const [sort, setSort]         = useState<SortMode>('value')
+  const [priceDir, setPriceDir] = useState<'asc' | 'desc'>('asc')
 
-  const cat   = CATALOG[slot]
-  const hasPM = cat.hasPM
+  const cat      = CATALOG[slot]
+  const hasPM    = cat.hasPM
+  const isPriceSortActive = sort === 'price_asc' || sort === 'price_desc'
+
+  const handlePriceBtn = () => {
+    if (isPriceSortActive) {
+      setSort(sort === 'price_asc' ? 'price_desc' : 'price_asc')
+    } else {
+      setSort('price_asc')
+    }
+  }
+
+  const priceBtnLabel = isPriceSortActive
+    ? (sort === 'price_asc' ? 'Price ↑' : 'Price ↓')
+    : 'Price'
+
+  const nonPmSorted = priceDir === 'asc'
+    ? sortByPrice(cat.opts)
+    : [...cat.opts].sort((a, b) => b.p - a.p)
 
   const cards = hasPM
     ? (() => {
@@ -33,8 +45,15 @@ export function CompareScreen() {
           <CompareCard key={opt.n} variant="pm" opt={opt} rank={i} maxPm={maxPm} maxPtp={maxPtp} sort={sort} />
         ))
       })()
-    : sortByPrice(cat.opts).map((opt, i) => (
-        <CompareCard key={opt.n} variant="price" n={opt.n} s={opt.s} p={opt.p} rank={i} />
+    : nonPmSorted.map((opt, i) => (
+        <CompareCard
+          key={opt.n}
+          variant="price"
+          n={opt.n}
+          s={opt.s}
+          p={opt.p}
+          rank={priceDir === 'asc' ? i : -1}
+        />
       ))
 
   return (
@@ -63,18 +82,45 @@ export function CompareScreen() {
         ))}
       </ScrollView>
 
-      {hasPM && (
+      {hasPM ? (
         <View style={s.sortRow}>
-          {SORT_MODES.map(({ id, label }) => (
-            <TouchableOpacity
-              key={id}
-              style={[s.sortBtn, sort === id && s.sortBtnOn]}
-              onPress={() => setSort(id)}
-            >
-              <Text style={[s.sortBtnTxt, sort === id && s.sortBtnTxtOn]}>{label}</Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={[s.sortBtn, sort === 'value' && s.sortBtnOn]}
+            onPress={() => setSort('value')}
+          >
+            <Text style={[s.sortBtnTxt, sort === 'value' && s.sortBtnTxtOn]}>Best value</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.sortBtn, sort === 'perf' && s.sortBtnOn]}
+            onPress={() => setSort('perf')}
+          >
+            <Text style={[s.sortBtnTxt, sort === 'perf' && s.sortBtnTxtOn]}>Performance</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[s.sortBtn, isPriceSortActive && s.sortBtnOn]}
+            onPress={handlePriceBtn}
+          >
+            <Text style={[s.sortBtnTxt, isPriceSortActive && s.sortBtnTxtOn]}>{priceBtnLabel}</Text>
+          </TouchableOpacity>
         </View>
+      ) : (
+        <View style={s.sortRow}>
+          <TouchableOpacity
+            style={[s.sortBtn, s.sortBtnOn]}
+            onPress={() => setPriceDir(priceDir === 'asc' ? 'desc' : 'asc')}
+          >
+            <Text style={[s.sortBtnTxt, s.sortBtnTxtOn]}>
+              {priceDir === 'asc' ? 'Price ↑' : 'Price ↓'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {sort === 'perf' && hasPM && (
+        <Text style={s.sortCaption}>
+          PassMark scores measure raw CPU/GPU speed from PassMark's public benchmark suite.
+          Higher score = faster component.
+        </Text>
       )}
 
       <ScrollView style={s.list} contentContainerStyle={{ padding: spacing.page }}>
@@ -128,5 +174,14 @@ const s = StyleSheet.create({
   sortBtnOn: { backgroundColor: 'rgba(10,132,255,0.15)', borderColor: color.info },
   sortBtnTxt: { fontSize: font.size.md, fontWeight: font.weight.medium, color: color.textSecondary },
   sortBtnTxtOn: { color: color.info },
+  sortCaption: {
+    fontSize: font.size.xs,
+    color: color.textDim,
+    paddingHorizontal: spacing.page,
+    paddingTop: 8,
+    paddingBottom: 6,
+    borderBottomWidth: 0.5,
+    borderBottomColor: color.borderSubtle,
+  },
   list: { flex: 1 },
 })

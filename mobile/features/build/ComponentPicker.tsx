@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons'
 import type { CatalogOption, CatalogSlot } from './build.types'
 import { color, font, radius, spacing } from '../../theme'
 
-type SortMode = 'default' | 'price' | 'popular'
+type SortMode = 'default' | 'price_asc' | 'price_desc' | 'popular'
 
 interface Props {
   slot: CatalogSlot
@@ -19,6 +19,8 @@ interface Props {
 export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: Props) {
   const [sortMode, setSortMode] = useState<SortMode>('default')
 
+  const isPriceActive = sortMode === 'price_asc' || sortMode === 'price_desc'
+
   let maxPtp = 0
   for (const o of slot.opts) {
     if (o.pm) {
@@ -29,8 +31,9 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
 
   const sortedOpts = useMemo(() => {
     const opts = [...slot.opts]
-    if (sortMode === 'price')   return opts.sort((a, b) => a.p - b.p)
-    if (sortMode === 'popular') return opts.sort((a, b) => (b.pm ?? 0) - (a.pm ?? 0))
+    if (sortMode === 'price_asc')  return opts.sort((a, b) => a.p - b.p)
+    if (sortMode === 'price_desc') return opts.sort((a, b) => b.p - a.p)
+    if (sortMode === 'popular')    return opts.sort((a, b) => (b.pm ?? 0) - (a.pm ?? 0))
     return opts
   }, [slot.opts, sortMode])
 
@@ -42,6 +45,12 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
     }
     onClose()
   }
+
+  const handlePriceChip = () => {
+    setSortMode(sortMode === 'price_asc' ? 'price_desc' : 'price_asc')
+  }
+
+  const priceLabel = sortMode === 'price_asc' ? 'Price ↑' : sortMode === 'price_desc' ? 'Price ↓' : 'Price'
 
   return (
     <Modal visible animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -55,19 +64,43 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
         </View>
 
         <View style={s.sortBar}>
-          {(['default', 'price', 'popular'] as SortMode[]).map(mode => (
-            <TouchableOpacity
-              key={mode}
-              style={[s.sortChip, sortMode === mode && s.sortChipActive]}
-              onPress={() => setSortMode(mode)}
-              activeOpacity={0.7}
-            >
-              <Text style={[s.sortChipText, sortMode === mode && s.sortChipTextActive]}>
-                {mode === 'default' ? 'Default' : mode === 'price' ? 'Price' : 'Popular'}
-              </Text>
-            </TouchableOpacity>
-          ))}
+          <TouchableOpacity
+            style={[s.sortChip, sortMode === 'default' && s.sortChipActive]}
+            onPress={() => setSortMode('default')}
+            activeOpacity={0.7}
+          >
+            <Text style={[s.sortChipText, sortMode === 'default' && s.sortChipTextActive]}>
+              Default
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[s.sortChip, isPriceActive && s.sortChipActive]}
+            onPress={handlePriceChip}
+            activeOpacity={0.7}
+          >
+            <Text style={[s.sortChipText, isPriceActive && s.sortChipTextActive]}>
+              {priceLabel}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[s.sortChip, sortMode === 'popular' && s.sortChipActive]}
+            onPress={() => setSortMode('popular')}
+            activeOpacity={0.7}
+          >
+            <Text style={[s.sortChipText, sortMode === 'popular' && s.sortChipTextActive]}>
+              PassMark
+            </Text>
+          </TouchableOpacity>
         </View>
+
+        {sortMode === 'popular' && (
+          <Text style={s.sortCaption}>
+            PassMark scores measure raw CPU/GPU speed from PassMark's public benchmark suite.
+            Higher score = faster component.
+          </Text>
+        )}
 
         <FlatList
           data={sortedOpts}
@@ -134,6 +167,15 @@ const s = StyleSheet.create({
     gap: 8,
     paddingHorizontal: spacing.page,
     paddingVertical: 10,
+    borderBottomWidth: 0.5,
+    borderBottomColor: color.borderFaint,
+  },
+  sortCaption: {
+    fontSize: font.size.xs,
+    color: color.textDim,
+    paddingHorizontal: spacing.page,
+    paddingTop: 8,
+    paddingBottom: 6,
     borderBottomWidth: 0.5,
     borderBottomColor: color.borderFaint,
   },
