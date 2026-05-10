@@ -17,7 +17,7 @@ mobile/features/account/      ✅ Account tab: profile, edit profile → Supabas
 
 ### Core App
 mobile/app/_layout.tsx        <- Root layout + auth gate
-mobile/app/(tabs)/_layout.tsx <- Tab navigator: build, saves, compare, account, community
+mobile/app/(tabs)/_layout.tsx <- Tab navigator: build, saves, compare, account
 mobile/app/auth.tsx           <- Auth screen
 mobile/context/AuthContext.tsx
 mobile/lib/supabase.ts
@@ -39,7 +39,7 @@ Always push to dev. Merge to main only when feature is complete.
 
 ## Architecture
 
-All five tabs (Build, Compare, Saves, Account, Community) are React Native feature slices using Expo Router with Supabase backing. The old Vite/React web app has been deleted — do not reference it.
+Four tabs (Build, Compare, Saves, Account) are React Native feature slices using Expo Router with Supabase backing. The old Vite/React web app has been deleted — do not reference it.
 
 ## Quality Bar
 
