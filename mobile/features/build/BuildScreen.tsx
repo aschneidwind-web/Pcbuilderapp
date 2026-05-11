@@ -64,15 +64,13 @@ export function BuildScreen() {
         {/* Header */}
         <View style={s.headerRow}>
           <Image source={require('../../assets/logo.png')} style={s.logoImg} resizeMode="contain" />
+          <View style={s.headerPrice}>
+            <Text style={s.subtitle}>Total estimate · {componentCount} of {TOTAL_SLOTS}</Text>
+            <Text style={s.price}>
+              ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </Text>
+          </View>
         </View>
-
-        {/* Price summary */}
-        <Text style={s.subtitle}>
-          Total estimate · {componentCount} of {TOTAL_SLOTS}
-        </Text>
-        <Text style={s.price}>
-          ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        </Text>
 
         {/* Socket pill */}
         {socketCompatible === false && (
@@ -155,30 +153,28 @@ const s = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: spacing.section,
     paddingTop: spacing.page,
     paddingBottom: 8,
   },
   logoImg: {
-    width: 130,
-    height: 36,
+    width: 140,
+    height: 40,
+  },
+  headerPrice: {
+    alignItems: 'flex-end',
   },
 
   subtitle: {
-    fontSize: font.size.body,
+    fontSize: font.size.sm,
     color: color.textDim,
-    paddingHorizontal: spacing.section,
-    paddingTop: 12,
-    paddingBottom: 4,
   },
   price: {
-    fontSize: font.size.hero,
+    fontSize: font.size.xl,
     fontWeight: font.weight.bold,
     color: color.textPrimary,
-    letterSpacing: -1,
-    paddingHorizontal: spacing.section,
-    lineHeight: 48,
+    letterSpacing: -0.5,
   },
 
   errPill: {
