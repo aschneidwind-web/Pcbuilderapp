@@ -346,10 +346,17 @@ async function importCategory(slot: string): Promise<number> {
 
   if (skipped > 0) console.log(`  [warn] ${skipped} rows skipped (no name)`)
 
+  // Deduplicate by name — keep last occurrence so newer scraped data wins
+  const seen = new Map<string, PartRow>()
+  for (const row of parts) seen.set(row.n, row)
+  const deduped = [...seen.values()]
+  const dropped = parts.length - deduped.length
+  if (dropped > 0) console.log(`  [dedup] ${dropped} duplicate name(s) dropped in ${slot}`)
+
   // Upsert in batches
   let total = 0
-  for (let i = 0; i < parts.length; i += BATCH_SIZE) {
-    total += await upsertBatch(parts.slice(i, i + BATCH_SIZE))
+  for (let i = 0; i < deduped.length; i += BATCH_SIZE) {
+    total += await upsertBatch(deduped.slice(i, i + BATCH_SIZE))
   }
 
   return total
