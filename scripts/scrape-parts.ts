@@ -64,6 +64,9 @@ async function fetchHtml(url: string): Promise<string | null> {
         render_js:     true,
         premium_proxy: true,
         country_code:  'us',
+        // wait until at least one product row is injected by the page's AJAX call
+        wait_for:      '#paginated_table tbody tr',
+        wait:          8000,
       },
       timeout:      60_000,
       responseType: 'text',
@@ -106,34 +109,24 @@ async function runDebug(): Promise<void> {
   }
   console.log('=== END PROBE ===\n')
 
-  // Step 2: log first 2 rows of table.xs-col-12 so we can see exact td class names
-  const tableRows = $('table.xs-col-12 tbody tr')
-  console.log(`table.xs-col-12 tbody tr count: ${tableRows.length}\n`)
-
-  if (tableRows.length > 0) {
-    console.log('=== FIRST 2 ROW OUTER HTML ===')
-    tableRows.slice(0, 2).each((i, tr) => {
-      console.log(`\n--- Row ${i + 1} ---`)
-      console.log($.html(tr))
-    })
-    console.log('\n=== END ROW HTML ===\n')
-
-    // Also extract td__ classes from first row for quick summary
-    const tdClasses: string[] = []
-    $(tableRows.get(0)!).find('td').each((_, td) => {
-      const cls = ($(td).attr('class') ?? '').split(/\s+/).find(c => c.startsWith('td__'))
-      if (cls) tdClasses.push(cls)
-    })
-    console.log(`First row td__ classes: ${tdClasses.join(', ') || '(none)'}`)
-  } else {
-    // Fallback: try tr.tr__product directly in case table structure differs
-    const legacyRows = $('tr.tr__product')
-    console.log(`Fallback tr.tr__product count: ${legacyRows.length}`)
-    if (legacyRows.length > 0) {
-      console.log('\n=== FIRST ROW (tr.tr__product) OUTER HTML ===')
-      console.log($.html(legacyRows.first()))
-    }
+  // Probe all tr variants to find where rows actually live
+  const variants: [string, number][] = [
+    ['table.xs-col-12 tbody tr', $('table.xs-col-12 tbody tr').length],
+    ['table.xs-col-12 tr',       $('table.xs-col-12 tr').length],
+    ['table.xs-col-12 > tr',     $('table.xs-col-12 > tr').length],
+  ]
+  console.log('=== TR VARIANT PROBE ===')
+  for (const [sel, count] of variants) {
+    console.log(`  ${sel.padEnd(32)} → ${count}`)
   }
+  console.log('=== END TR VARIANT PROBE ===\n')
+
+  // Log first 3000 chars of the table's own HTML so we can see the real structure
+  const tableEl = $('table.xs-col-12')
+  const tableHtml = $.html(tableEl)
+  console.log('=== table.xs-col-12 HTML (first 3000 chars) ===')
+  console.log(tableHtml.slice(0, 3000))
+  console.log('\n=== END TABLE HTML ===')
 }
 
 // ---------------------------------------------------------------------------
