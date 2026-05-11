@@ -241,9 +241,10 @@ async function main(): Promise<void> {
   let filterSlots: string[] | null = null
   if (catArgIdx >= 0) {
     const catArg = process.argv[catArgIdx]!
-    const afterEq = catArg.includes('=') ? catArg.split('=')[1]! : ''
+    // PowerShell may convert "a,b,c" → "a b c" (spaces) or split into separate argv items
+    const afterEq = catArg.includes('=') ? catArg.split('=').slice(1).join('=') : ''
     const subsequent = process.argv.slice(catArgIdx + 1).filter(a => !a.startsWith('-'))
-    filterSlots = [...afterEq.split(','), ...subsequent].map(s => s.trim()).filter(Boolean)
+    filterSlots = [...afterEq.split(/[,\s]+/), ...subsequent].map(s => s.trim()).filter(Boolean)
   }
 
   const allSlots = Object.keys(CATEGORIES)
