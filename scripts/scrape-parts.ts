@@ -264,16 +264,9 @@ async function main(): Promise<void> {
 
     const parts = await scrapeCategory(slot, slug)
 
-    // Deduplicate by name — keep last occurrence
-    const seen = new Map<string, Record<string, string>>()
-    for (const p of parts) if (p['name']) seen.set(p['name'], p)
-    const deduped = [...seen.values()]
-    const dropped = parts.length - deduped.length
-    if (dropped > 0) console.log(`  [dedup] ${dropped} duplicate name(s) dropped in ${slot}`)
-
     const outPath = path.join(DATA_DIR, `${slot}.json`)
-    await fs.writeFile(outPath, JSON.stringify(deduped, null, 2))
-    console.log(`  Saved → ${outPath}`)
+    await fs.writeFile(outPath, JSON.stringify(parts, null, 2))
+    console.log(`  Saved → ${outPath} (${parts.length} rows)`)
 
     if (i < slots.length - 1) await sleep(3_000)
   }
