@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 import { CATALOG } from './build.catalog'
+import { checkCoolerSocketCompat, checkSocketCompat } from './build.compatibility'
 import { SLOT_KEYS } from './build.types'
 import type { BuildState, CatalogOption, SlotKey } from './build.types'
 
@@ -8,6 +9,7 @@ interface BuildContextValue {
   totalPrice: number
   componentCount: number
   socketCompatible: boolean | null
+  coolerCompatible: boolean | null
   selectComponent: (slot: SlotKey, option: CatalogOption) => void
   clearComponent: (slot: SlotKey) => void
   clearAll: () => void
@@ -19,6 +21,7 @@ export const BuildContext = createContext<BuildContextValue>({
   totalPrice: 0,
   componentCount: 0,
   socketCompatible: null,
+  coolerCompatible: null,
   selectComponent: () => {},
   clearComponent: () => {},
   clearAll: () => {},
@@ -67,13 +70,20 @@ export function BuildProvider({ children }: { children: React.ReactNode }) {
   const socketCompatible = useMemo((): boolean | null => {
     const cpu = build.cpu
     const mb = build.motherboard
-    if (!cpu?.sk || !mb?.sk) return null
-    return cpu.sk === mb.sk
+    if (!cpu || !mb) return null
+    return checkSocketCompat(cpu, mb)
   }, [build.cpu, build.motherboard])
+
+  const coolerCompatible = useMemo((): boolean | null => {
+    const cooler = build.cooler
+    const cpu = build.cpu
+    if (!cooler || !cpu) return null
+    return checkCoolerSocketCompat(cooler, cpu)
+  }, [build.cooler, build.cpu])
 
   return (
     <BuildContext.Provider value={{
-      build, totalPrice, componentCount, socketCompatible,
+      build, totalPrice, componentCount, socketCompatible, coolerCompatible,
       selectComponent, clearComponent, clearAll, loadBuild,
     }}>
       {children}

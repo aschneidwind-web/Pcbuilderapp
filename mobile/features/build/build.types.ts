@@ -18,6 +18,8 @@ export interface CatalogOption {
   feat?: string
   vrs?: number
   tdp?: number
+  coolerType?: 'air' | 'aio'
+  sockets?: string[]
 }
 
 export interface CatalogSlot {
