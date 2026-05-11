@@ -234,7 +234,23 @@ async function main(): Promise<void> {
 
   await fs.mkdir(DATA_DIR, { recursive: true })
 
-  const slots = Object.keys(CATEGORIES)
+  // --categories=gpu,storage,ram  → scrape only those slots
+  const categoryArg = process.argv.find(a => a.startsWith('--categories='))
+  const filterSlots = categoryArg
+    ? categoryArg.split('=')[1]!.split(',').map(s => s.trim()).filter(Boolean)
+    : null
+
+  const allSlots = Object.keys(CATEGORIES)
+  const slots = filterSlots
+    ? allSlots.filter(s => filterSlots.includes(s))
+    : allSlots
+
+  if (filterSlots) {
+    const unknown = filterSlots.filter(s => !allSlots.includes(s))
+    if (unknown.length) console.warn(`[warn] Unknown categories: ${unknown.join(', ')}`)
+    console.log(`Scraping ${slots.length} of ${allSlots.length} categories: ${slots.join(', ')}\n`)
+  }
+
   for (let i = 0; i < slots.length; i++) {
     const slot = slots[i]!
     const slug = CATEGORIES[slot]!

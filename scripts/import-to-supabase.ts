@@ -126,12 +126,16 @@ function normaliseCooler(raw: Record<string, string>, slot: string): PartRow | n
     ? rawSockets.split(/[,/]/).map(s => s.trim()).filter(Boolean)
     : null
 
+  // Color variants of the same cooler are distinct SKUs with different prices
+  const color = raw['color']?.trim() || null
+  const n = color ? `${name} (${color})` : name
+
   const s = cooler_type === 'aio'
     ? compactSpec(`AIO`, radiatorSize ? `${radiatorSize}mm` : null, tdp ? `${tdp}W TDP` : null)
     : compactSpec(`Air`, tdp ? `${tdp}W TDP` : null)
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:           parsePrice(raw['price']),
     tdp,
     cooler_type,
@@ -181,10 +185,13 @@ function normaliseRam(raw: Record<string, string>, slot: string): PartRow | null
   const modMatch   = modulesRaw.match(/(\d+)\s*[x×]\s*(\d+)\s*GB/i)
   const gb         = modMatch ? parseInt(modMatch[1], 10) * parseInt(modMatch[2], 10) : null
 
+  // Speed (DDR gen + MHz) is the key differentiator for same-capacity kits
+  const n = speedRaw && !name.includes(speedRaw) ? `${name} ${speedRaw}` : name
+
   const s = compactSpec(speedRaw || null, modulesRaw || null) || 'RAM'
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:   parsePrice(raw['price']),
     mhz,
     gb,
@@ -208,6 +215,9 @@ function normaliseStorage(raw: Record<string, string>, slot: string): PartRow | 
     tb = isFinite(gb) ? Math.round(gb / 1000 * 100) / 100 : null
   }
 
+  // Capacity is the key variant differentiator (e.g. "Samsung 990 Pro 1 TB" vs "2 TB")
+  const n = capacityRaw && !name.includes(capacityRaw) ? `${name} ${capacityRaw}` : name
+
   const storType  = raw['type']?.trim()      || null
   const iface     = raw['interface']?.trim() || null
   const readSpeed = parseIntField(raw['read_speed'] || raw['sequential_read'])
@@ -219,7 +229,7 @@ function normaliseStorage(raw: Record<string, string>, slot: string): PartRow | 
   ) || 'Storage'
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:    parsePrice(raw['price']),
     tb,
     read: readSpeed,
@@ -231,17 +241,22 @@ function normaliseGpu(raw: Record<string, string>, slot: string): PartRow | null
   const name = raw['name']?.trim()
   if (!name) return null
 
+  // Chipset is the defining spec — "Gigabyte GAMING OC" means nothing without it
+  const chipset = raw['chipset']?.trim() || null
+  const n = chipset ? `${name} ${chipset}` : name
+
   // memory field e.g. "12 GB"
   const memRaw  = raw['memory']?.trim()      || ''
   const memType = raw['memory_type']?.trim() || raw['memory_type_2']?.trim() || ''
 
   const s = compactSpec(
+    chipset || null,
     memRaw  ? `${memRaw}` : null,
     memType || null,
   ) || 'GPU'
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:   parsePrice(raw['price']),
     scraped_at: new Date().toISOString(),
   }
@@ -252,17 +267,22 @@ function normalisePsu(raw: Record<string, string>, slot: string): PartRow | null
   if (!name) return null
 
   const watts      = parseIntField(raw['wattage'])
-  const efficiency = raw['efficiency']?.trim() || null
-  const modular    = raw['modular']?.trim()    || null
+  // field is "efficiency_rating" in scraped JSON, not "efficiency"
+  const efficiency = raw['efficiency_rating']?.trim() || raw['efficiency']?.trim() || null
+  const modular    = raw['modular']?.trim() || null
+
+  // Color variants of the same PSU are distinct SKUs
+  const color = raw['color']?.trim() || null
+  const n = color ? `${name} (${color})` : name
 
   const s = compactSpec(
     watts ? `${watts}W` : null,
-    efficiency ? `80+ ${efficiency}` : null,
+    efficiency || null,
     modular    ? `${modular} Modular` : null,
   ) || 'PSU'
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:     parsePrice(raw['price']),
     watts,
     scraped_at: new Date().toISOString(),
@@ -348,10 +368,17 @@ async function importCategory(slot: string): Promise<number> {
 
   // Deduplicate by name — keep last occurrence so newer scraped data wins
   const seen = new Map<string, PartRow>()
-  for (const row of parts) seen.set(row.n, row)
+  const collisions: string[] = []
+  for (const row of parts) {
+    if (seen.has(row.n)) collisions.push(row.n)
+    seen.set(row.n, row)
+  }
   const deduped = [...seen.values()]
   const dropped = parts.length - deduped.length
-  if (dropped > 0) console.log(`  [dedup] ${dropped} duplicate name(s) dropped in ${slot}`)
+  if (dropped > 0) {
+    console.log(`  [dedup] ${dropped} duplicate name(s) dropped in ${slot}`)
+    collisions.slice(0, 5).forEach(n => console.log(`    dup: "${n}"`))
+  }
 
   // Upsert in batches
   let total = 0
