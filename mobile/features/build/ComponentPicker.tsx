@@ -103,6 +103,10 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
           </Text>
         )}
 
+        {sortedOpts.length === 0 && (
+          <Text style={s.emptyText}>No parts available for this slot.</Text>
+        )}
+
         <FlatList
           data={sortedOpts}
           keyExtractor={o => o.n}
@@ -239,4 +243,11 @@ const s = StyleSheet.create({
   optPts: { fontSize: font.size.sm, color: color.textDim },
   selIndicator: { alignItems: 'center', gap: 2 },
   tapRemove: { fontSize: font.size.xs, color: color.textDim },
+  emptyText: {
+    fontSize: font.size.body,
+    color: color.textDim,
+    textAlign: 'center',
+    marginTop: 48,
+    paddingHorizontal: spacing.page,
+  },
 })
