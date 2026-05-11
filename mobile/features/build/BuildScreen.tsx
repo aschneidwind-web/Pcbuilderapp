@@ -10,7 +10,6 @@ import { ComponentRow } from './ComponentRow'
 import { ComponentPicker } from './ComponentPicker'
 import { BuildReport } from './BuildReport'
 import { BuildIllustration } from './BuildIllustration'
-import { CATALOG } from './build.catalog'
 import { SLOT_KEYS } from './build.types'
 import type { SlotKey } from './build.types'
 import type { BuildComponents } from '../saves/saves.types'
@@ -28,7 +27,7 @@ const toBuildComponents = (build: ReturnType<typeof useBuild>['build']): BuildCo
 }
 
 export function BuildScreen() {
-  const { build, totalPrice, componentCount, socketCompatible, selectComponent, clearComponent } = useBuild()
+  const { build, catalog, partsLoading, totalPrice, componentCount, socketCompatible, selectComponent, clearComponent } = useBuild()
   const { createSave } = useSaves()
 
   const [activePicker, setActivePicker] = useState<SlotKey | null>(null)
@@ -97,15 +96,18 @@ export function BuildScreen() {
             <Text style={s.sectionCount}>{componentCount} selected</Text>
           </View>
 
-          {SLOT_KEYS.map(key => (
-            <ComponentRow
-              key={key}
-              slotKey={key}
-              slot={CATALOG[key]}
-              selected={build[key]}
-              onClick={() => setActivePicker(key)}
-            />
-          ))}
+          {partsLoading || !catalog
+            ? <ActivityIndicator style={{ marginTop: 32 }} color={color.primary} />
+            : SLOT_KEYS.map(key => (
+                <ComponentRow
+                  key={key}
+                  slotKey={key}
+                  slot={catalog[key]}
+                  selected={build[key]}
+                  onClick={() => setActivePicker(key)}
+                />
+              ))
+          }
 
           {/* Save */}
           <View style={s.saveArea}>
@@ -133,9 +135,9 @@ export function BuildScreen() {
         </View>
       </ScrollView>
 
-      {activePicker && (
+      {activePicker && catalog && (
         <ComponentPicker
-          slot={CATALOG[activePicker]}
+          slot={catalog[activePicker]}
           selected={build[activePicker]}
           onSelect={opt => selectComponent(activePicker, opt)}
           onClose={() => setActivePicker(null)}

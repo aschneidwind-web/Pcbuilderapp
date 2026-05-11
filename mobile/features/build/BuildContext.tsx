@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
-import { CATALOG } from './build.catalog'
 import { checkCoolerSocketCompat, checkSocketCompat } from './build.compatibility'
 import { SLOT_KEYS } from './build.types'
-import type { BuildState, CatalogOption, SlotKey } from './build.types'
+import type { BuildState, Catalog, CatalogOption, SlotKey } from './build.types'
+import { useParts } from './useParts'
 
 interface BuildContextValue {
   build: BuildState
+  catalog: Catalog | null
+  partsLoading: boolean
+  partsError: string | null
   totalPrice: number
   componentCount: number
   socketCompatible: boolean | null
@@ -18,6 +21,9 @@ interface BuildContextValue {
 
 export const BuildContext = createContext<BuildContextValue>({
   build: {},
+  catalog: null,
+  partsLoading: true,
+  partsError: null,
   totalPrice: 0,
   componentCount: 0,
   socketCompatible: null,
@@ -30,6 +36,7 @@ export const BuildContext = createContext<BuildContextValue>({
 
 export function BuildProvider({ children }: { children: React.ReactNode }) {
   const [build, setBuild] = useState<BuildState>({})
+  const { catalog, partsLoading, partsError } = useParts()
 
   const selectComponent = useCallback((slot: SlotKey, option: CatalogOption) => {
     setBuild(prev => ({ ...prev, [slot]: option }))
@@ -46,16 +53,17 @@ export function BuildProvider({ children }: { children: React.ReactNode }) {
   const clearAll = useCallback(() => setBuild({}), [])
 
   const loadBuild = useCallback((components: Partial<Record<string, { name: string }>>) => {
+    if (!catalog) return
     const next: BuildState = {}
     for (const slot of SLOT_KEYS) {
       const ref = components[slot]
       if (ref) {
-        const found = CATALOG[slot].opts.find(o => o.n === ref.name)
+        const found = catalog[slot].opts.find(o => o.n === ref.name)
         if (found) next[slot] = found
       }
     }
     setBuild(next)
-  }, [])
+  }, [catalog])
 
   const totalPrice = useMemo(
     () => SLOT_KEYS.reduce((sum, k) => sum + (build[k]?.p ?? 0), 0),
@@ -83,7 +91,8 @@ export function BuildProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BuildContext.Provider value={{
-      build, totalPrice, componentCount, socketCompatible, coolerCompatible,
+      build, catalog, partsLoading, partsError,
+      totalPrice, componentCount, socketCompatible, coolerCompatible,
       selectComponent, clearComponent, clearAll, loadBuild,
     }}>
       {children}
