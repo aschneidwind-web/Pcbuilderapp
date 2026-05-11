@@ -1,19 +1,19 @@
 #!/usr/bin/env tsx
 /**
- * Scrapes PCPartPicker product listings using a headless Chromium browser.
+ * Scrapes PCPartPicker via ScrapingBee (handles Cloudflare bypass).
  *
- * PCPartPicker sits behind Cloudflare. If your IP is on a block list, set:
- *   PLAYWRIGHT_PROXY=http://user:pass@host:port   (residential proxy)
+ * Required:  SCRAPINGBEE_API_KEY=<your key>
+ * Debug:     DEBUG_SELECTOR=1  (fetches cpu p1, logs HTML + selector probe, no file write)
  *
  * Run: npx tsx scripts/scrape-parts.ts
  */
-import { chromium } from 'playwright'
-import type { Page } from 'playwright'
+import axios, { AxiosError } from 'axios'
+import * as cheerio from 'cheerio'
 import * as fs from 'fs/promises'
 import * as path from 'path'
 
 // ---------------------------------------------------------------------------
-// Config
+// Config / env validation
 // ---------------------------------------------------------------------------
 
 const DATA_DIR = path.join(__dirname, 'data')
@@ -29,11 +29,15 @@ const CATEGORIES: Record<string, string> = {
   case:        'case',
 }
 
-const USER_AGENT =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
-
 const MAX_PAGES_PER_CATEGORY = 60
-const PROXY = process.env['PLAYWRIGHT_PROXY']
+const DEBUG = !!process.env['DEBUG_SELECTOR']
+
+const rawKey = process.env['SCRAPINGBEE_API_KEY']
+if (!rawKey) {
+  console.error('Missing SCRAPINGBEE_API_KEY env var')
+  process.exit(1)
+}
+const API_KEY: string = rawKey
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -47,16 +51,86 @@ function randomDelay(): Promise<void> {
   return sleep(1000 + Math.floor(Math.random() * 1500))
 }
 
-function isBlocked(text: string): boolean {
-  return text.toLowerCase().includes('unavailable') ||
-         text.toLowerCase().includes('access denied') ||
-         text.toLowerCase().includes('cf-error')
+// ---------------------------------------------------------------------------
+// ScrapingBee fetch — returns the rendered HTML string for a URL
+// ---------------------------------------------------------------------------
+
+async function fetchHtml(url: string): Promise<string | null> {
+  try {
+    const res = await axios.get<string>('https://app.scrapingbee.com/api/v1/', {
+      params: {
+        api_key:       API_KEY,
+        url,
+        render_js:     true,
+        premium_proxy: true,
+        country_code:  'us',
+      },
+      timeout:      60_000,
+      responseType: 'text',
+    })
+    return res.data
+  } catch (err) {
+    const e = err as AxiosError
+    const status = e.response?.status
+    console.error(`  [err] ScrapingBee ${url}: ${e.message}${status ? ` (HTTP ${status})` : ''}`)
+    return null
+  }
 }
 
 // ---------------------------------------------------------------------------
-// Fetch one paginated result set using PCPartPicker's AJAX endpoint.
-// The call is made from inside the browser page so it carries the real
-// Cloudflare session cookies established during warm-up.
+// Debug mode — probe selectors on cpu page 1, never writes files
+// ---------------------------------------------------------------------------
+
+async function runDebug(): Promise<void> {
+  console.log('DEBUG_SELECTOR mode — fetching https://pcpartpicker.com/products/cpu/?page=1\n')
+
+  const html = await fetchHtml('https://pcpartpicker.com/products/cpu/?page=1')
+  if (!html) {
+    console.error('Fetch failed. Verify SCRAPINGBEE_API_KEY is valid.')
+    process.exit(1)
+  }
+
+  console.log('=== HTML (first 5000 chars) ===')
+  console.log(html.slice(0, 5000))
+  console.log('=== END HTML ===\n')
+
+  const $ = cheerio.load(html)
+
+  const SELECTORS = [
+    'table.xs-col-12',
+    '#products__table',
+    'tr.tr__product',
+    '.td__name',
+  ] as const
+
+  console.log('=== SELECTOR PROBE ===')
+  for (const sel of SELECTORS) {
+    const count = $(sel).length
+    console.log(`  ${sel.padEnd(26)} → ${count} match${count !== 1 ? 'es' : ''}`)
+
+    if (sel === 'tr.tr__product' && count > 0) {
+      // Show td__ class names from the first row so we can verify field extraction
+      const tdClasses: string[] = []
+      $(sel).first().find('td').each((_, td) => {
+        const tdCls = ($(td).attr('class') ?? '').split(/\s+/).find(c => c.startsWith('td__'))
+        if (tdCls) tdClasses.push(tdCls)
+      })
+      console.log(`    First row td__ classes: ${tdClasses.join(', ') || '(none)'}`)
+
+      // Show what the first row's name cell contains
+      const nameCell = $(sel).first().find('td').filter((_, td) =>
+        ($(td).attr('class') ?? '').includes('td__name')
+      )
+      if (nameCell.length) {
+        console.log(`    First part name: "${nameCell.text().trim().slice(0, 80)}"`)
+      }
+    }
+  }
+  console.log('=== END PROBE ===')
+}
+
+// ---------------------------------------------------------------------------
+// Parse product rows and detect pagination from rendered HTML
 // ---------------------------------------------------------------------------
 
 interface PageResult {
@@ -64,128 +138,64 @@ interface PageResult {
   hasMore: boolean
 }
 
-async function fetchProductPage(
-  page: Page,
-  slug: string,
-  pageNum: number,
-): Promise<PageResult | null> {
-  const fetchUrl = `https://pcpartpicker.com/products/${slug}/fetch/?page=${pageNum}&pp=50`
+function parseHtml(html: string): PageResult {
+  const $ = cheerio.load(html)
+  const rows: Record<string, string>[] = []
 
-  try {
-    const result = await page.evaluate(
-      async (url: string): Promise<{ rows: Record<string, string>[]; hasMore: boolean } | null> => {
-        // --- runs inside the browser ---
-        let data: Record<string, unknown>
-        try {
-          const resp = await fetch(url, {
-            headers: {
-              'X-Requested-With': 'XMLHttpRequest',
-              'Accept':           'application/json, text/javascript, */*; q=0.01',
-              'Referer':          window.location.href,
-            },
-            credentials: 'include',
-          })
-          if (!resp.ok) return null
-          data = await resp.json() as Record<string, unknown>
-        } catch {
-          return null
-        }
+  $('tr.tr__product').each((_, tr) => {
+    const fields: Record<string, string> = {}
 
-        const res = (data['result'] ?? data) as Record<string, unknown>
-        const html = res['html'] as string | undefined
-        if (!html) return null
+    $(tr).find('td').each((_, td) => {
+      // Identify the field by the td__* class on the cell
+      const tdClass = ($(td).attr('class') ?? '')
+        .split(/\s+/)
+        .find(c => c.startsWith('td__'))
+      if (!tdClass) return
 
-        // Wrap bare <tr> fragments so the browser parses them correctly
-        const wrapped = html.trimStart().startsWith('<table')
-          ? html
-          : `<table><tbody>${html}</tbody></table>`
+      const key = tdClass.slice(4) // strip "td__"
 
-        const div = document.createElement('div')
-        div.innerHTML = wrapped
+      if (key === 'name') {
+        // Name lives in a nested <p> first, then first <a>, then raw text
+        const text =
+          $(td).find('p').first().text().trim() ||
+          $(td).find('a').first().text().trim() ||
+          $(td).text().trim()
+        fields[key] = text
+      } else if (key === 'price') {
+        const m = $(td).text().match(/\$([\d,]+\.?\d*)/)
+        fields[key] = m ? m[1].replace(/,/g, '') : ''
+      } else {
+        const t = $(td).text().trim()
+        if (t) fields[key] = t
+      }
+    })
 
-        const rows: Record<string, string>[] = []
-        div.querySelectorAll('tr.tr__product').forEach(tr => {
-          const fields: Record<string, string> = {}
+    if (fields['name']) rows.push(fields)
+  })
 
-          tr.querySelectorAll('td').forEach(td => {
-            const tdClass = Array.from(td.classList).find(c => c.startsWith('td__'))
-            if (!tdClass) return
+  // PCPartPicker marks the next-page button with class "next";
+  // disabled / absent means we are on the last page.
+  const hasMore = $('.pagination .next:not(.disabled) a').length > 0
 
-            const key = tdClass.slice(4) // strip "td__"
-
-            if (key === 'name') {
-              const p = td.querySelector('p')
-              const a = td.querySelector('a')
-              fields[key] = ((p ?? a ?? td).textContent ?? '').trim()
-            } else if (key === 'price') {
-              const m = (td.textContent ?? '').match(/\$([\d,]+\.?\d*)/)
-              fields[key] = m ? m[1].replace(/,/g, '') : ''
-            } else {
-              const t = (td.textContent ?? '').trim()
-              if (t) fields[key] = t
-            }
-          })
-
-          if (fields['name']) rows.push(fields)
-        })
-
-        // is_more_pages is the explicit signal; fall back to count > 0
-        const count = typeof res['count'] === 'number' ? res['count'] as number : -1
-        const hasMore =
-          res['is_more_pages'] === true ||
-          (res['is_more_pages'] == null && count > 0)
-
-        return { rows, hasMore }
-      },
-      fetchUrl,
-    )
-
-    return result
-  } catch (err) {
-    console.error(`  [err] ${slug} p${pageNum}: ${err instanceof Error ? err.message : err}`)
-    return null
-  }
+  return { rows, hasMore }
 }
 
 // ---------------------------------------------------------------------------
-// Scrape one category — land on the listing page first (establishes the
-// correct Referer + session context), then paginate via AJAX.
+// Scrape one category across all pages
 // ---------------------------------------------------------------------------
 
-async function scrapeCategory(
-  page: Page,
-  slot: string,
-  slug: string,
-): Promise<Record<string, string>[]> {
+async function scrapeCategory(slot: string, slug: string): Promise<Record<string, string>[]> {
   console.log(`\nScraping ${slot} (/${slug}/)`)
-
-  // Navigate to the listing page to establish session/Referer context
-  try {
-    await page.goto(
-      `https://pcpartpicker.com/products/${slug}/`,
-      { waitUntil: 'domcontentloaded', timeout: 30_000 },
-    )
-    await sleep(2_000)
-  } catch (err) {
-    console.error(`  [err] loading /${slug}/: ${err instanceof Error ? err.message : err}`)
-    return []
-  }
-
-  const bodyText = await page.evaluate(() => document.body.innerText)
-  if (isBlocked(bodyText)) {
-    console.error(`  [blocked] ${slug}: Cloudflare block active — set PLAYWRIGHT_PROXY and retry`)
-    return []
-  }
-
   const all: Record<string, string>[] = []
   let consecutiveFails = 0
 
   for (let pageNum = 1; pageNum <= MAX_PAGES_PER_CATEGORY; pageNum++) {
     process.stdout.write(`  p${pageNum}…`)
 
-    const result = await fetchProductPage(page, slug, pageNum)
+    const url = `https://pcpartpicker.com/products/${slug}/?page=${pageNum}`
+    const html = await fetchHtml(url)
 
-    if (!result) {
+    if (!html) {
       consecutiveFails++
       if (consecutiveFails >= 3) {
         process.stdout.write(' 3 consecutive failures, stopping\n')
@@ -193,15 +203,16 @@ async function scrapeCategory(
       }
       process.stdout.write(' retrying in 5s\n')
       await sleep(5_000)
-      pageNum--
+      pageNum-- // retry same page
       continue
     }
 
     consecutiveFails = 0
-    all.push(...result.rows)
-    process.stdout.write(` ${result.rows.length} parts (running: ${all.length})\n`)
+    const { rows, hasMore } = parseHtml(html)
+    all.push(...rows)
+    process.stdout.write(` ${rows.length} parts (running: ${all.length})\n`)
 
-    if (!result.hasMore || result.rows.length === 0) break
+    if (!hasMore || rows.length === 0) break
 
     await randomDelay()
   }
@@ -215,65 +226,24 @@ async function scrapeCategory(
 // ---------------------------------------------------------------------------
 
 async function main(): Promise<void> {
+  if (DEBUG) {
+    await runDebug()
+    return
+  }
+
   await fs.mkdir(DATA_DIR, { recursive: true })
 
-  if (PROXY) console.log(`Proxy: ${PROXY}`)
+  const slots = Object.keys(CATEGORIES)
+  for (let i = 0; i < slots.length; i++) {
+    const slot = slots[i]!
+    const slug = CATEGORIES[slot]!
 
-  const browser = await chromium.launch({
-    headless: true,
-    args: ['--disable-blink-features=AutomationControlled'],
-    ...(PROXY ? { proxy: { server: PROXY } } : {}),
-  })
+    const parts = await scrapeCategory(slot, slug)
+    const outPath = path.join(DATA_DIR, `${slot}.json`)
+    await fs.writeFile(outPath, JSON.stringify(parts, null, 2))
+    console.log(`  Saved → ${outPath}`)
 
-  const context = await browser.newContext({
-    viewport:  { width: 1280, height: 800 },
-    userAgent: USER_AGENT,
-  })
-
-  // Minimal stealth: remove the webdriver flag and fake chrome.runtime
-  await context.addInitScript(() => {
-    Object.defineProperty(navigator, 'webdriver', { get: () => undefined })
-    const w = window as unknown as Record<string, unknown>
-    if (!w['chrome']) w['chrome'] = { runtime: {} }
-  })
-
-  const page = await context.newPage()
-
-  // Warm-up: establish cookies on the root domain
-  console.log('Warming up (pcpartpicker.com)…')
-  try {
-    await page.goto('https://pcpartpicker.com', { waitUntil: 'networkidle', timeout: 60_000 })
-  } catch {
-    // networkidle can time out on long-polling pages; domcontentloaded is enough
-    console.log('  (networkidle timeout — continuing)')
-  }
-  await sleep(5_000)
-
-  // Fail fast if Cloudflare is blocking this IP
-  const homeText = await page.evaluate(() => document.body.innerText)
-  if (isBlocked(homeText)) {
-    console.error('\nBLOCKED: PCPartPicker returned "unavailable" on the home page.')
-    console.error('Cloudflare is blocking this IP/ASN.')
-    console.error('Fix: set PLAYWRIGHT_PROXY=http://user:pass@host:port and retry.\n')
-    await browser.close()
-    process.exit(1)
-  }
-
-  try {
-    const slots = Object.keys(CATEGORIES)
-    for (let i = 0; i < slots.length; i++) {
-      const slot = slots[i]!
-      const slug = CATEGORIES[slot]!
-
-      const parts = await scrapeCategory(page, slot, slug)
-      const outPath = path.join(DATA_DIR, `${slot}.json`)
-      await fs.writeFile(outPath, JSON.stringify(parts, null, 2))
-      console.log(`  Saved → ${outPath}`)
-
-      if (i < slots.length - 1) await sleep(3_000)
-    }
-  } finally {
-    await browser.close()
+    if (i < slots.length - 1) await sleep(3_000)
   }
 
   console.log('\nScraping complete.')

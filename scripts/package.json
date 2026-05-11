@@ -8,11 +8,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
-    "axios": "^1.7.9",
-    "cheerio": "^1.0.0",
-    "playwright": "^1.59.1",
-    "playwright-extra": "^4.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "axios": "^1.16.0",
+    "cheerio": "^1.2.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
