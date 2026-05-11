@@ -185,8 +185,10 @@ function normaliseRam(raw: Record<string, string>, slot: string): PartRow | null
   const modMatch   = modulesRaw.match(/(\d+)\s*[x×]\s*(\d+)\s*GB/i)
   const gb         = modMatch ? parseInt(modMatch[1], 10) * parseInt(modMatch[2], 10) : null
 
-  // Speed (DDR gen + MHz) is the key differentiator for same-capacity kits
-  const n = speedRaw && !name.includes(speedRaw) ? `${name} ${speedRaw}` : name
+  // Speed + color distinguish same-capacity kits (e.g. DDR5-6000 Black vs White)
+  const color = raw['color']?.trim() || null
+  const withSpeed = speedRaw && !name.includes(speedRaw) ? `${name} ${speedRaw}` : name
+  const n = color ? `${withSpeed} (${color})` : withSpeed
 
   const s = compactSpec(speedRaw || null, modulesRaw || null) || 'RAM'
 
@@ -241,9 +243,11 @@ function normaliseGpu(raw: Record<string, string>, slot: string): PartRow | null
   const name = raw['name']?.trim()
   if (!name) return null
 
-  // Chipset is the defining spec — "Gigabyte GAMING OC" means nothing without it
+  // Chipset + color distinguish GPU SKUs (same board in multiple colors)
   const chipset = raw['chipset']?.trim() || null
-  const n = chipset ? `${name} ${chipset}` : name
+  const color   = raw['color']?.trim()   || null
+  const withChipset = chipset ? `${name} ${chipset}` : name
+  const n = color ? `${withChipset} (${color})` : withChipset
 
   // memory field e.g. "12 GB"
   const memRaw  = raw['memory']?.trim()      || ''
@@ -297,10 +301,13 @@ function normaliseCase(raw: Record<string, string>, slot: string): PartRow | nul
   const sidePanel  = raw['side_panel']?.trim()   || null
   const formFactor = raw['form_factor']?.trim()  || raw['mbd_form_factor']?.trim() || null
 
+  const color = raw['color']?.trim() || null
+  const n = color ? `${name} (${color})` : name
+
   const s = compactSpec(caseType, formFactor, sidePanel) || 'Case'
 
   return {
-    slot, n: name, s,
+    slot, n, s,
     p:   parsePrice(raw['price']),
     scraped_at: new Date().toISOString(),
   }
