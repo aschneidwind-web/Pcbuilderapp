@@ -1,68 +1,97 @@
-﻿# PartFlow — Claude Code Instructions
+# PartFlow — Claude Code Instructions
 
 ## CRITICAL RULES — READ BEFORE DOING ANYTHING
 
-1. NEVER create worktrees. Do not run git worktree add under any circumstances.
-2. NEVER check if the server is running. It is. Always.
+1. NEVER create worktrees. Do not run `git worktree add` under any circumstances.
+2. NEVER restart the dev server. Expo fast-refreshes on file save.
 3. Always work directly in C:\Users\Andrew\Documents\pc-builder
-4. After every meaningful file change, run: git save "description" then git push
+4. After every meaningful file change, run: `git save "description"` then `git push`
+5. Before making any claim about file paths, component names, code structure, or what exists in the codebase — always read the file first. Never state structural facts from memory. If unsure, say so and read it.
+
+## Source of Truth
+
+- All code lives under `mobile/`. No other directory is active.
+- Before referencing any file path, component name, or entry count — read the file first.
+- Never assume a file exists, has been deleted, or contains specific content without reading it.
 
 ## Project Structure
 
 ### React Native Features (Mobile — Expo Router)
-mobile/features/build/        ✅ Build tab: component picker, build summary, quick score
-mobile/features/saves/        ✅ Saved builds tab: list, load, delete builds
-mobile/features/compare/      ✅ Compare tab: category picker, sort buttons, comparison cards (PM & price)
-mobile/features/account/      ✅ Account tab: profile, edit profile → Supabase, password, settings, dark mode
+```
+mobile/features/build/        ✅ Build tab
+mobile/features/saves/        ✅ Saved builds tab
+mobile/features/compare/      ✅ Compare tab
+mobile/features/account/      ✅ Account tab
+```
 
-### Core App
-mobile/app/_layout.tsx        <- Root layout + auth gate
-mobile/app/(tabs)/_layout.tsx <- Tab navigator: build, saves, compare, account
-mobile/app/auth.tsx           <- Auth screen
+### Key File Locations
+```
+mobile/features/build/BuildScreen.tsx         ← main build screen (NOT BuildPage)
+mobile/features/build/build.catalog.ts        ← parts catalog (~148 entries)
+mobile/features/build/build.types.ts          ← CatalogOption, SlotKey, BuildState
+mobile/features/build/build.compatibility.ts  ← checkSocketCompat, checkCoolerSocketCompat
+mobile/features/build/BuildContext.tsx        ← useBuild, socketCompatible, coolerCompatible
+mobile/features/build/ComponentPicker.tsx     ← part picker sheet
+mobile/features/build/ComponentRow.tsx        ← row in build screen
+mobile/app/_layout.tsx                        ← root layout + auth gate
+mobile/app/(tabs)/_layout.tsx                 ← tab navigator
+mobile/app/auth.tsx                           ← auth screen
 mobile/context/AuthContext.tsx
 mobile/lib/supabase.ts
-mobile/.env.local              <- EXPO_PUBLIC_SUPABASE_URL + EXPO_PUBLIC_SUPABASE_ANON_KEY
-mobile/theme.ts                <- Design tokens (colors, spacing, typography)
+mobile/theme.ts                               ← design tokens (colors, spacing, typography)
+mobile/.env.local                             ← EXPO_PUBLIC_SUPABASE_URL + EXPO_PUBLIC_SUPABASE_ANON_KEY
+```
+
+### Core App
+- Auth gate and tab navigation live in `mobile/app/`
+- Supabase client in `mobile/lib/supabase.ts`
+- Design tokens in `mobile/theme.ts` — always use these, never hardcode colors or spacing
 
 ## Dev Server
 
-Run from: C:\Users\Andrew\Documents\pc-builder\mobile
-Command: expo start (then press 'a' for Android, 'i' for iOS, 'w' for web)
+Run from: `C:\Users\Andrew\Documents\pc-builder\mobile`
+Command: `expo start` (then press `a` for Android, `i` for iOS, `w` for web)
 Never restart it — Expo fast-refreshes on file save.
 
 ## Git Workflow
 
-Active branch: dev
-Stable branch: main
-Commit alias: git save "message"
-Always push to dev. Merge to main only when feature is complete.
+- Active branch: `dev`
+- Stable branch: `main`
+- Commit alias: `git save "message"`
+- Always push to `dev`. Merge to `main` only when a feature is complete.
 
 ## Architecture
 
-Four tabs (Build, Compare, Saves, Account) are React Native feature slices using Expo Router with Supabase backing. The old Vite/React web app has been deleted — do not reference it.
+Four tabs (Build, Compare, Saves, Account) are React Native feature slices using Expo Router with Supabase backing. The old Vite/React web app has been fully deleted — do not reference it, do not create files outside `mobile/`.
 
 ## Quality Bar
 
 This is a production app, not a prototype. Every change must:
-- **Be scalable** — no localStorage for user data, no hardcoded state
+- **Be scalable** — no localStorage, no hardcoded state
 - **Be testable** — new logic gets unit tests before implementation
 - **Be clean** — no TODO comments left in committed code without a GitHub issue
-- **Match existing patterns** — check neighboring feature slices before inventing new ones
+- **Match existing patterns** — read neighboring feature slices before inventing new ones
 
 ## General Coding Rules
-- **Modularization:** Follow the Single Responsibility Principle (SRP). Keep functions and classes small.
-- **Modern Idioms:** Use the most current, officially recommended patterns for the language/framework (e.g., Python 3.12+ type hints, React functional components).
-- **No Placeholders:** Always provide complete, runnable code blocks. Never say "X remains unchanged" unless it is a minor snippet for context.
-- **Return Early:** Prefer the "return early" pattern to reduce nesting and improve readability.
+
+- **Modularization:** Follow SRP. Keep functions and classes small.
+- **Modern Idioms:** Use current React Native / TypeScript patterns. Functional components only.
+- **No Placeholders:** Always provide complete, runnable code. Never say "X remains unchanged."
+- **Return Early:** Prefer early returns to reduce nesting.
 
 ## Workflow & Iteration
-- **TDD First:** When asked for new logic, always propose or write the unit tests before the architectural impacts and edge cases.
+
+- **TDD First:** Write unit tests before implementation for any new logic.
+- **Read Before Edit:** Always read a file in full before modifying it.
+- **Run tests after logic changes:** Fix all failures before moving to the next step.
 
 ## Error Handling & Security
-- **Fail Fast:** Validate inputs and preconditions early. Prohibit silent failures.
-- **No Hardcoded Secrets:** Never include API keys or credentials; use environment variables as placeholders.
-- **Explicit Exceptions:** Use specific error types rather than generic catch-all blocks.
+
+- **Fail Fast:** Validate inputs early. No silent failures.
+- **No Hardcoded Secrets:** Use environment variables. Never commit credentials.
+- **Explicit Exceptions:** Use specific error types, not generic catch-all blocks.
 
 ## Response Style
-- **Conciseness:** Be direct. Skip "Great question!" or "I'd be happy to help."
-- **Explain "Why," Not "What":** Use comments to explain non-obvious design decisions, not to restate what a line of code is doing.
+
+- **Conciseness:** Be direct. No filler phrases.
+- **Explain "Why," Not "What":** Comments explain non-obvious decisions, not what the code does.
