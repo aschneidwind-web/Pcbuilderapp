@@ -90,10 +90,6 @@ async function runDebug(): Promise<void> {
     process.exit(1)
   }
 
-  console.log('=== HTML (first 5000 chars) ===')
-  console.log(html.slice(0, 5000))
-  console.log('=== END HTML ===\n')
-
   const $ = cheerio.load(html)
 
   const SELECTORS = [
@@ -107,26 +103,37 @@ async function runDebug(): Promise<void> {
   for (const sel of SELECTORS) {
     const count = $(sel).length
     console.log(`  ${sel.padEnd(26)} → ${count} match${count !== 1 ? 'es' : ''}`)
+  }
+  console.log('=== END PROBE ===\n')
 
-    if (sel === 'tr.tr__product' && count > 0) {
-      // Show td__ class names from the first row so we can verify field extraction
-      const tdClasses: string[] = []
-      $(sel).first().find('td').each((_, td) => {
-        const tdCls = ($(td).attr('class') ?? '').split(/\s+/).find(c => c.startsWith('td__'))
-        if (tdCls) tdClasses.push(tdCls)
-      })
-      console.log(`    First row td__ classes: ${tdClasses.join(', ') || '(none)'}`)
+  // Step 2: log first 2 rows of table.xs-col-12 so we can see exact td class names
+  const tableRows = $('table.xs-col-12 tbody tr')
+  console.log(`table.xs-col-12 tbody tr count: ${tableRows.length}\n`)
 
-      // Show what the first row's name cell contains
-      const nameCell = $(sel).first().find('td').filter((_, td) =>
-        ($(td).attr('class') ?? '').includes('td__name')
-      )
-      if (nameCell.length) {
-        console.log(`    First part name: "${nameCell.text().trim().slice(0, 80)}"`)
-      }
+  if (tableRows.length > 0) {
+    console.log('=== FIRST 2 ROW OUTER HTML ===')
+    tableRows.slice(0, 2).each((i, tr) => {
+      console.log(`\n--- Row ${i + 1} ---`)
+      console.log($.html(tr))
+    })
+    console.log('\n=== END ROW HTML ===\n')
+
+    // Also extract td__ classes from first row for quick summary
+    const tdClasses: string[] = []
+    $(tableRows.get(0)!).find('td').each((_, td) => {
+      const cls = ($(td).attr('class') ?? '').split(/\s+/).find(c => c.startsWith('td__'))
+      if (cls) tdClasses.push(cls)
+    })
+    console.log(`First row td__ classes: ${tdClasses.join(', ') || '(none)'}`)
+  } else {
+    // Fallback: try tr.tr__product directly in case table structure differs
+    const legacyRows = $('tr.tr__product')
+    console.log(`Fallback tr.tr__product count: ${legacyRows.length}`)
+    if (legacyRows.length > 0) {
+      console.log('\n=== FIRST ROW (tr.tr__product) OUTER HTML ===')
+      console.log($.html(legacyRows.first()))
     }
   }
-  console.log('=== END PROBE ===')
 }
 
 // ---------------------------------------------------------------------------
@@ -142,11 +149,14 @@ function parseHtml(html: string): PageResult {
   const $ = cheerio.load(html)
   const rows: Record<string, string>[] = []
 
-  $('tr.tr__product').each((_, tr) => {
+  // table.xs-col-12 is the confirmed product table selector
+  const tableRows = $('table.xs-col-12 tbody tr')
+  const selector = tableRows.length > 0 ? 'table.xs-col-12 tbody tr' : 'tr.tr__product'
+
+  $(selector).each((_, tr) => {
     const fields: Record<string, string> = {}
 
     $(tr).find('td').each((_, td) => {
-      // Identify the field by the td__* class on the cell
       const tdClass = ($(td).attr('class') ?? '')
         .split(/\s+/)
         .find(c => c.startsWith('td__'))
@@ -155,12 +165,10 @@ function parseHtml(html: string): PageResult {
       const key = tdClass.slice(4) // strip "td__"
 
       if (key === 'name') {
-        // Name lives in a nested <p> first, then first <a>, then raw text
-        const text =
+        fields[key] =
           $(td).find('p').first().text().trim() ||
           $(td).find('a').first().text().trim() ||
           $(td).text().trim()
-        fields[key] = text
       } else if (key === 'price') {
         const m = $(td).text().match(/\$([\d,]+\.?\d*)/)
         fields[key] = m ? m[1].replace(/,/g, '') : ''
@@ -173,8 +181,6 @@ function parseHtml(html: string): PageResult {
     if (fields['name']) rows.push(fields)
   })
 
-  // PCPartPicker marks the next-page button with class "next";
-  // disabled / absent means we are on the last page.
   const hasMore = $('.pagination .next:not(.disabled) a').length > 0
 
   return { rows, hasMore }
