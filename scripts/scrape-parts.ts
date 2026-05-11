@@ -109,24 +109,25 @@ async function runDebug(): Promise<void> {
   }
   console.log('=== END PROBE ===\n')
 
-  // Probe all tr variants to find where rows actually live
-  const variants: [string, number][] = [
-    ['table.xs-col-12 tbody tr', $('table.xs-col-12 tbody tr').length],
-    ['table.xs-col-12 tr',       $('table.xs-col-12 tr').length],
-    ['table.xs-col-12 > tr',     $('table.xs-col-12 > tr').length],
-  ]
-  console.log('=== TR VARIANT PROBE ===')
-  for (const [sel, count] of variants) {
-    console.log(`  ${sel.padEnd(32)} → ${count}`)
-  }
-  console.log('=== END TR VARIANT PROBE ===\n')
+  // Log first 2 product rows so we can confirm exact td__ class names
+  const rows = $('tr.tr__product')
+  console.log(`tr.tr__product count: ${rows.length}\n`)
 
-  // Log first 3000 chars of the table's own HTML so we can see the real structure
-  const tableEl = $('table.xs-col-12')
-  const tableHtml = $.html(tableEl)
-  console.log('=== table.xs-col-12 HTML (first 3000 chars) ===')
-  console.log(tableHtml.slice(0, 3000))
-  console.log('\n=== END TABLE HTML ===')
+  if (rows.length > 0) {
+    console.log('=== FIRST 2 ROW OUTER HTML ===')
+    rows.slice(0, 2).each((i, tr) => {
+      console.log(`\n--- Row ${i + 1} ---`)
+      console.log($.html(tr))
+    })
+    console.log('\n=== END ROW HTML ===\n')
+
+    const tdClasses: string[] = []
+    $(rows.get(0)!).find('td').each((_, td) => {
+      const cls = ($(td).attr('class') ?? '').split(/\s+/).find(c => c.startsWith('td__'))
+      if (cls) tdClasses.push(cls)
+    })
+    console.log(`First row td__ classes: ${tdClasses.join(', ') || '(none)'}`)
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -138,36 +139,37 @@ interface PageResult {
   hasMore: boolean
 }
 
+function toSnakeCase(label: string): string {
+  return label.toLowerCase().trim().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '')
+}
+
 function parseHtml(html: string): PageResult {
   const $ = cheerio.load(html)
   const rows: Record<string, string>[] = []
 
-  // table.xs-col-12 is the confirmed product table selector
-  const tableRows = $('table.xs-col-12 tbody tr')
-  const selector = tableRows.length > 0 ? 'table.xs-col-12 tbody tr' : 'tr.tr__product'
-
-  $(selector).each((_, tr) => {
+  $('tr.tr__product').each((_, tr) => {
     const fields: Record<string, string> = {}
 
     $(tr).find('td').each((_, td) => {
-      const tdClass = ($(td).attr('class') ?? '')
-        .split(/\s+/)
-        .find(c => c.startsWith('td__'))
-      if (!tdClass) return
+      const tdClasses = ($(td).attr('class') ?? '').split(/\s+/)
 
-      const key = tdClass.slice(4) // strip "td__"
-
-      if (key === 'name') {
-        fields[key] =
+      if (tdClasses.includes('td__name')) {
+        // Name is in <p> inside .td__nameWrapper; fall back to <a> text or raw cell text
+        fields['name'] =
+          $(td).find('.td__nameWrapper p').first().text().trim() ||
           $(td).find('p').first().text().trim() ||
           $(td).find('a').first().text().trim() ||
           $(td).text().trim()
-      } else if (key === 'price') {
+      } else if (tdClasses.includes('td__price')) {
         const m = $(td).text().match(/\$([\d,]+\.?\d*)/)
-        fields[key] = m ? m[1].replace(/,/g, '') : ''
-      } else {
-        const t = $(td).text().trim()
-        if (t) fields[key] = t
+        fields['price'] = m ? m[1].replace(/,/g, '') : ''
+      } else if (tdClasses.includes('td__spec')) {
+        // Spec label text → snake_case key; value = cell text minus the label
+        const label = $(td).find('h6.specLabel').text().trim()
+        if (!label) return
+        const key   = toSnakeCase(label)
+        const value = $(td).text().trim().replace(label, '').trim()
+        if (key && value) fields[key] = value
       }
     })
 
