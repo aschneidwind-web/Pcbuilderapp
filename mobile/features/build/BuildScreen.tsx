@@ -153,16 +153,18 @@ const s = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: spacing.section,
     paddingTop: spacing.page,
     paddingBottom: 8,
   },
   logoImg: {
-    width: 140,
-    height: 40,
+    width: 160,
+    height: 44,
   },
   headerPrice: {
+    position: 'absolute',
+    right: spacing.section,
     alignItems: 'flex-end',
   },
 
