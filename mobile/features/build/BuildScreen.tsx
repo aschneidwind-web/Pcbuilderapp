@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   View, Text, ScrollView, TextInput, TouchableOpacity,
-  StyleSheet, ActivityIndicator,
+  StyleSheet, ActivityIndicator, Image,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useBuild } from './BuildContext'
@@ -63,7 +63,7 @@ export function BuildScreen() {
       <ScrollView style={s.scroll} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={s.headerRow}>
-          <Text style={s.appName}>PartFlow</Text>
+          <Image source={require('../../assets/logo.png')} style={s.logoImg} resizeMode="contain" />
         </View>
 
         {/* Price summary */}
@@ -160,11 +160,9 @@ const s = StyleSheet.create({
     paddingTop: spacing.page,
     paddingBottom: 8,
   },
-  appName: {
-    fontSize: font.size.xxl,
-    fontWeight: font.weight.bold,
-    color: color.textPrimary,
-    letterSpacing: -0.5,
+  logoImg: {
+    width: 130,
+    height: 36,
   },
 
   subtitle: {
