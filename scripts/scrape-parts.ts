@@ -235,10 +235,16 @@ async function main(): Promise<void> {
   await fs.mkdir(DATA_DIR, { recursive: true })
 
   // --categories=gpu,storage,ram  → scrape only those slots
-  const categoryArg = process.argv.find(a => a.startsWith('--categories='))
-  const filterSlots = categoryArg
-    ? categoryArg.split('=')[1]!.split(',').map(s => s.trim()).filter(Boolean)
-    : null
+  // PowerShell splits "a,b,c" into separate argv items, so we also collect
+  // subsequent non-flag args to reconstruct the full list.
+  const catArgIdx = process.argv.findIndex(a => a.startsWith('--categories'))
+  let filterSlots: string[] | null = null
+  if (catArgIdx >= 0) {
+    const catArg = process.argv[catArgIdx]!
+    const afterEq = catArg.includes('=') ? catArg.split('=')[1]! : ''
+    const subsequent = process.argv.slice(catArgIdx + 1).filter(a => !a.startsWith('-'))
+    filterSlots = [...afterEq.split(','), ...subsequent].map(s => s.trim()).filter(Boolean)
+  }
 
   const allSlots = Object.keys(CATEGORIES)
   const slots = filterSlots
