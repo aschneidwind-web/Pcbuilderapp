@@ -20,6 +20,12 @@ export interface CatalogOption {
   tdp?: number
   coolerType?: 'air' | 'aio'
   sockets?: string[]
+  /** Raw UserBenchmark sample count. Higher = more popular. Used for default sort. */
+  samples?: number
+  /** Brand key for logo lookup (e.g. 'amd', 'intel', 'corsair'). Lowercase, no spaces. */
+  brand?: string
+  /** Optional per-part image URL (e.g. Supabase Storage). Takes precedence over brand logo. */
+  img?: string
 }
 
 export interface CatalogSlot {
