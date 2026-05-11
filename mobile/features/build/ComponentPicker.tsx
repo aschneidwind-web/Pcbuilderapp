@@ -1,13 +1,13 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
-  Modal, View, Text, TouchableOpacity, FlatList, StyleSheet,
+  Modal, View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Ionicons } from '@expo/vector-icons'
 import type { CatalogOption, CatalogSlot } from './build.types'
 import { color, font, radius, spacing } from '../../theme'
 
-type SortMode = 'default' | 'price_asc' | 'price_desc' | 'popular'
+type SortMode = 'popular' | 'price_asc' | 'price_desc' | 'performance'
 
 interface Props {
   slot: CatalogSlot
@@ -17,26 +17,39 @@ interface Props {
   onClear: () => void
 }
 
+function sortOptions(opts: CatalogOption[], mode: SortMode): CatalogOption[] {
+  const next = [...opts]
+  if (mode === 'price_asc')   return next.sort((a, b) => a.p - b.p)
+  if (mode === 'price_desc')  return next.sort((a, b) => b.p - a.p)
+  if (mode === 'performance') return next.sort((a, b) => (b.pm ?? 0) - (a.pm ?? 0))
+  // popular: samples desc, parts without samples fall to the bottom in catalog order
+  return next.sort((a, b) => (b.samples ?? -1) - (a.samples ?? -1))
+}
+
+function filterOptions(opts: CatalogOption[], query: string): CatalogOption[] {
+  const q = query.trim().toLowerCase()
+  if (!q) return opts
+  return opts.filter(o => o.n.toLowerCase().includes(q) || o.s.toLowerCase().includes(q))
+}
+
 export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: Props) {
-  const [sortMode, setSortMode] = useState<SortMode>('default')
+  const [sortMode, setSortMode] = useState<SortMode>('popular')
+  const [query, setQuery]       = useState('')
 
   const isPriceActive = sortMode === 'price_asc' || sortMode === 'price_desc'
+  const priceLabel    = sortMode === 'price_asc' ? 'Price ↑' : sortMode === 'price_desc' ? 'Price ↓' : 'Price'
 
-  let maxPtp = 0
-  for (const o of slot.opts) {
-    if (o.pm) {
+  const { visibleOpts, maxPtp } = useMemo(() => {
+    const filtered = filterOptions(slot.opts, query)
+    const sorted   = sortOptions(filtered, sortMode)
+    let max = 0
+    for (const o of sorted) {
+      if (!o.pm) continue
       const ptp = Math.round(o.pm / o.p)
-      if (ptp > maxPtp) maxPtp = ptp
+      if (ptp > max) max = ptp
     }
-  }
-
-  const sortedOpts = useMemo(() => {
-    const opts = [...slot.opts]
-    if (sortMode === 'price_asc')  return opts.sort((a, b) => a.p - b.p)
-    if (sortMode === 'price_desc') return opts.sort((a, b) => b.p - a.p)
-    if (sortMode === 'popular')    return opts.sort((a, b) => (b.pm ?? 0) - (a.pm ?? 0))
-    return opts
-  }, [slot.opts, sortMode])
+    return { visibleOpts: sorted, maxPtp: max }
+  }, [slot.opts, sortMode, query])
 
   const handleSelect = (opt: CatalogOption) => {
     if (selected?.n === opt.n) {
@@ -48,10 +61,8 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
   }
 
   const handlePriceChip = () => {
-    setSortMode(sortMode === 'price_asc' ? 'price_desc' : 'price_asc')
+    setSortMode(isPriceActive ? (sortMode === 'price_asc' ? 'price_desc' : 'price_asc') : 'price_asc')
   }
-
-  const priceLabel = sortMode === 'price_asc' ? 'Price ↑' : sortMode === 'price_desc' ? 'Price ↓' : 'Price'
 
   return (
     <Modal visible animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
@@ -64,14 +75,34 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
           <View style={{ width: 32 }} />
         </View>
 
+        <View style={s.searchWrap}>
+          <Ionicons name="search" size={16} color={color.textDim} style={s.searchIcon} />
+          <TextInput
+            style={s.searchInput}
+            value={query}
+            onChangeText={setQuery}
+            placeholder={`Search ${slot.label.toLowerCase()}…`}
+            placeholderTextColor={color.textDim}
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={() => setQuery('')} style={s.clearBtn} hitSlop={8}>
+              <Ionicons name="close-circle" size={16} color={color.textDim} />
+            </TouchableOpacity>
+          )}
+        </View>
+
         <View style={s.sortBar}>
           <TouchableOpacity
-            style={[s.sortChip, sortMode === 'default' && s.sortChipActive]}
-            onPress={() => setSortMode('default')}
+            style={[s.sortChip, sortMode === 'popular' && s.sortChipActive]}
+            onPress={() => setSortMode('popular')}
             activeOpacity={0.7}
           >
-            <Text style={[s.sortChipText, sortMode === 'default' && s.sortChipTextActive]}>
-              Default
+            <Text style={[s.sortChipText, sortMode === 'popular' && s.sortChipTextActive]}>
+              Popular
             </Text>
           </TouchableOpacity>
 
@@ -85,31 +116,28 @@ export function ComponentPicker({ slot, selected, onSelect, onClose, onClear }: 
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[s.sortChip, sortMode === 'popular' && s.sortChipActive]}
-            onPress={() => setSortMode('popular')}
-            activeOpacity={0.7}
-          >
-            <Text style={[s.sortChipText, sortMode === 'popular' && s.sortChipTextActive]}>
-              PassMark
-            </Text>
-          </TouchableOpacity>
+          {slot.hasPM && (
+            <TouchableOpacity
+              style={[s.sortChip, sortMode === 'performance' && s.sortChipActive]}
+              onPress={() => setSortMode('performance')}
+              activeOpacity={0.7}
+            >
+              <Text style={[s.sortChipText, sortMode === 'performance' && s.sortChipTextActive]}>
+                Performance
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        {sortMode === 'popular' && (
-          <Text style={s.sortCaption}>
-            PassMark scores measure raw CPU/GPU speed from PassMark's public benchmark suite.
-            Higher score = faster component.
-          </Text>
-        )}
-
-        {sortedOpts.length === 0 && (
-          <Text style={s.emptyText}>No parts available for this slot.</Text>
-        )}
-
         <FlatList
-          data={sortedOpts}
+          data={visibleOpts}
           keyExtractor={o => o.n}
+          keyboardShouldPersistTaps="handled"
+          ListEmptyComponent={
+            <View style={s.empty}>
+              <Text style={s.emptyText}>No matches for "{query}"</Text>
+            </View>
+          }
           renderItem={({ item: opt }) => {
             const ptp = opt.pm ? Math.round(opt.pm / opt.p) : null
             const isBestValue = ptp != null && ptp === maxPtp
@@ -167,20 +195,33 @@ const s = StyleSheet.create({
     fontWeight: font.weight.semibold,
     color: color.textPrimary,
   },
+
+  searchWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: spacing.page,
+    marginTop: 10,
+    marginBottom: 4,
+    paddingHorizontal: 10,
+    backgroundColor: color.bgHover,
+    borderRadius: radius.md,
+    borderWidth: 0.5,
+    borderColor: color.borderSubtle,
+  },
+  searchIcon: { marginRight: 6 },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 8,
+    fontSize: font.size.body,
+    color: color.textPrimary,
+  },
+  clearBtn: { padding: 4 },
+
   sortBar: {
     flexDirection: 'row',
     gap: 8,
     paddingHorizontal: spacing.page,
     paddingVertical: 10,
-    borderBottomWidth: 0.5,
-    borderBottomColor: color.borderFaint,
-  },
-  sortCaption: {
-    fontSize: font.size.xs,
-    color: color.textDim,
-    paddingHorizontal: spacing.page,
-    paddingTop: 8,
-    paddingBottom: 6,
     borderBottomWidth: 0.5,
     borderBottomColor: color.borderFaint,
   },
@@ -204,6 +245,10 @@ const s = StyleSheet.create({
   sortChipTextActive: {
     color: color.primaryLight,
   },
+
+  empty: { paddingVertical: 40, alignItems: 'center' },
+  emptyText: { fontSize: font.size.body, color: color.textDim },
+
   optRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -243,11 +288,4 @@ const s = StyleSheet.create({
   optPts: { fontSize: font.size.sm, color: color.textDim },
   selIndicator: { alignItems: 'center', gap: 2 },
   tapRemove: { fontSize: font.size.xs, color: color.textDim },
-  emptyText: {
-    fontSize: font.size.body,
-    color: color.textDim,
-    textAlign: 'center',
-    marginTop: 48,
-    paddingHorizontal: spacing.page,
-  },
 })
